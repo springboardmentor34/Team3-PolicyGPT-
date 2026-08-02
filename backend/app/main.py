@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from app.routers import policy, scheme, notification
-
+from app.routers import policy, scheme, notification, auth
 
 
 app = FastAPI(
@@ -12,7 +11,7 @@ app = FastAPI(
 app.include_router(policy.router)
 app.include_router(scheme.router)
 app.include_router(notification.router)
-
+app.include_router(auth.router)
 
 @app.get("/")
 def root():
