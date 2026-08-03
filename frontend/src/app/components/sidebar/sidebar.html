@@ -1,0 +1,11 @@
+<aside class="pg-sidebar">
+  <h4 class="pg-sidebar__title">{{ title }}</h4>
+  <mat-nav-list class="pg-sidebar__list">
+    @for (link of links; track link.path) {
+      <a mat-list-item [routerLink]="link.path" routerLinkActive="active" class="pg-sidebar__link">
+        <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+        <span matListItemTitle>{{ link.label }}</span>
+      </a>
+    }
+  </mat-nav-list>
+</aside>

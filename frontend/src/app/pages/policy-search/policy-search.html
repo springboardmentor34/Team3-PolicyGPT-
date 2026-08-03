@@ -1,0 +1,655 @@
+<div class="policy-search-page">
+
+  <!-- ================= NAVBAR ================= -->
+
+  <header class="top-navbar">
+
+    <div class="logo-section">
+
+      <div class="logo-box">
+        <mat-icon>shield</mat-icon>
+      </div>
+
+      <div class="logo-text">
+
+        <h2>PolicyGPT</h2>
+
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+
+      </div>
+
+    </div>
+
+    <!-- Search -->
+
+    <div class="search-section">
+
+      <mat-form-field appearance="outline" class="nav-search">
+
+        <mat-icon matPrefix>search</mat-icon>
+
+        <input
+          matInput
+          [(ngModel)]="search"
+          (keyup)="applyFilters()"
+          placeholder="Search schemes, policies or eligibility criteria...">
+
+      </mat-form-field>
+
+    </div>
+
+    <!-- Right -->
+
+    <div class="nav-right">
+
+      
+
+      <div class="profile">
+
+        <div class="avatar">
+
+          {{userName.charAt(0)}}
+
+        </div>
+
+        <div class="profile-info">
+
+          <h4>{{userName}}</h4>
+
+          <span>Verified Citizen</span>
+
+        </div>
+
+      </div>
+
+      <button
+        mat-raised-button
+        class="logout-btn">
+
+        Logout
+
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- ================= CONTENT ================= -->
+
+  <div class="page-content">
+
+    <div class="page-title">
+
+      <h1>Policy Search</h1>
+
+      <p>
+
+        Browse and filter government policies and public schemes across ministries,
+        categories and states.
+
+      </p>
+
+    </div>
+
+    <!-- ================= SEARCH CARD ================= -->
+
+    <mat-card class="search-card">
+
+      <div class="search-row">
+
+        <mat-form-field
+          appearance="outline"
+          class="search-box">
+
+          <mat-icon matPrefix>
+
+            search
+
+          </mat-icon>
+
+          <input
+            matInput
+            [(ngModel)]="search"
+            (keyup)="applyFilters()"
+            placeholder="Search by policy name, ministry, scheme or keyword...">
+
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="search-btn"
+          (click)="searchPolicies()">
+
+          <mat-icon>
+
+            search
+
+          </mat-icon>
+
+          Search
+
+        </button>
+
+      </div>
+
+      <!-- ================= ACTIVE FILTERS ================= -->
+
+      <div class="active-filters">
+
+        <span>Active Filters :</span>
+
+        <div
+          class="chip"
+          *ngIf="categoryAgriculture">
+
+          Agriculture
+
+          <mat-icon
+            (click)="categoryAgriculture=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="categoryHealth">
+
+          Health
+
+          <mat-icon
+            (click)="categoryHealth=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="categoryEducation">
+
+          Education
+
+          <mat-icon
+            (click)="categoryEducation=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+                <div
+          class="chip"
+          *ngIf="categoryEmployment">
+
+          Employment
+
+          <mat-icon
+            (click)="categoryEmployment=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="categoryHousing">
+
+          Housing
+
+          <mat-icon
+            (click)="categoryHousing=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="stateTamilNadu">
+
+          Tamil Nadu
+
+          <mat-icon
+            (click)="stateTamilNadu=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="stateKarnataka">
+
+          Karnataka
+
+          <mat-icon
+            (click)="stateKarnataka=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="stateAllIndia">
+
+          All India
+
+          <mat-icon
+            (click)="stateAllIndia=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="eligibleOnly">
+
+          Eligible Only
+
+          <mat-icon
+            (click)="eligibleOnly=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <a
+          class="clear-link"
+          (click)="clearAllFilters()">
+
+          Clear All
+
+        </a>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= MAIN LAYOUT ================= -->
+
+    <div class="main-layout">
+
+      <!-- ================= FILTER CARD ================= -->
+
+      <mat-card class="filter-card">
+
+        <h3>CATEGORY</h3>
+
+        <mat-checkbox
+          [(ngModel)]="categoryAgriculture"
+          (change)="applyFilters()">
+
+          Agriculture
+
+          <span class="count">42</span>
+
+        </mat-checkbox>
+
+        <mat-checkbox
+          [(ngModel)]="categoryHealth"
+          (change)="applyFilters()">
+
+          Health
+
+          <span class="count">31</span>
+
+        </mat-checkbox>
+
+        <mat-checkbox
+          [(ngModel)]="categoryEducation"
+          (change)="applyFilters()">
+
+          Education
+
+          <span class="count">27</span>
+
+        </mat-checkbox>
+
+        <mat-checkbox
+          [(ngModel)]="categoryEmployment"
+          (change)="applyFilters()">
+
+          Employment
+
+          <span class="count">18</span>
+
+        </mat-checkbox>
+
+        <mat-checkbox
+          [(ngModel)]="categoryHousing"
+          (change)="applyFilters()">
+
+          Housing
+
+          <span class="count">15</span>
+
+        </mat-checkbox>
+
+        <hr>
+
+        <!-- ================= STATE ================= -->
+
+        <h3>STATE</h3>
+
+        <mat-checkbox
+          [(ngModel)]="stateTamilNadu"
+          (change)="applyFilters()">
+
+          Tamil Nadu
+
+          <span class="count">64</span>
+
+        </mat-checkbox>
+
+        <mat-checkbox
+          [(ngModel)]="stateKarnataka"
+          (change)="applyFilters()">
+
+          Karnataka
+
+          <span class="count">51</span>
+
+        </mat-checkbox>
+
+        <mat-checkbox
+          [(ngModel)]="stateAllIndia"
+          (change)="applyFilters()">
+
+          All India
+
+          <span class="count">92</span>
+
+        </mat-checkbox>
+
+        <hr>
+
+        <!-- ================= INCOME ================= -->
+
+        <h3>ANNUAL INCOME LIMIT</h3>
+
+        <mat-slider
+          min="0"
+          max="500000"
+          step="10000">
+
+          <input
+            matSliderThumb
+            [(ngModel)]="selectedIncome"
+            (ngModelChange)="applyFilters()">
+
+        </mat-slider>
+
+        <div class="income-label">
+
+          <span>₹0</span>
+
+          <span>₹5,00,000+</span>
+
+        </div>
+
+        <hr>
+
+        <!-- ================= STATUS ================= -->
+
+        <h3>STATUS</h3>
+
+        <mat-checkbox
+          [(ngModel)]="eligibleOnly"
+          (change)="applyFilters()">
+
+          Eligible for me
+
+        </mat-checkbox>
+
+        <mat-checkbox
+          [(ngModel)]="currentlyOpen"
+          (change)="applyFilters()">
+
+          Currently Open
+
+        </mat-checkbox>
+
+        <button
+          mat-stroked-button
+          class="reset-btn"
+          (click)="resetFilters()">
+
+          Reset Filters
+
+        </button>
+
+      </mat-card>
+
+      <!-- ================= RESULTS SECTION ================= -->
+
+      <div class="results-section">
+                <!-- ================= RESULTS HEADER ================= -->
+
+        <div class="results-header">
+
+          <h3>
+
+            {{filteredSchemes.length}} Results Found
+
+          </h3>
+
+          <mat-form-field
+            appearance="outline"
+            class="sort-box">
+
+            <mat-select
+              [(ngModel)]="selectedSort"
+              (selectionChange)="sortSchemes()">
+
+              <mat-option value="Most Relevant">
+
+                Most Relevant
+
+              </mat-option>
+
+              <mat-option value="Newest">
+
+                Newest
+
+              </mat-option>
+
+              <mat-option value="Deadline">
+
+                Deadline
+
+              </mat-option>
+
+            </mat-select>
+
+          </mat-form-field>
+
+        </div>
+
+        <!-- ================= SCHEME CARDS ================= -->
+
+        <mat-card
+          class="scheme-card"
+          *ngFor="let scheme of displayedSchemes">
+
+          <div class="card-top">
+
+            <div class="left-top">
+
+              <div class="scheme-icon">
+
+                <mat-icon>
+
+                  {{scheme.icon}}
+
+                </mat-icon>
+
+              </div>
+
+              <span class="category-tag">
+
+                {{scheme.category}}
+
+              </span>
+
+            </div>
+
+            <div
+              class="status-badge"
+              [ngClass]="scheme.statusColor">
+
+              {{scheme.status}}
+
+            </div>
+
+          </div>
+
+          <h2>
+
+            {{scheme.title}}
+
+          </h2>
+
+          <p class="description">
+
+            {{scheme.description}}
+
+          </p>
+
+          <div class="card-footer">
+
+            <div class="info">
+
+              <mat-icon>
+
+                calendar_today
+
+              </mat-icon>
+
+              <span>
+
+                {{scheme.deadline}}
+
+              </span>
+
+            </div>
+
+            <div class="info">
+
+              <mat-icon>
+
+                account_balance
+
+              </mat-icon>
+
+              <span>
+
+                {{scheme.ministry}}
+
+              </span>
+
+            </div>
+
+            <div class="info">
+
+              <mat-icon>
+
+                location_on
+
+              </mat-icon>
+
+              <span>
+
+                {{scheme.state}}
+
+              </span>
+
+            </div>
+
+            <a
+              class="view-btn"
+              [routerLink]="['/policy-details', scheme.id]">
+
+              View Details →
+
+            </a>
+
+          </div>
+
+        </mat-card>
+
+        <!-- ================= END OF SCHEME LIST ================= -->
+                 <!-- ================= PAGINATION ================= -->
+
+        <div class="pagination">
+
+          <!-- Previous -->
+
+          <button
+            mat-icon-button
+            (click)="previousPage()"
+            [disabled]="currentPage===1">
+
+            <mat-icon>
+
+              chevron_left
+
+            </mat-icon>
+
+          </button>
+
+          <!-- Page Numbers -->
+
+          <button
+            *ngFor="let page of pageNumbers"
+            mat-raised-button
+            [color]="currentPage===page ? 'primary' : ''"
+            (click)="goToPage(page)">
+
+            {{page}}
+
+          </button>
+
+          <!-- Next -->
+
+          <button
+            mat-icon-button
+            (click)="nextPage()"
+            [disabled]="currentPage===pageNumbers.length">
+
+            <mat-icon>
+
+              chevron_right
+
+            </mat-icon>
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

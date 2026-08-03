@@ -1,0 +1,579 @@
+<div class="government-dashboard">
+
+  <!-- ================= NAVBAR ================= -->
+
+  <header class="top-navbar">
+
+    <div class="logo-section">
+
+      <div class="logo-box">
+        <mat-icon>account_balance</mat-icon>
+      </div>
+
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>Government Portal</span>
+      </div>
+
+    </div>
+
+    <div class="search-section">
+
+      <mat-form-field appearance="outline" class="search-field">
+
+        <mat-icon matPrefix>search</mat-icon>
+
+        <input
+          matInput
+          placeholder="Search schemes, applications...">
+
+      </mat-form-field>
+
+    </div>
+
+    <div class="nav-right">
+
+      <button mat-icon-button class="icon-btn">
+
+        <mat-icon>notifications</mat-icon>
+
+        <span class="badge">5</span>
+
+      </button>
+
+      <div class="profile">
+
+        <div class="avatar">
+
+          G
+
+        </div>
+
+        <div class="profile-info">
+
+          <h4>Government Officer</h4>
+
+          <span>Administrator</span>
+
+        </div>
+
+      </div>
+
+      <button
+        mat-raised-button
+        class="logout-btn">
+
+        Logout
+
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- ================= CONTENT ================= -->
+
+  <div class="dashboard-content">
+
+    <div class="welcome-section">
+
+      <h1>
+
+        Government Dashboard
+
+      </h1>
+
+      <p>
+
+        Monitor applications, manage schemes and view analytics from one place.
+
+      </p>
+
+    </div>
+
+    <!-- ================= SUMMARY CARDS ================= -->
+
+    <div class="stats-grid">
+
+      <mat-card class="stat-card blue">
+
+        <mat-icon>description</mat-icon>
+
+        <h2>52</h2>
+
+        <p>Total Schemes</p>
+
+      </mat-card>
+
+      <mat-card class="stat-card green">
+
+        <mat-icon>assignment</mat-icon>
+
+        <h2>18,245</h2>
+
+        <p>Total Applications</p>
+
+      </mat-card>
+
+      <mat-card class="stat-card orange">
+
+        <mat-icon>pending_actions</mat-icon>
+
+        <h2>463</h2>
+
+        <p>Pending Review</p>
+
+      </mat-card>
+
+      <mat-card class="stat-card purple">
+
+        <mat-icon>check_circle</mat-icon>
+
+        <h2>17,120</h2>
+
+        <p>Approved</p>
+
+      </mat-card>
+
+    </div>
+
+    <!-- ================= MAIN GRID ================= -->
+
+    <div class="dashboard-grid">
+
+      <!-- ================= LEFT PANEL ================= -->
+
+<div class="left-panel">
+
+  <!-- Analytics -->
+
+  <mat-card class="dashboard-card">
+
+    <div class="card-header">
+
+      <h2>Applications Overview</h2>
+
+      <button mat-button color="primary">
+        View Report
+      </button>
+
+    </div>
+
+    <div class="chart-placeholder">
+
+      <mat-icon>bar_chart</mat-icon>
+
+      <h3>Monthly Applications</h3>
+
+      <p>Chart integration (Chart.js / ApexCharts) will appear here.</p>
+
+    </div>
+
+  </mat-card>
+
+  <!-- Recent Applications -->
+
+  <mat-card class="dashboard-card">
+
+    <div class="card-header">
+
+      <h2>Recent Applications</h2>
+
+      <button mat-button color="primary">
+
+        View All
+
+      </button>
+
+    </div>
+
+    <table class="applications-table">
+
+      <thead>
+
+      <tr>
+
+        <th>Applicant</th>
+
+        <th>Scheme</th>
+
+        <th>Status</th>
+
+        <th>Date</th>
+
+        <th>Action</th>
+
+      </tr>
+
+      </thead>
+
+      <tbody>
+
+      <tr>
+
+        <td>Ravi Kumar</td>
+
+        <td>PM Kisan</td>
+
+        <td>
+
+          <span class="status approved">
+
+            Approved
+
+          </span>
+
+        </td>
+
+        <td>02 Aug 2026</td>
+
+        <td>
+
+          <button
+          mat-stroked-button>
+
+            View
+
+          </button>
+
+        </td>
+
+      </tr>
+
+      <tr>
+
+        <td>Priya</td>
+
+        <td>PMAY</td>
+
+        <td>
+
+          <span class="status pending">
+
+            Pending
+
+          </span>
+
+        </td>
+
+        <td>01 Aug 2026</td>
+
+        <td>
+
+          <button
+          mat-stroked-button>
+
+            Review
+
+          </button>
+
+        </td>
+
+      </tr>
+
+      <tr>
+
+        <td>Arjun</td>
+
+        <td>Scholarship</td>
+
+        <td>
+
+          <span class="status review">
+
+            Under Review
+
+          </span>
+
+        </td>
+
+        <td>31 Jul 2026</td>
+
+        <td>
+
+          <button
+          mat-stroked-button>
+
+            View
+
+          </button>
+
+        </td>
+
+      </tr>
+
+      </tbody>
+
+    </table>
+
+  </mat-card>
+
+</div>
+
+<!-- ================= RIGHT PANEL ================= -->
+
+<div class="right-panel">
+
+  <!-- Quick Actions -->
+
+  <mat-card class="dashboard-card">
+
+    <h2>
+
+      Quick Actions
+
+    </h2>
+
+    <div class="action-grid">
+
+      <button
+      mat-raised-button
+      color="primary">
+
+        <mat-icon>
+
+          add_circle
+
+        </mat-icon>
+
+        Add Scheme
+
+      </button>
+
+      <button
+      mat-raised-button
+      color="accent">
+
+        <mat-icon>
+
+          edit_note
+
+        </mat-icon>
+
+        Manage Schemes
+
+      </button>
+
+      <button
+      mat-raised-button>
+
+        <mat-icon>
+
+          groups
+
+        </mat-icon>
+
+        Manage Users
+
+      </button>
+
+      <button
+      mat-raised-button>
+
+        <mat-icon>
+
+          analytics
+
+        </mat-icon>
+
+        Reports
+
+      </button>
+
+    </div>
+
+  </mat-card>
+  <!-- ================= LATEST NOTIFICATIONS ================= -->
+
+<mat-card class="dashboard-card">
+
+  <h2>
+
+    Latest Notifications
+
+  </h2>
+
+  <div class="notification-item">
+
+    <mat-icon class="green">
+
+      check_circle
+
+    </mat-icon>
+
+    <div>
+
+      <h4>
+
+        PM Kisan applications approved
+
+      </h4>
+
+      <p>
+
+        125 applications approved today.
+
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="notification-item">
+
+    <mat-icon class="orange">
+
+      warning
+
+    </mat-icon>
+
+    <div>
+
+      <h4>
+
+        Pending document verification
+
+      </h4>
+
+      <p>
+
+        63 applications require document verification.
+
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="notification-item">
+
+    <mat-icon class="blue">
+
+      campaign
+
+    </mat-icon>
+
+    <div>
+
+      <h4>
+
+        New scheme published
+
+      </h4>
+
+      <p>
+
+        Skill India Digital scheme is now live.
+
+      </p>
+
+    </div>
+
+  </div>
+
+</mat-card>
+
+<!-- ================= UPCOMING DEADLINES ================= -->
+
+<mat-card class="dashboard-card">
+
+  <h2>
+
+    Upcoming Deadlines
+
+  </h2>
+
+  <div class="deadline-item">
+
+    <div>
+
+      <h4>
+
+        PM Kisan Registration
+
+      </h4>
+
+      <span>
+
+        Last Date: 30 Sep 2026
+
+      </span>
+
+    </div>
+
+    <button
+    mat-stroked-button>
+
+      View
+
+    </button>
+
+  </div>
+
+  <div class="deadline-item">
+
+    <div>
+
+      <h4>
+
+        National Scholarship Portal
+
+      </h4>
+
+      <span>
+
+        Last Date: 15 Oct 2026
+
+      </span>
+
+    </div>
+
+    <button
+    mat-stroked-button>
+
+      View
+
+    </button>
+
+  </div>
+
+  <div class="deadline-item">
+
+    <div>
+
+      <h4>
+
+        PMAY Scheme
+
+      </h4>
+
+      <span>
+
+        Last Date: 10 Nov 2026
+
+      </span>
+
+    </div>
+
+    <button
+    mat-stroked-button>
+
+      View
+
+    </button>
+
+  </div>
+
+</mat-card>
+
+</div>
+
+<!-- ================= END RIGHT PANEL ================= -->
+
+</div>
+
+<!-- ================= END GRID ================= -->
+
+</div>
+
+</div>

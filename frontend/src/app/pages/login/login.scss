@@ -1,0 +1,384 @@
+/* =========================================================
+   PolicyGPT Login Page
+   ========================================================= */
+
+html,
+body{
+  margin:0;
+  padding:0;
+  height:100%;
+  overflow:hidden;
+  font-family:'Inter',sans-serif;
+  background:#F4F7FB;
+}
+
+.login-page{
+  display:flex;
+  width:100%;
+  height:calc(100vh - 64px);
+  background:#F4F7FB;
+  overflow:hidden;
+}
+
+/* ================= LEFT ================= */
+
+.login-left{
+  width:40%;
+  background:linear-gradient(180deg,#173E73 0%,#21549C 100%);
+  padding:40px;
+  color:#fff;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.brand-logo{
+  width:64px;
+  height:64px;
+  border-radius:14px;
+  background:rgba(255,255,255,.12);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.brand-logo mat-icon{
+  color:#ffffff;
+  font-size:36px;
+  width:36px;
+  height:36px;
+}
+
+.brand h2{
+  margin:0;
+  font-size:26px;
+  font-family:'Poppins',sans-serif;
+  font-weight:700;
+  color:#ffffff;
+}
+
+.brand span{
+  display:block;
+  margin-top:2px;
+  font-size:11px;
+  letter-spacing:.4px;
+  color:#D6E4FF;
+}
+
+.left-content{
+  margin-top:28px;
+}
+
+.left-content h1{
+    color: #FFFFFF !important;
+    font-family: 'Poppins', sans-serif;
+    font-size: 33px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 20px;
+}
+
+.left-content p{
+    color: #D6E4FF !important;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 30px;
+}
+
+.feature{
+  display:flex;
+  align-items:center;
+  gap:16px;
+
+  padding:14px 16px;
+  margin-bottom:14px;
+
+  border-radius:12px;
+  background:rgba(255,255,255,.08);
+}
+
+.feature-icon{
+
+  width:42px;
+  height:42px;
+
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
+
+  border:1px solid rgba(255,255,255,.15);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.feature-icon mat-icon{
+  color:#86EFAC;
+  font-size:22px;
+}
+
+.feature span{
+  color:#fff;
+  font-size:15px;
+  font-weight:500;
+  line-height:1.35;
+}
+
+.copyright{
+  margin-top:18px;
+  color:rgba(255,255,255,.55);
+  font-size:12px;
+}
+
+/* ================= RIGHT ================= */
+
+.login-right{
+  width:60%;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  background:#F4F7FB;
+}
+
+.login-box{
+  width:480px;
+}
+
+.login-box h1{
+
+  margin:0;
+
+  text-align:center;
+
+  font-family:Poppins,sans-serif;
+  font-size:38px;
+  font-weight:700;
+
+  color:#111827;
+}
+
+.subtitle{
+
+  margin-top:10px;
+  margin-bottom:45px;
+
+  text-align:center;
+
+  color:#64748B;
+
+  font-size:18px;
+}
+
+.full-width{
+  width:100%;
+  margin-bottom:24px;
+}
+
+.login-options{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin:12px 0 28px;
+}
+
+.login-options a{
+  text-decoration:none;
+  color:#2563EB;
+  font-size:14px;
+}
+
+.login-options a:hover{
+  text-decoration:underline;
+}
+
+.login-btn{
+
+  width:100%;
+  height:54px!important;
+
+  border-radius:12px!important;
+
+  background:#1E4D8F!important;
+
+  color:#fff!important;
+
+  font-size:19px!important;
+  font-weight:600!important;
+}
+
+.divider{
+
+  display:flex;
+  align-items:center;
+
+  margin:28px 0;
+}
+
+.divider::before,
+.divider::after{
+
+  content:"";
+
+  flex:1;
+
+  height:1px;
+
+  background:#CBD5E1;
+}
+
+.divider span{
+
+  padding:0 18px;
+
+  color:#94A3B8;
+
+  font-size:14px;
+}
+
+.digilocker-btn{
+
+  width:100%;
+  height:52px!important;
+
+  border-radius:12px!important;
+
+  background:#fff;
+}
+
+.register{
+
+  margin-top:24px;
+
+  text-align:center;
+
+  color:#64748B;
+
+  font-size:14px;
+}
+
+.register a{
+
+  color:#2563EB;
+
+  font-weight:600;
+
+  text-decoration:none;
+}
+
+.register a:hover{
+  text-decoration:underline;
+}
+
+/* ================= MATERIAL ================= */
+
+::ng-deep .mat-mdc-form-field{
+
+  width:100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper{
+
+  height:50px!important;
+
+  border-radius:12px!important;
+}
+
+::ng-deep .mdc-text-field{
+
+  background:white!important;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper{
+  display:none;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1000px){
+
+.login-left{
+
+  width:42%;
+  padding:28px;
+}
+
+.left-content h1{
+  font-size:34px;
+}
+
+.left-content p{
+  font-size:15px;
+}
+
+.feature{
+  padding:12px;
+}
+
+.login-right{
+  width:58%;
+}
+
+.login-box{
+  width:420px;
+}
+
+}
+
+@media(max-width:768px){
+
+.login-left{
+  display:none;
+}
+
+.login-right{
+  width:100%;
+  padding:30px;
+}
+
+.login-box{
+  width:100%;
+  max-width:450px;
+}
+
+.login-box h1{
+  font-size:34px;
+}
+
+.subtitle{
+  font-size:16px;
+}
+
+}
+/* Heading above input */
+
+.input-heading{
+    display:block;
+    margin-bottom:8px;
+    margin-left:2px;
+
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    font-weight:500;
+
+    color:#111827;
+}
+
+/* Placeholder */
+
+.mat-mdc-input-element::placeholder{
+    color:#94A3B8 !important;
+    opacity:1;
+    font-size:15px;
+}

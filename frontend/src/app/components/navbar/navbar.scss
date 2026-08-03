@@ -1,0 +1,111 @@
+.pg-navbar {
+  background: var(--pg-white) !important;
+  color: var(--pg-text) !important;
+  box-shadow: 0 2px 8px rgba(11, 79, 138, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0;
+  height: 64px;
+}
+
+.pg-navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pg-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--pg-font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--pg-primary-dark);
+
+  &:hover { text-decoration: none; }
+
+  &__icon {
+    color: var(--pg-primary);
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+  }
+
+  &__accent { color: var(--pg-primary); }
+}
+
+.pg-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+.pg-nav-link {
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: var(--pg-text);
+  font-weight: 500;
+  font-size: 0.92rem;
+
+  &:hover {
+    background: var(--pg-primary-light);
+    color: var(--pg-primary);
+    text-decoration: none;
+  }
+
+  &.active {
+    color: var(--pg-primary);
+    background: var(--pg-primary-light);
+    font-weight: 600;
+  }
+}
+
+.pg-navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .pg-btn-outline {
+    border-color: var(--pg-primary);
+    color: var(--pg-primary);
+    @media (max-width: 768px) { display: none; }
+  }
+
+  .pg-btn-primary {
+    background: var(--pg-primary) !important;
+    color: #fff !important;
+    @media (max-width: 768px) { display: none; }
+  }
+}
+
+.pg-menu-toggle {
+  display: none;
+  @media (max-width: 992px) { display: inline-flex; }
+}
+
+.pg-mobile-menu {
+  display: none;
+  @media (max-width: 992px) {
+    display: flex;
+    flex-direction: column;
+    background: var(--pg-white);
+    border-top: 1px solid var(--pg-border);
+    padding: 8px 16px 16px;
+
+    a {
+      padding: 10px 4px;
+      color: var(--pg-text);
+      border-bottom: 1px solid var(--pg-border);
+
+      &.active { color: var(--pg-primary); font-weight: 600; }
+      &:hover { color: var(--pg-primary); text-decoration: none; }
+    }
+  }
+}

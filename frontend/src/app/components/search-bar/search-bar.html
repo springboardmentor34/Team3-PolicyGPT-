@@ -1,0 +1,19 @@
+<div class="pg-search-bar">
+  <mat-icon class="pg-search-bar__icon">search</mat-icon>
+  <input
+    class="pg-search-bar__input"
+    type="text"
+    [(ngModel)]="query"
+    [placeholder]="placeholder"
+    (keyup)="onKeyUp($event)"
+    aria-label="Search"
+  />
+  @if (query) {
+    <button mat-icon-button (click)="onClear()" aria-label="Clear search">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+  <button mat-raised-button class="pg-search-bar__btn" (click)="onSearch()">
+    Search
+  </button>
+</div>

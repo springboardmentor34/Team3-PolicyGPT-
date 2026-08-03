@@ -1,0 +1,475 @@
+/* ================= PAGE ================= */
+
+.policy-details-page{
+min-height:100vh;
+background:#F5F7FB;
+padding:30px;
+font-family:'Inter',sans-serif;
+}
+
+/* ================= BREADCRUMB ================= */
+
+.breadcrumb{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:14px;
+margin-bottom:25px;
+color:#6B7280;
+}
+
+.breadcrumb a{
+text-decoration:none;
+color:#2563EB;
+font-weight:500;
+}
+
+.breadcrumb .current{
+color:#111827;
+font-weight:600;
+}
+
+/* ================= HERO ================= */
+
+.hero-banner{
+background:linear-gradient(135deg,#2563EB,#0F4C97);
+border-radius:22px;
+padding:45px;
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+color:white;
+margin-bottom:35px;
+box-shadow:0 12px 30px rgba(37,99,235,.20);
+}
+
+.banner-left{
+width:75%;
+}
+
+.policy-badge{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:8px 18px;
+background:rgba(255,255,255,.15);
+border-radius:25px;
+font-size:14px;
+margin-bottom:20px;
+}
+
+.policy-badge mat-icon{
+font-size:20px;
+width:20px;
+height:20px;
+}
+
+.hero-banner h1{
+font-size:42px;
+font-weight:700;
+margin-bottom:20px;
+line-height:1.2;
+}
+
+.hero-banner p{
+font-size:16px;
+line-height:1.8;
+color:#E5E7EB;
+max-width:750px;
+}
+
+/* ================= BUTTONS ================= */
+
+.action-buttons{
+display:flex;
+gap:15px;
+margin:30px 0;
+}
+
+.apply-btn{
+height:48px;
+padding:0 25px;
+border-radius:10px;
+font-weight:600;
+}
+
+.save-btn{
+height:48px;
+padding:0 25px;
+border-radius:10px;
+background:white;
+}
+
+/* ================= STATS ================= */
+
+.banner-stats{
+display:flex;
+gap:25px;
+margin-top:30px;
+}
+
+.stat{
+background:rgba(255,255,255,.12);
+padding:18px;
+border-radius:14px;
+min-width:150px;
+}
+
+.stat h3{
+margin:0;
+font-size:24px;
+font-weight:700;
+}
+
+.stat span{
+font-size:13px;
+color:#E5E7EB;
+}
+
+/* ================= ELIGIBLE BADGE ================= */
+
+.banner-right{
+display:flex;
+align-items:flex-start;
+}
+
+.eligible-badge{
+background:#DCFCE7;
+color:#15803D;
+padding:14px 22px;
+border-radius:30px;
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:600;
+font-size:16px;
+}
+/* ================= LAYOUT ================= */
+
+.details-layout{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:30px;
+align-items:start;
+}
+
+.left-content,
+.right-content{
+display:flex;
+flex-direction:column;
+gap:25px;
+}
+
+/* ================= CARDS ================= */
+
+.info-card,
+.side-card{
+padding:25px;
+border-radius:18px !important;
+box-shadow:0 8px 20px rgba(0,0,0,.06)!important;
+background:#fff;
+}
+
+.card-title{
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:20px;
+}
+
+.card-title mat-icon{
+color:#2563EB;
+}
+
+.card-title h2{
+margin:0;
+font-size:24px;
+font-weight:700;
+color:#111827;
+}
+
+/* ================= OVERVIEW ================= */
+
+.info-card p{
+font-size:15px;
+line-height:1.8;
+color:#4B5563;
+}
+
+/* ================= ELIGIBILITY ================= */
+
+.criteria-item{
+display:flex;
+align-items:flex-start;
+gap:15px;
+margin-bottom:18px;
+}
+
+.criteria-item mat-icon{
+margin-top:2px;
+}
+
+.criteria-item span{
+font-size:15px;
+line-height:1.7;
+color:#374151;
+}
+
+/* ================= DOCUMENTS ================= */
+
+.document-item{
+display:flex;
+align-items:center;
+gap:18px;
+padding:12px 0;
+}
+
+.document-icon{
+width:48px;
+height:48px;
+border-radius:12px;
+background:#EFF6FF;
+display:flex;
+justify-content:center;
+align-items:center;
+color:#2563EB;
+}
+
+.document-item h4{
+margin:0;
+font-size:16px;
+font-weight:600;
+}
+
+.document-item p{
+margin:5px 0 0;
+font-size:14px;
+color:#6B7280;
+}
+
+.info-card hr{
+border:none;
+height:1px;
+background:#E5E7EB;
+margin:12px 0;
+}
+
+/* ================= FAQ ================= */
+
+.faq-item{
+display:flex;
+align-items:center;
+gap:12px;
+padding:16px 0;
+cursor:pointer;
+transition:.3s;
+}
+
+.faq-item:hover{
+color:#2563EB;
+padding-left:8px;
+}
+
+.faq-item mat-icon{
+color:#2563EB;
+}
+/* ================= APPLICATION STATUS ================= */
+
+.status-item{
+display:flex;
+align-items:center;
+gap:12px;
+padding:12px 0;
+font-size:15px;
+color:#6B7280;
+}
+
+.status-item.completed{
+color:#16A34A;
+font-weight:600;
+}
+
+.status-item.completed mat-icon{
+color:#16A34A;
+}
+
+.status-item.active{
+color:#2563EB;
+font-weight:600;
+}
+
+.status-item.active mat-icon{
+color:#2563EB;
+}
+
+.continue-btn{
+width:100%;
+margin-top:20px;
+height:48px;
+font-weight:600;
+border-radius:10px;
+}
+
+/* ================= MINISTRY DETAILS ================= */
+
+.detail-row{
+display:flex;
+justify-content:space-between;
+padding:12px 0;
+border-bottom:1px solid #E5E7EB;
+}
+
+.detail-row:last-child{
+border-bottom:none;
+}
+
+.detail-row span{
+color:#6B7280;
+font-size:14px;
+}
+
+.detail-row strong{
+color:#111827;
+font-size:14px;
+}
+
+/* ================= RELATED SCHEMES ================= */
+
+.related-item{
+display:flex;
+align-items:center;
+gap:15px;
+padding:15px 0;
+}
+
+.related-item h4{
+margin:0;
+font-size:16px;
+font-weight:600;
+color:#111827;
+}
+
+.related-item p{
+margin:5px 0 0;
+font-size:14px;
+color:#6B7280;
+}
+
+.related-icon{
+width:46px;
+height:46px;
+border-radius:12px;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+.related-icon.green{
+background:#22C55E;
+}
+
+.related-icon.orange{
+background:#F59E0B;
+}
+
+.side-card hr{
+border:none;
+height:1px;
+background:#E5E7EB;
+margin:12px 0;
+}
+
+/* ================= BUTTON HOVER ================= */
+
+.apply-btn:hover,
+.continue-btn:hover{
+transform:translateY(-2px);
+transition:.3s;
+}
+
+.save-btn:hover{
+background:#F3F4F6;
+transition:.3s;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px){
+
+.details-layout{
+grid-template-columns:1fr;
+}
+
+.banner-left{
+width:100%;
+}
+
+.banner-right{
+margin-top:25px;
+}
+
+.hero-banner{
+flex-direction:column;
+}
+
+.banner-stats{
+flex-wrap:wrap;
+}
+
+}
+
+@media(max-width:768px){
+
+.policy-details-page{
+padding:15px;
+}
+
+.hero-banner{
+padding:25px;
+}
+
+.hero-banner h1{
+font-size:30px;
+}
+
+.banner-stats{
+flex-direction:column;
+gap:15px;
+}
+
+.stat{
+width:100%;
+}
+
+.action-buttons{
+flex-direction:column;
+}
+
+.apply-btn,
+.save-btn{
+width:100%;
+}
+
+.card-title h2{
+font-size:20px;
+}
+
+.document-item,
+.related-item{
+flex-direction:row;
+align-items:flex-start;
+}
+
+}
+.hero-banner{
+background:linear-gradient(135deg,#1E3A8A,#1E40AF);
+color:white;
+}
+.hero-banner h1{
+color:#ffffff !important;
+font-size:42px;
+font-weight:700;
+margin-bottom:20px;
+line-height:1.2;
+}
