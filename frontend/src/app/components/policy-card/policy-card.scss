@@ -1,0 +1,60 @@
+.pg-policy-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 16px 4px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: 1.05rem;
+    margin: 8px 0 6px;
+    color: var(--pg-primary-dark);
+    line-height: 1.35;
+  }
+
+  &__desc {
+    font-size: 0.87rem;
+    color: var(--pg-text-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 10px 0;
+    font-size: 0.8rem;
+    color: var(--pg-text-muted);
+
+    span { display: flex; align-items: center; gap: 6px; }
+    mat-icon { font-size: 16px; height: 16px; width: 16px; color: var(--pg-primary); }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--pg-border);
+    margin-top: auto;
+    padding: 8px 0 4px !important;
+  }
+
+  .pg-view-count {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+
+    mat-icon { font-size: 16px; height: 16px; width: 16px; }
+  }
+}

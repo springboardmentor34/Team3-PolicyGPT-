@@ -1,0 +1,121 @@
+<!-- ===================== HERO BANNER ===================== -->
+<section class="pg-hero">
+  <div class="pg-container pg-hero__inner">
+    <span class="pg-hero__eyebrow">Government of India Initiative</span>
+    <h1 class="pg-hero__title">
+      Discover, Compare & Access<br />
+      <span>Government Policies &amp; Public Schemes</span>
+    </h1>
+    <p class="pg-hero__subtitle">
+      PolicyGPT brings together every government policy and welfare scheme in one place —
+      search, check eligibility, and stay informed, all in a few clicks.
+    </p>
+
+    <app-search-bar
+      placeholder="Search for policies, schemes, departments..."
+      (search)="onHeroSearch($event)"
+    ></app-search-bar>
+
+    <div class="pg-hero__actions">
+      <button mat-raised-button class="pg-btn-primary" routerLink="/eligibility-checker">
+        Check Eligibility
+      </button>
+      <button mat-stroked-button class="pg-btn-outline" routerLink="/compare-policies">
+        Compare Policies
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STATS STRIP ===================== -->
+<section class="pg-stats">
+  <div class="pg-container pg-stats__grid">
+    @for (stat of stats; track stat.label) {
+      <div class="pg-stats__item">
+        <mat-icon>{{ stat.icon }}</mat-icon>
+        <div>
+          <h3>{{ stat.value }}</h3>
+          <span>{{ stat.label }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<div class="pg-page">
+  <div class="pg-container">
+
+    <!-- ===================== POPULAR CATEGORIES ===================== -->
+    <section class="pg-home-section">
+      <div class="pg-flex-between">
+        <h2 class="pg-section-title">Popular Categories</h2>
+      </div>
+
+      @if (loadingCategories) {
+        <app-loading-spinner message="Loading categories..."></app-loading-spinner>
+      } @else {
+        <div class="pg-categories-grid">
+          @for (cat of categories; track cat.name) {
+            <div class="pg-category-tile" (click)="onCategoryClick(cat)">
+              <mat-icon>{{ cat.icon }}</mat-icon>
+              <h4>{{ cat.name }}</h4>
+              <span>{{ cat.count }} Policies</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- ===================== FEATURED POLICIES ===================== -->
+    <section class="pg-home-section">
+      <div class="pg-flex-between">
+        <h2 class="pg-section-title">Featured Policies</h2>
+        <button mat-button color="primary" routerLink="/policy-search">
+          View All <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      @if (loadingPolicies) {
+        <app-loading-spinner message="Loading featured policies..."></app-loading-spinner>
+      } @else {
+        <div class="pg-cards-grid">
+          @for (policy of featuredPolicies; track policy.id) {
+            <app-policy-card [policy]="policy"></app-policy-card>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- ===================== LATEST SCHEMES ===================== -->
+    <section class="pg-home-section">
+      <div class="pg-flex-between">
+        <h2 class="pg-section-title">Latest Public Schemes</h2>
+        <button mat-button color="primary" routerLink="/policy-search">
+          View All <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      @if (loadingSchemes) {
+        <app-loading-spinner message="Loading latest schemes..."></app-loading-spinner>
+      } @else {
+        <div class="pg-cards-grid">
+          @for (scheme of latestSchemes; track scheme.id) {
+            <app-scheme-card [scheme]="scheme"></app-scheme-card>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- ===================== CTA BANNER ===================== -->
+    <section class="pg-cta">
+      <div class="pg-cta__text">
+        <h2>Not sure which schemes you're eligible for?</h2>
+        <p>Answer a few quick questions and instantly see which government schemes apply to you.</p>
+      </div>
+      <button mat-raised-button class="pg-btn-primary" routerLink="/eligibility-checker">
+        Check My Eligibility <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+      </button>
+    </section>
+
+  </div>
+</div>

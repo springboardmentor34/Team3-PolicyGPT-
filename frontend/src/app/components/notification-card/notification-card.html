@@ -1,0 +1,27 @@
+<div class="pg-notification-card" [class.pg-notification-card--unread]="!notification.read">
+  <div class="pg-notification-card__icon" [ngClass]="'pg-notification-card__icon--' + notification.type">
+    <mat-icon>{{ icon }}</mat-icon>
+  </div>
+
+  <div class="pg-notification-card__body">
+    <div class="pg-flex-between">
+      <h4>{{ notification.title }}</h4>
+      @if (!notification.read) {
+        <span class="pg-notification-card__dot"></span>
+      }
+    </div>
+    <p>{{ notification.message }}</p>
+    <span class="pg-notification-card__date">{{ notification.date }}</span>
+  </div>
+
+  <div class="pg-notification-card__actions">
+    @if (!notification.read) {
+      <button mat-icon-button (click)="onMarkAsRead()" matTooltip="Mark as read" aria-label="Mark as read">
+        <mat-icon>done</mat-icon>
+      </button>
+    }
+    <button mat-icon-button (click)="onDismiss()" matTooltip="Dismiss" aria-label="Dismiss">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

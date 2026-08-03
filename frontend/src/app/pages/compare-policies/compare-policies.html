@@ -1,0 +1,651 @@
+<div class="compare-page">
+
+  <!-- ================= NAVBAR ================= -->
+
+  <header class="top-navbar">
+
+    <!-- Logo -->
+
+    <div class="logo-section">
+
+      <div class="logo-box">
+
+        <mat-icon>shield</mat-icon>
+
+      </div>
+
+      <div class="logo-text">
+
+        <h2>PolicyGPT</h2>
+
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+
+      </div>
+
+    </div>
+
+    <!-- Search -->
+
+    <div class="search-section">
+
+      <mat-form-field appearance="outline" class="nav-search">
+
+        <mat-icon matPrefix>search</mat-icon>
+
+        <input
+          matInput
+          [(ngModel)]="search"
+          placeholder="Search government schemes..."
+          (keyup)="searchPolicy()">
+
+      </mat-form-field>
+
+    </div>
+
+    <!-- Right -->
+
+    <div class="nav-right">
+
+
+      <div class="profile">
+
+        <div class="avatar">
+
+          {{userName.charAt(0)}}
+
+        </div>
+
+        <div class="profile-info">
+
+          <h4>{{userName}}</h4>
+
+          <span>Verified Citizen</span>
+
+        </div>
+
+      </div>
+
+      <button
+        mat-raised-button
+        class="logout-btn">
+
+        Logout
+
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- ================= PAGE ================= -->
+
+  <div class="page-content">
+
+    <!-- Header -->
+
+    <div class="page-header">
+
+      <div>
+
+        <h1>
+
+          Compare Government Schemes
+
+        </h1>
+
+        <p>
+
+          Compare eligibility, benefits, documents, application process and deadlines.
+
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- ================= SELECT POLICIES ================= -->
+
+    <mat-card class="compare-card">
+
+      <div class="compare-row">
+
+        <!-- Policy 1 -->
+
+        <mat-form-field appearance="outline" class="policy-select">
+
+          <mat-label>
+
+            Policy 1
+
+          </mat-label>
+
+          <mat-select [(ngModel)]="selectedPolicy1">
+
+            <mat-option
+              *ngFor="let policy of policies"
+              [value]="policy.name">
+
+              {{policy.name}}
+
+            </mat-option>
+
+          </mat-select>
+
+        </mat-form-field>
+
+        <!-- Swap -->
+
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="swapPolicies()">
+
+          <mat-icon>
+
+            swap_horiz
+
+          </mat-icon>
+
+        </button>
+
+        <!-- Policy 2 -->
+
+        <mat-form-field appearance="outline" class="policy-select">
+
+          <mat-label>
+
+            Policy 2
+
+          </mat-label>
+
+          <mat-select [(ngModel)]="selectedPolicy2">
+
+            <mat-option
+              *ngFor="let policy of policies"
+              [value]="policy.name">
+
+              {{policy.name}}
+
+            </mat-option>
+
+          </mat-select>
+
+        </mat-form-field>
+
+        <!-- Compare -->
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="comparePolicies()">
+
+          <mat-icon>
+
+            compare_arrows
+
+          </mat-icon>
+
+          Compare
+
+        </button>
+
+        <!-- Reset -->
+
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="resetComparison()">
+
+          Reset
+
+        </button>
+
+      </div>
+
+    </mat-card>
+        <!-- ================= COMPARISON TABLE ================= -->
+
+    <mat-card class="comparison-card">
+
+      <div class="comparison-header">
+
+        <h2>
+
+          Side-by-Side Comparison
+
+        </h2>
+
+        <p>
+
+          Compare important details of both government schemes.
+
+        </p>
+
+      </div>
+
+      <div class="comparison-table">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Feature</th>
+
+              <th>{{policyOne?.name}}</th>
+
+              <th>{{policyTwo?.name}}</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+
+              <td><strong>Category</strong></td>
+
+              <td>{{policyOne?.category}}</td>
+
+              <td>{{policyTwo?.category}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Ministry</strong></td>
+
+              <td>{{policyOne?.ministry}}</td>
+
+              <td>{{policyTwo?.ministry}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Benefit</strong></td>
+
+              <td>{{policyOne?.benefit}}</td>
+
+              <td>{{policyTwo?.benefit}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Eligibility</strong></td>
+
+              <td>{{policyOne?.eligibility}}</td>
+
+              <td>{{policyTwo?.eligibility}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Income Limit</strong></td>
+
+              <td>{{policyOne?.income}}</td>
+
+              <td>{{policyTwo?.income}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Required Documents</strong></td>
+
+              <td>{{policyOne?.documents}}</td>
+
+              <td>{{policyTwo?.documents}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Application Mode</strong></td>
+
+              <td>{{policyOne?.apply}}</td>
+
+              <td>{{policyTwo?.apply}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Processing Time</strong></td>
+
+              <td>{{policyOne?.processing}}</td>
+
+              <td>{{policyTwo?.processing}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Last Date</strong></td>
+
+              <td>{{policyOne?.deadline}}</td>
+
+              <td>{{policyTwo?.deadline}}</td>
+
+            </tr>
+
+            <tr>
+
+              <td><strong>Status</strong></td>
+
+              <td>
+
+                <span class="status active">
+
+                  {{policyOne?.status}}
+
+                </span>
+
+              </td>
+
+              <td>
+
+                <span class="status active">
+
+                  {{policyTwo?.status}}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= BENEFITS ================= -->
+
+    <div class="benefit-grid">
+
+      <!-- Policy 1 -->
+
+      <mat-card class="benefit-card">
+
+        <h3>
+
+          {{policyOne?.name}}
+
+        </h3>
+
+        <ul>
+
+          <li>✔ {{policyOne?.benefit}}</li>
+
+          <li>✔ {{policyOne?.eligibility}}</li>
+
+          <li>✔ {{policyOne?.apply}} Application</li>
+
+          <li>✔ {{policyOne?.processing}} Processing</li>
+
+        </ul>
+
+      </mat-card>
+
+      <!-- Policy 2 -->
+
+      <mat-card class="benefit-card">
+
+        <h3>
+
+          {{policyTwo?.name}}
+
+        </h3>
+
+        <ul>
+
+          <li>✔ {{policyTwo?.benefit}}</li>
+
+          <li>✔ {{policyTwo?.eligibility}}</li>
+
+          <li>✔ {{policyTwo?.apply}} Application</li>
+
+          <li>✔ {{policyTwo?.processing}} Processing</li>
+
+        </ul>
+
+      </mat-card>
+
+    </div>
+        <!-- ================= SUMMARY ================= -->
+
+    <div class="summary-grid">
+
+      <!-- Overall Match -->
+
+      <mat-card class="summary-card">
+
+        <div class="summary-icon">
+
+          <mat-icon>
+
+            analytics
+
+          </mat-icon>
+
+        </div>
+
+        <h2>
+
+          {{getOverallMatch()}}%
+
+        </h2>
+
+        <p>
+
+          Overall Match
+
+        </p>
+
+      </mat-card>
+
+      <!-- Recommended -->
+
+      <mat-card class="summary-card">
+
+        <div class="summary-icon success">
+
+          <mat-icon>
+
+            emoji_events
+
+          </mat-icon>
+
+        </div>
+
+        <h2>
+
+          Recommended
+
+        </h2>
+
+        <p>
+
+          {{getRecommendation()}}
+
+        </p>
+
+      </mat-card>
+
+    </div>
+
+    <!-- ================= ELIGIBILITY ================= -->
+
+    <mat-card class="eligibility-card">
+
+      <h2>
+
+        Eligibility Summary
+
+      </h2>
+
+      <div class="eligibility-grid">
+
+        <div class="eligibility-box">
+
+          <h3>
+
+            {{policyOne?.name}}
+
+          </h3>
+
+          <ul>
+
+            <li>
+
+              ✔ {{policyOne?.eligibility}}
+
+            </li>
+
+            <li>
+
+              ✔ {{policyOne?.income}}
+
+            </li>
+
+            <li>
+
+              ✔ {{policyOne?.status}}
+
+            </li>
+
+          </ul>
+
+        </div>
+
+        <div class="eligibility-box">
+
+          <h3>
+
+            {{policyTwo?.name}}
+
+          </h3>
+
+          <ul>
+
+            <li>
+
+              ✔ {{policyTwo?.eligibility}}
+
+            </li>
+
+            <li>
+
+              ✔ {{policyTwo?.income}}
+
+            </li>
+
+            <li>
+
+              ✔ {{policyTwo?.status}}
+
+            </li>
+
+          </ul>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= DOCUMENTS ================= -->
+
+    <mat-card class="documents-card">
+
+      <h2>
+
+        Required Documents
+
+      </h2>
+
+      <div class="documents-grid">
+
+        <div class="document-box">
+
+          <h3>
+
+            {{policyOne?.name}}
+
+          </h3>
+
+          <p>
+
+            {{policyOne?.documents}}
+
+          </p>
+
+        </div>
+
+        <div class="document-box">
+
+          <h3>
+
+            {{policyTwo?.name}}
+
+          </h3>
+
+          <p>
+
+            {{policyTwo?.documents}}
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= FINAL RECOMMENDATION ================= -->
+
+    <mat-card class="recommendation-card">
+
+      <div class="recommendation-header">
+
+        <mat-icon>
+
+          lightbulb
+
+        </mat-icon>
+
+        <h2>
+
+          AI Recommendation
+
+        </h2>
+
+      </div>
+
+      <p>
+
+        Based on the comparison, the most suitable scheme is
+
+        <strong>
+
+          {{getRecommendation()}}
+
+        </strong>
+
+        considering the processing time, benefits, eligibility, and application status.
+
+      </p>
+
+    </mat-card>
+
+  </div>
+
+</div>

@@ -1,0 +1,801 @@
+<div class="eligibility-page">
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="top-navbar">
+
+<div class="logo-section">
+
+<div class="logo-box">
+<mat-icon>shield</mat-icon>
+</div>
+
+<div class="logo-text">
+<h2>PolicyGPT</h2>
+<span>GOVT. SCHEME INTELLIGENCE</span>
+</div>
+
+</div>
+
+
+<div class="nav-right">
+
+
+
+<div class="profile">
+
+<div class="avatar">
+
+{{userName.charAt(0)}}
+
+</div>
+
+<div class="profile-info">
+
+<h4>{{userName}}</h4>
+
+<span>Verified Citizen</span>
+
+</div>
+
+</div>
+
+<button
+mat-raised-button
+class="logout-btn">
+
+Logout
+
+</button>
+
+</div>
+
+</header>
+
+<!-- ================= CONTENT ================= -->
+
+<div class="checker-content">
+
+<div class="page-header">
+
+<h1>Eligibility Checker</h1>
+
+<p>
+
+Answer a few quick questions and we'll match you with government schemes you qualify for.
+
+</p>
+
+</div>
+
+<!-- ================= STEPPER ================= -->
+
+<div class="stepper">
+
+<!-- STEP 1 -->
+
+<div
+class="step"
+[class.completed]="currentStep>1"
+[class.active]="currentStep==1">
+
+<div class="step-circle">
+
+<mat-icon *ngIf="currentStep>1">
+
+check
+
+</mat-icon>
+
+<span *ngIf="currentStep<=1">
+
+1
+
+</span>
+
+</div>
+
+<span>
+
+Personal Information
+
+</span>
+
+</div>
+
+<div
+class="step-line"
+[class.active]="currentStep>1">
+
+</div>
+
+<!-- STEP 2 -->
+
+<div
+class="step"
+[class.completed]="currentStep>2"
+[class.active]="currentStep==2">
+
+<div class="step-circle">
+
+<mat-icon *ngIf="currentStep>2">
+
+check
+
+</mat-icon>
+
+<span *ngIf="currentStep<=2">
+
+2
+
+</span>
+
+</div>
+
+<span>
+
+Income & Occupation
+
+</span>
+
+</div>
+
+<div
+class="step-line"
+[class.active]="currentStep>2">
+
+</div>
+
+<!-- STEP 3 -->
+
+<div
+class="step"
+[class.completed]="currentStep>3"
+[class.active]="currentStep==3">
+
+<div class="step-circle">
+
+<mat-icon *ngIf="currentStep>3">
+
+check
+
+</mat-icon>
+
+<span *ngIf="currentStep<=3">
+
+3
+
+</span>
+
+</div>
+
+<span>
+
+Category
+
+</span>
+
+</div>
+
+<div
+class="step-line"
+[class.active]="currentStep>3">
+
+</div>
+
+<!-- STEP 4 -->
+
+<div
+class="step"
+[class.active]="currentStep==4">
+
+<div class="step-circle">
+
+4
+
+</div>
+
+<span>
+
+Results
+
+</span>
+
+</div>
+
+</div>
+
+<!-- ================================================= -->
+<!-- STEP 1 : PERSONAL INFORMATION -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==1">
+
+<mat-card class="form-card">
+
+<div class="card-header">
+
+<h2>
+
+Personal Information
+
+</h2>
+
+<p>
+
+Please fill your personal details.
+
+</p>
+
+</div>
+
+<div class="form-grid">
+
+<!-- Full Name -->
+
+<div>
+
+<label>
+
+Full Name
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>
+
+person
+
+</mat-icon>
+
+<input
+matInput
+[(ngModel)]="fullName"
+placeholder="Enter full name">
+
+</mat-form-field>
+
+</div>
+
+<!-- Mobile -->
+
+<div>
+
+<label>
+
+Mobile Number
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>
+
+call
+
+</mat-icon>
+
+<input
+matInput
+[(ngModel)]="mobile"
+placeholder="+91 9876543210">
+
+</mat-form-field>
+
+</div>
+
+<!-- Email -->
+
+<div>
+
+<label>
+
+Email Address
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>
+
+mail
+
+</mat-icon>
+
+<input
+matInput
+[(ngModel)]="email"
+placeholder="example@gmail.com">
+
+</mat-form-field>
+
+</div>
+
+<!-- Aadhaar -->
+
+<div>
+
+<label>
+
+Aadhaar Number
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>
+
+badge
+
+</mat-icon>
+
+<input
+matInput
+[(ngModel)]="aadhaar"
+placeholder="XXXX XXXX XXXX">
+
+</mat-form-field>
+
+</div>
+
+<!-- DOB -->
+
+<div>
+
+<label>
+
+Date of Birth
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<input
+matInput
+type="date"
+[(ngModel)]="dob">
+
+</mat-form-field>
+
+</div>
+
+<!-- Gender -->
+
+<div>
+
+<label>
+
+Gender
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-select [(ngModel)]="gender">
+
+<mat-option value="Male">
+
+Male
+
+</mat-option>
+
+<mat-option value="Female">
+
+Female
+
+</mat-option>
+
+<mat-option value="Other">
+
+Other
+
+</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+</div>
+
+<!-- State -->
+
+<div>
+
+<label>
+
+State
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-select [(ngModel)]="state">
+
+<mat-option
+*ngFor="let s of states"
+[value]="s">
+
+{{s}}
+
+</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+</div>
+
+<!-- District -->
+
+<div>
+
+<label>
+
+District
+
+</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-select [(ngModel)]="district">
+
+<mat-option
+*ngFor="let d of districts"
+[value]="d">
+
+{{d}}
+
+</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+</div>
+
+</div>
+
+<div class="button-row">
+
+<span></span>
+
+<button
+mat-raised-button
+color="primary"
+class="continue-btn"
+(click)="nextStep()">
+
+Continue
+
+<mat-icon>
+
+arrow_forward
+
+</mat-icon>
+
+</button>
+
+</div>
+
+</mat-card>
+
+</div>
+<!-- ================================================= -->
+<!-- STEP 2 : INCOME & OCCUPATION -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==2">
+
+<mat-card class="form-card">
+
+<div class="card-header">
+
+<h2>Income & Occupation</h2>
+
+<p>Provide your income and occupation details.</p>
+
+</div>
+
+<!-- Annual Income -->
+
+<label>Annual Family Income (₹)</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>currency_rupee</mat-icon>
+
+<input
+matInput
+type="number"
+placeholder="Enter annual income"
+[(ngModel)]="annualIncome">
+
+</mat-form-field>
+
+<!-- Occupation -->
+
+<label>Select Occupation</label>
+
+<div class="occupation-grid">
+
+<div
+class="occupation-card"
+*ngFor="let item of occupations"
+[class.active]="selectedOccupation==item.name"
+(click)="selectOccupation(item.name)">
+
+<div class="occupation-icon">
+
+<mat-icon>
+
+{{item.icon}}
+
+</mat-icon>
+
+</div>
+
+<div>
+
+<h4>{{item.name}}</h4>
+
+<p>{{item.description}}</p>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- State -->
+
+<label>State</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>location_on</mat-icon>
+
+<mat-select [(ngModel)]="state">
+
+<mat-option
+*ngFor="let s of states"
+[value]="s">
+
+{{s}}
+
+</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+<!-- Buttons -->
+
+<div class="button-row">
+
+<button
+mat-stroked-button
+class="back-btn"
+(click)="previousStep()">
+
+<mat-icon>
+
+arrow_back
+
+</mat-icon>
+
+Back
+
+</button>
+
+<div class="step-count">
+
+Step 2 of 4
+
+</div>
+
+<button
+mat-raised-button
+color="primary"
+class="continue-btn"
+(click)="nextStep()">
+
+Continue
+
+<mat-icon>
+
+arrow_forward
+
+</mat-icon>
+
+</button>
+
+</div>
+
+</mat-card>
+
+</div>
+<!-- ================================================= -->
+<!-- STEP 3 : CATEGORY -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==3">
+
+<mat-card class="form-card">
+
+<div class="card-header">
+
+<h2>Category</h2>
+
+<p>Select your category to check government scheme eligibility.</p>
+
+</div>
+
+<label>Category</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>category</mat-icon>
+
+<mat-select [(ngModel)]="selectedCategory">
+
+<mat-option
+*ngFor="let category of categories"
+[value]="category">
+
+{{category}}
+
+</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+<label>Caste Category</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>groups</mat-icon>
+
+<mat-select [(ngModel)]="selectedCaste">
+
+<mat-option
+*ngFor="let caste of casteCategories"
+[value]="caste">
+
+{{caste}}
+
+</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+<label>Are you differently abled?</label>
+
+<mat-form-field appearance="outline" class="full-width">
+
+<mat-icon matPrefix>accessible</mat-icon>
+
+<mat-select [(ngModel)]="disability">
+
+<mat-option value="No">No</mat-option>
+
+<mat-option value="Yes">Yes</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+<div class="button-row">
+
+<button
+mat-stroked-button
+class="back-btn"
+(click)="previousStep()">
+
+<mat-icon>arrow_back</mat-icon>
+
+Back
+
+</button>
+
+<div class="step-count">
+
+Step 3 of 4
+
+</div>
+
+<button
+mat-raised-button
+color="primary"
+class="continue-btn"
+(click)="nextStep()">
+
+Continue
+
+<mat-icon>arrow_forward</mat-icon>
+
+</button>
+
+</div>
+
+</mat-card>
+
+</div>
+<!-- ================================================= -->
+<!-- STEP 4 : RESULTS -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==4">
+
+<mat-card class="result-card">
+
+<div class="success-icon">
+
+<mat-icon>
+
+check_circle
+
+</mat-icon>
+
+</div>
+
+<h1>
+
+{{eligibleCount}}
+
+</h1>
+
+<h2>
+
+You're eligible for {{eligibleCount}} schemes
+
+</h2>
+
+<p>
+
+Based on your profile, income, occupation and category,
+we found {{eligibleCount}} government schemes that you can
+apply for right now.
+
+</p>
+
+<div class="button-row">
+
+<button
+mat-stroked-button
+class="back-btn"
+(click)="previousStep()">
+
+<mat-icon>
+
+arrow_back
+
+</mat-icon>
+
+Back
+
+</button>
+
+<button
+mat-raised-button
+color="primary"
+class="continue-btn"
+routerLink="/scheme-matches">
+
+View My Matches
+
+<mat-icon>
+
+arrow_forward
+
+</mat-icon>
+
+</button>
+
+</div>
+
+</mat-card>
+
+</div>

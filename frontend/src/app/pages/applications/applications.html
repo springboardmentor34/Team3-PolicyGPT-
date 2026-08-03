@@ -1,0 +1,58 @@
+
+<div class="applications-page">
+
+<div class="page-header">
+
+<h1>My Applications</h1>
+
+<p>Track the status of all submitted government scheme applications.</p>
+
+</div>
+
+<div class="application-grid">
+
+<mat-card
+class="application-card"
+*ngFor="let app of applications">
+
+<div class="top">
+
+<div class="icon" [ngClass]="app.color">
+
+<mat-icon>{{app.icon}}</mat-icon>
+
+</div>
+
+<span class="status" [ngClass]="app.color">
+
+{{app.status}}
+
+</span>
+
+</div>
+
+<h2>
+
+{{app.scheme}}
+
+</h2>
+
+<p>
+
+Applied on {{app.date}}
+
+</p>
+
+<button
+  mat-raised-button
+  color="primary"
+  (click)="viewDetails(app.id)">
+
+  View Details
+
+</button>
+</mat-card>
+
+</div>
+
+</div>

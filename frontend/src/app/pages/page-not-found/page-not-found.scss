@@ -1,0 +1,19 @@
+.pg-placeholder {
+  max-width: 480px;
+  margin: 64px auto;
+  padding: 48px 32px;
+  text-align: center;
+}
+.pg-placeholder__icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  color: var(--pg-primary);
+  margin-bottom: 12px;
+}
+.pg-placeholder h2 { margin-bottom: 8px; }
+.pg-placeholder p { margin-bottom: 20px; }
+.pg-placeholder .pg-btn-primary {
+  background: var(--pg-primary) !important;
+  color: #fff !important;
+}

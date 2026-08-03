@@ -1,0 +1,97 @@
+<div class="saved-page">
+
+<div class="page-header">
+
+<h1>Saved Policies</h1>
+
+<p>
+
+Your bookmarked government schemes and policies.
+
+</p>
+
+</div>
+
+<div class="policy-grid">
+
+<mat-card
+class="policy-card"
+*ngFor="let policy of savedPolicies">
+
+<span class="category">
+
+{{policy.category}}
+
+</span>
+
+<h2>
+
+{{policy.title}}
+
+</h2>
+
+<p>
+
+{{policy.description}}
+
+</p>
+
+<div class="saved-date">
+
+<mat-icon>
+
+bookmark
+
+</mat-icon>
+
+Saved on {{policy.savedOn}}
+
+</div>
+
+<div class="button-row">
+
+<button
+mat-raised-button
+color="primary"
+(click)="viewDetails(policy.id)">
+
+View Details
+
+</button>
+
+<button
+mat-stroked-button
+color="warn"
+(click)="removePolicy(policy.id)">
+
+Remove
+
+</button>
+
+</div>
+
+</mat-card>
+
+</div>
+
+<div
+class="empty"
+*ngIf="savedPolicies.length==0">
+
+<mat-icon>
+
+bookmark_remove
+
+</mat-icon>
+
+<h2>No Saved Policies</h2>
+
+<p>
+
+You haven't saved any schemes yet.
+
+</p>
+
+</div>
+
+</div>
