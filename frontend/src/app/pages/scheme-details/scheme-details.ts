@@ -1,10 +1,20 @@
-import { Component } from '@angular/core';
+//import { Component } from '@angular/core';
+//import { CommonModule } from '@angular/common';
+//import { RouterModule } from '@angular/router';
+
+//import { MatButtonModule } from '@angular/material/button';
+//import { MatCardModule } from '@angular/material/card';
+//import { MatIconModule } from '@angular/material/icon';
+
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+
+import { SchemeService } from '../../services/scheme.service';
 
 @Component({
   selector: 'app-scheme-details',
@@ -19,68 +29,79 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './scheme-details.html',
   styleUrls: ['./scheme-details.scss']
 })
-export class SchemeDetailsComponent {
+export class SchemeDetailsComponent implements OnInit{
 
   userName = 'Sri';
+  constructor(
+  private route: ActivatedRoute,
+  private schemeService: SchemeService
+) {}
 
-  scheme = {
+ngOnInit(): void {
 
-    title: 'PM Kisan Samman Nidhi',
+  const id = this.route.snapshot.paramMap.get('id');
 
-    category: 'Agriculture',
+  if (id) {
 
-    ministry: 'Ministry of Agriculture & Farmers Welfare',
+    this.schemeService.getSchemeById(id).subscribe({
 
-    status: 'Eligible',
+    next: (response: any) => {
 
-    deadline: '30 September 2026',
+  const data = response.data;
 
-    mode: 'Online',
-
-    processing: '30 Days',
-
-    website: 'https://pmkisan.gov.in'
-
+  this.scheme = {
+    title: data.scheme_name,
+    category: data.category,
+    ministry: data.department,
+    status: "Available",
+    deadline: "Not Available",
+    mode: "Online",
+    processing: "Not Available",
+    website: "#"
   };
 
-  benefits = [
+  this.benefits = [data.benefits];
+  this.documents = ["Documents will be updated soon"];
 
-    '₹6,000 financial assistance every year',
+  console.log(this.scheme);
 
-    'Amount credited directly to bank account',
+},
 
-    'Support for small and marginal farmers',
+      error: (err) => {
 
-    'No application processing fee'
+        console.error(err);
 
-  ];
+      }
 
-  eligibility = [
+    });
 
-    'Indian Citizen',
+  }
 
-    'Must be a Farmer',
+}
 
-    'Own agricultural land',
+scheme: any = {};
 
-    'Valid Aadhaar Card',
+benefits = [
+  '₹6,000 financial assistance every year',
+  'Amount credited directly to bank account',
+  'Support for small and marginal farmers',
+  'No application processing fee'
+];
 
-    'Active Bank Account'
+eligibility = [
+  'Indian Citizen',
+  'Must be a Farmer',
+  'Own agricultural land',
+  'Valid Aadhaar Card',
+  'Active Bank Account'
+];
 
-  ];
-
-  documents = [
-
-    'Aadhaar Card',
-
-    'Bank Passbook',
-
-    'Land Ownership Certificate',
-
-    'Income Certificate',
-
-    'Passport Size Photo'
-
-  ];
+documents = [
+  'Aadhaar Card',
+  'Bank Passbook',
+  'Land Ownership Certificate',
+  'Income Certificate',
+  'Passport Size Photo'
+];
 
 }

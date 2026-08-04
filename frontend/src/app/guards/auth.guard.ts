@@ -1,21 +1,20 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 /**
  * authGuard
  * ----------------------------------------------------------------------
- * Placeholder route guard. No real authentication is implemented on the
- * frontend per project scope — this simply demonstrates where a future
- * AuthService (backed by the FastAPI backend) would be injected to check
- * session/token validity before allowing access to protected routes such
- * as dashboards and profile pages.
+ * Protects routes that require a logged-in user (dashboards, reports,
+ * profile, etc). Checks for a real JWT token via AuthService, and
+ * redirects to /login with a returnUrl if the user isn't authenticated.
  * ----------------------------------------------------------------------
  */
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
+  const authService = inject(AuthService);
 
-  // TODO: Replace with a real AuthService call once backend auth is wired up.
-  const isAuthenticated = true;
+  const isAuthenticated = authService.isLoggedIn();
 
   if (!isAuthenticated) {
     router.navigate(['/login'], { queryParams: { returnUrl: state.url } });

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -29,6 +31,11 @@ import { MatSelectModule } from '@angular/material/select';
   styleUrl: './register.scss'
 })
 export class RegisterComponent {
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   selectedRole = 'citizen';
 
@@ -61,14 +68,35 @@ export class RegisterComponent {
 
   createAccount() {
 
-    console.log({
-      role: this.selectedRole,
-      fullName: this.fullName,
-      mobile: this.mobile,
+    const registerData = {
+      full_name: this.fullName,
       email: this.email,
       password: this.password,
-      state: this.state,
-      agree: this.agree
+      role: this.selectedRole,
+      mobile: this.mobile,
+      state: this.state
+    };
+
+    this.authService.register(registerData).subscribe({
+
+      next: (response: any) => {
+
+        console.log(response);
+
+        alert('Registration Successful');
+
+        this.router.navigate(['/login']);
+
+      },
+
+      error: (error) => {
+
+        console.error(error);
+
+        alert('Registration Failed');
+
+      }
+
     });
 
   }

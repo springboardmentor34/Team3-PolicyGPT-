@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.routers import policy, scheme, notification, auth
 
 
@@ -8,10 +10,29 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
+# CORS Configuration
+origins = [
+    "http://localhost:4200",
+    "http://127.0.0.1:4200"
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Routers
 app.include_router(policy.router)
 app.include_router(scheme.router)
 app.include_router(notification.router)
 app.include_router(auth.router)
+
 
 @app.get("/")
 def root():

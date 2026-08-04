@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
+import { SchemeService } from '../../services/scheme.service';
+import { OnInit } from '@angular/core';
 
 interface Scheme{
 
@@ -62,7 +64,7 @@ templateUrl:'./policy-search.html',
 styleUrls:['./policy-search.scss']
 })
 
-export class PolicySearchComponent{
+export class PolicySearchComponent implements OnInit {
 
 // ================= USER =================
 
@@ -116,263 +118,67 @@ displayedSchemes:Scheme[]=[];
 
 // ================= CONSTRUCTOR =================
 
-constructor(){
+constructor(private schemeService: SchemeService) {}
 
-this.loadSchemes();
-
+ngOnInit(): void {
+  this.loadSchemes();
 }
 
 // ================= LOAD SCHEMES =================
 
-loadSchemes(){
+loadSchemes(): void {
 
-this.schemes=[
+  this.schemeService.getAllSchemes().subscribe({
 
-{
+    next: (response: any) => {
 
-id:1,
+      console.log(response);
 
-icon:'agriculture',
+      this.schemes = response.data.map((scheme: any, index: number) => ({
 
-category:'Agriculture',
+    id: index + 1,
 
-title:'PM Kisan Samman Nidhi',
+    icon: 'description',
 
-description:'Income support of ₹6,000 per year for eligible farmer families.',
+    category: scheme.category,
 
-ministry:'Ministry of Agriculture',
+    title: scheme.scheme_name,
 
-deadline:'30 Sep 2026',
+    description: scheme.benefits,
 
-status:'Eligible',
+    ministry: scheme.department,
 
-statusColor:'eligible',
+    deadline: 'Ongoing',
 
-state:'Tamil Nadu',
+    status: 'Available',
 
-incomeLimit:500000,
+    statusColor: 'eligible',
 
-eligible:true,
+    state: scheme.state,
 
-open:true
+    incomeLimit: 500000,
 
-},
+    eligible: true,
 
-{
+    open: true
 
-id:2,
+    }));
 
-icon:'health_and_safety',
+      this.filteredSchemes = [...this.schemes];
 
-category:'Health',
+      this.updateDisplayedSchemes();
 
-title:'Ayushman Bharat PM-JAY',
+    },
 
-description:'Health insurance coverage up to ₹5 lakh.',
+    error: (error) => {
 
-ministry:'Ministry of Health',
+      console.error(error);
 
-deadline:'Ongoing',
+      alert('Unable to load schemes');
 
-status:'Eligible',
+    }
 
-statusColor:'eligible',
-
-state:'All India',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:3,
-
-icon:'school',
-
-category:'Education',
-
-title:'National Scholarship Portal',
-
-description:'Scholarship support for students.',
-
-ministry:'Ministry of Education',
-
-deadline:'15 Oct 2026',
-
-status:'Review',
-
-statusColor:'review',
-
-state:'Tamil Nadu',
-
-incomeLimit:250000,
-
-eligible:false,
-
-open:true
-
-},
-
-{
-
-id:4,
-
-icon:'home',
-
-category:'Housing',
-
-title:'PM Awas Yojana',
-
-description:'Affordable housing assistance.',
-
-ministry:'Ministry of Housing',
-
-deadline:'31 Dec 2026',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'Karnataka',
-
-incomeLimit:300000,
-
-eligible:true,
-
-open:false
-
-},
-
-{
-
-id:5,
-
-icon:'work',
-
-category:'Employment',
-
-title:'Skill India Mission',
-
-description:'Skill development for youth.',
-
-ministry:'MSDE',
-
-deadline:'Ongoing',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'All India',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:6,
-
-icon:'payments',
-
-category:'Finance',
-
-title:'PM Mudra Loan',
-
-description:'Business loan assistance.',
-
-ministry:'Finance',
-
-deadline:'Ongoing',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'Tamil Nadu',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:7,
-
-icon:'elderly',
-
-category:'Pension',
-
-title:'Atal Pension Yojana',
-
-description:'Monthly pension scheme.',
-
-ministry:'Finance',
-
-deadline:'Ongoing',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'All India',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:8,
-
-icon:'groups',
-
-category:'Women',
-
-title:'Beti Bachao Beti Padhao',
-
-description:'Women empowerment scheme.',
-
-ministry:'Women & Child Development',
-
-deadline:'31 Dec 2026',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'Tamil Nadu',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-}
-
-];
-
-this.filteredSchemes=[...this.schemes];
-
-this.displayedSchemes=[...this.filteredSchemes];
+  });
 
 }
 // ================= APPLY FILTERS =================
