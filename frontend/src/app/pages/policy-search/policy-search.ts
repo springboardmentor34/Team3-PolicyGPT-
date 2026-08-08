@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
-import { SchemeService } from '../../services/scheme.service';
+import { PolicyService } from '../../services/policy.service';
 import { OnInit } from '@angular/core';
 
 interface Scheme{
@@ -118,43 +118,43 @@ displayedSchemes:Scheme[]=[];
 
 // ================= CONSTRUCTOR =================
 
-constructor(private schemeService: SchemeService) {}
+constructor(private policyService: PolicyService) {}
 
 ngOnInit(): void {
-  this.loadSchemes();
+  this.loadPolicies();
 }
 
-// ================= LOAD SCHEMES =================
+// ================= LOAD POLICIES =================
 
-loadSchemes(): void {
+loadPolicies(keyword?: string): void {
 
-  this.schemeService.getAllSchemes().subscribe({
+  this.policyService.getAllPolicies(keyword ? { keyword } : undefined).subscribe({
 
     next: (response: any) => {
 
       console.log(response);
 
-      this.schemes = response.data.map((scheme: any, index: number) => ({
+      this.schemes = response.data.map((policy: any) => ({
 
-    id: index + 1,
+    id: policy.policy_id,
 
     icon: 'description',
 
-    category: scheme.category,
+    category: policy.category,
 
-    title: scheme.scheme_name,
+    title: policy.policy_name,
 
-    description: scheme.benefits,
+    description: policy.description,
 
-    ministry: scheme.department,
+    ministry: policy.ministry,
 
-    deadline: 'Ongoing',
+    deadline: policy.effective_date || 'Ongoing',
 
-    status: 'Available',
+    status: policy.status,
 
     statusColor: 'eligible',
 
-    state: scheme.state,
+    state: policy.state,
 
     incomeLimit: 500000,
 
@@ -164,9 +164,7 @@ loadSchemes(): void {
 
     }));
 
-      this.filteredSchemes = [...this.schemes];
-
-      this.updateDisplayedSchemes();
+      this.applyFilters();
 
     },
 
@@ -174,7 +172,7 @@ loadSchemes(): void {
 
       console.error(error);
 
-      alert('Unable to load schemes');
+      alert('Unable to load policies');
 
     }
 
@@ -214,7 +212,7 @@ applyFilters(): void {
 
         (this.categoryAgriculture && scheme.category === 'Agriculture') ||
 
-        (this.categoryHealth && scheme.category === 'Health') ||
+        (this.categoryHealth && scheme.category === 'Healthcare') ||
 
         (this.categoryEducation && scheme.category === 'Education') ||
 
@@ -285,7 +283,7 @@ applyFilters(): void {
 
 searchPolicies(): void {
 
-  this.applyFilters();
+  this.loadPolicies(this.search.trim() || undefined);
 
 }
 

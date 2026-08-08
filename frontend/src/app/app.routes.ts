@@ -34,6 +34,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'manage-policies-schemes',
+    loadComponent: () =>
+      import('./pages/manage-policies-schemes/manage-policies-schemes').then((m) => m.ManagePoliciesSchemesComponent),
+    title: 'PolicyGPT | Manage Policies & Schemes',
+    canActivate: [authGuard],
+  },
+  {
     path: 'policy-search',
     loadComponent: () => import('./pages/policy-search/policy-search').then((m) => m.PolicySearchComponent),
     title: 'PolicyGPT | Search Policies',

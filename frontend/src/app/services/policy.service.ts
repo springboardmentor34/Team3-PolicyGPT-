@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
@@ -11,8 +11,17 @@ export class PolicyService {
 
   constructor(private http: HttpClient) {}
 
-  getAllPolicies(): Observable<any> {
-    return this.http.get(this.api + '/');
+  getAllPolicies(filters?: { category?: string; state?: string; department?: string; ministry?: string; status?: string; keyword?: string; include_archived?: boolean }): Observable<any> {
+    let params = new HttpParams();
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = (filters as any)[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value);
+        }
+      });
+    }
+    return this.http.get(this.api + '/', { params });
   }
 
   getPolicyById(id: string | number): Observable<any> {
@@ -21,6 +30,18 @@ export class PolicyService {
 
   createPolicy(policy: any): Observable<any> {
     return this.http.post(this.api + '/', policy);
+  }
+
+  updatePolicy(id: string | number, policy: any): Observable<any> {
+    return this.http.put(this.api + '/' + id, policy);
+  }
+
+  archivePolicy(id: string | number): Observable<any> {
+    return this.http.patch(this.api + '/' + id + '/archive', {});
+  }
+
+  unarchivePolicy(id: string | number): Observable<any> {
+    return this.http.patch(this.api + '/' + id + '/unarchive', {});
   }
 
   // Temporary until backend endpoint is created

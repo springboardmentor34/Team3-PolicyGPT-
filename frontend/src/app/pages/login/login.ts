@@ -56,7 +56,13 @@ export class LoginComponent {
 
       alert('Login Successful');
 
-      this.router.navigate(['/citizen-dashboard']);
+      const role = this.getRoleFromToken(response.access_token);
+
+      if (role === 'official') {
+        this.router.navigate(['/government-dashboard']);
+      } else {
+        this.router.navigate(['/citizen-dashboard']);
+      }
 
     },
 
@@ -70,6 +76,23 @@ export class LoginComponent {
 
   });
 
+}
+
+/**
+ * Decodes the JWT payload (no verification needed here — this is purely
+ * for deciding where to redirect after login; the backend independently
+ * verifies the token's signature on every actual API request).
+ */
+private getRoleFromToken(token: string): string | null {
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const payloadJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+    const payload = JSON.parse(payloadJson);
+    return payload.role || null;
+  } catch (e) {
+    console.error('Could not decode token', e);
+    return null;
+  }
 }
 
 }

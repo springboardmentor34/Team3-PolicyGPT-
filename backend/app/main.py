@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import policy, scheme, notification, auth
+from app.routers import eligibility_rule
 
 
 app = FastAPI(
@@ -32,7 +33,7 @@ app.include_router(policy.router)
 app.include_router(scheme.router)
 app.include_router(notification.router)
 app.include_router(auth.router)
-
+app.include_router(eligibility_rule.router)
 
 @app.get("/")
 def root():

@@ -13,6 +13,7 @@ from app.auth.security import (
     verify_password,
     create_access_token,
 )
+from app.auth.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/auth",
@@ -65,4 +66,14 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
     return {
         "access_token": token,
         "token_type": "bearer"
+    }
+
+
+@router.get("/me")
+def get_me(current_user: User = Depends(get_current_user)):
+    return {
+        "user_id": current_user.user_id,
+        "full_name": current_user.full_name,
+        "email": current_user.email,
+        "role": current_user.role,
     }

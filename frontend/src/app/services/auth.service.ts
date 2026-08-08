@@ -31,4 +31,8 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
+  getMe(): Observable<any> {
+    return this.http.get(`${this.api}/me`);
+  }
+
 }
