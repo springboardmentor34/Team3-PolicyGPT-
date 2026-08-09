@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import policy, scheme, notification, auth
+from app.routers import policy, scheme, notification, auth, comparison
 from app.routers import eligibility_rule
-
 
 app = FastAPI(
     title="PolicyGPT API",
@@ -11,13 +10,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-
 # CORS Configuration
+
 origins = [
     "http://localhost:4200",
     "http://127.0.0.1:4200"
 ]
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,13 +25,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Routers
-app.include_router(policy.router)
-app.include_router(scheme.router)
-app.include_router(notification.router)
-app.include_router(auth.router)
-app.include_router(eligibility_rule.router)
+
+app.include_router(comparison.router)
 
 @app.get("/")
 def root():
@@ -42,7 +36,6 @@ def root():
         "message": "Government Policy & Public Scheme Intelligence Platform API",
         "status": "Backend Initialized Successfully"
     }
-
 
 @app.get("/health")
 def health():

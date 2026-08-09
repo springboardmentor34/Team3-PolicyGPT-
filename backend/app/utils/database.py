@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "postgresql://postgres:1234@localhost:5432/policygpt"
+DATABASE_URL = "postgresql://postgres:#Priya.15@localhost:5432/schemews_db"
 
 engine = create_engine(DATABASE_URL)
 
