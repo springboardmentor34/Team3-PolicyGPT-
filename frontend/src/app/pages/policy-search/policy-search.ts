@@ -11,368 +11,156 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
+import { PolicyService } from '../../services/policy.service';
+import { AuthService } from '../../services/auth.service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { OnInit } from '@angular/core';
 
 interface Scheme{
-
 id:number;
-
 icon:string;
-
 category:string;
-
 title:string;
-
 description:string;
-
 ministry:string;
-
 deadline:string;
-
+publicationDate?: string;
 status:string;
-
 statusColor:string;
-
 state:string;
-
-incomeLimit:number;
-
 eligible:boolean;
-
 open:boolean;
-
 }
-
 @Component({
 selector:'app-policy-search',
 standalone:true,
-imports:[
-CommonModule,
-FormsModule,
-RouterModule,
-MatButtonModule,
-MatCardModule,
-MatCheckboxModule,
-MatFormFieldModule,
-MatIconModule,
-MatInputModule,
-MatSelectModule,
-MatSliderModule
+imports: [
+  CommonModule,
+  FormsModule,
+  RouterModule,
+  MatButtonModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatSelectModule,
+  MatSliderModule,
+  MatDatepickerModule,
+  MatNativeDateModule
 ],
 templateUrl:'./policy-search.html',
 styleUrls:['./policy-search.scss']
 })
 
-export class PolicySearchComponent{
+export class PolicySearchComponent implements OnInit {
 
 // ================= USER =================
 
 userName='Sri';
-
 // ================= SEARCH =================
 
 search='';
-
 selectedSort='Most Relevant';
 
 // ================= PAGINATION =================
 
 currentPage=1;
-
 itemsPerPage=8;
-
 pageNumbers=[1,2,3,4,5,6,7,8,9];
 
 // ================= FILTERS =================
 
-categoryAgriculture=false;
-
-categoryHealth=false;
-
 categoryEducation=false;
-
-categoryEmployment=false;
-
-categoryHousing=false;
-
+categoryScholarships = false;
 stateTamilNadu=false;
-
 stateKarnataka=false;
-
 stateAllIndia=false;
-
+activeOnly=false;
 eligibleOnly=false;
-
 currentlyOpen=false;
 
-selectedIncome=500000;
+
+selectedPublicationDate = '';
 
 // ================= ARRAYS =================
 
 schemes:Scheme[]=[];
-
 filteredSchemes:Scheme[]=[];
-
 displayedSchemes:Scheme[]=[];
 
 // ================= CONSTRUCTOR =================
 
-constructor(){
+constructor(
+  private policyService: PolicyService,
+  private authService: AuthService
+) {}
 
-this.loadSchemes();
-
+ngOnInit(): void {
+  this.loadPolicies();
 }
 
-// ================= LOAD SCHEMES =================
+// ================= LOAD POLICIES =================
 
-loadSchemes(){
+loadPolicies(keyword?: string): void {
+  this.policyService.searchPolicies(keyword || '', 1).subscribe({
+    next: (response: any) => {
+      console.log('Search response:', response);
+      this.schemes = response.policies.map((policy: any) => ({
 
-this.schemes=[
+        id: policy.policy_id,
+        icon: 'description',
+        category: policy.category,
+        title: policy.policy_name,
+        description: policy.description,
+        ministry: policy.ministry,
+        deadline: policy.effective_date || 'Ongoing',
+        publicationDate: policy.publication_date,
+        status: policy.status,
+        statusColor: 'eligible',
+        state: policy.state,
+        incomeLimit: 500000,
+        eligible: true,
+        open: true
 
-{
+      }));
 
-id:1,
+      // Also add schemes returned by backend
+      response.schemes.forEach((scheme: any) => {
 
-icon:'agriculture',
+        this.schemes.push({
 
-category:'Agriculture',
+          id: scheme.scheme_id,
+          icon: 'description',
+          category: scheme.category,
+          title: scheme.scheme_name,
+          description: scheme.description,
+          ministry: scheme.department,
+          deadline: scheme.end_date || 'Ongoing',
+          status: scheme.status,
+          statusColor: 'eligible',
+          state: scheme.state,
+          eligible: true,
+          open: true
 
-title:'PM Kisan Samman Nidhi',
+        });
 
-description:'Income support of ₹6,000 per year for eligible farmer families.',
+      });
 
-ministry:'Ministry of Agriculture',
+      this.applyFilters();
 
-deadline:'30 Sep 2026',
+    },
 
-status:'Eligible',
+    error: (error) => {
 
-statusColor:'eligible',
+      console.error('Search error:', error);
 
-state:'Tamil Nadu',
+      alert('Unable to load search results');
 
-incomeLimit:500000,
+    }
 
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:2,
-
-icon:'health_and_safety',
-
-category:'Health',
-
-title:'Ayushman Bharat PM-JAY',
-
-description:'Health insurance coverage up to ₹5 lakh.',
-
-ministry:'Ministry of Health',
-
-deadline:'Ongoing',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'All India',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:3,
-
-icon:'school',
-
-category:'Education',
-
-title:'National Scholarship Portal',
-
-description:'Scholarship support for students.',
-
-ministry:'Ministry of Education',
-
-deadline:'15 Oct 2026',
-
-status:'Review',
-
-statusColor:'review',
-
-state:'Tamil Nadu',
-
-incomeLimit:250000,
-
-eligible:false,
-
-open:true
-
-},
-
-{
-
-id:4,
-
-icon:'home',
-
-category:'Housing',
-
-title:'PM Awas Yojana',
-
-description:'Affordable housing assistance.',
-
-ministry:'Ministry of Housing',
-
-deadline:'31 Dec 2026',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'Karnataka',
-
-incomeLimit:300000,
-
-eligible:true,
-
-open:false
-
-},
-
-{
-
-id:5,
-
-icon:'work',
-
-category:'Employment',
-
-title:'Skill India Mission',
-
-description:'Skill development for youth.',
-
-ministry:'MSDE',
-
-deadline:'Ongoing',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'All India',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:6,
-
-icon:'payments',
-
-category:'Finance',
-
-title:'PM Mudra Loan',
-
-description:'Business loan assistance.',
-
-ministry:'Finance',
-
-deadline:'Ongoing',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'Tamil Nadu',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:7,
-
-icon:'elderly',
-
-category:'Pension',
-
-title:'Atal Pension Yojana',
-
-description:'Monthly pension scheme.',
-
-ministry:'Finance',
-
-deadline:'Ongoing',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'All India',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-},
-
-{
-
-id:8,
-
-icon:'groups',
-
-category:'Women',
-
-title:'Beti Bachao Beti Padhao',
-
-description:'Women empowerment scheme.',
-
-ministry:'Women & Child Development',
-
-deadline:'31 Dec 2026',
-
-status:'Eligible',
-
-statusColor:'eligible',
-
-state:'Tamil Nadu',
-
-incomeLimit:500000,
-
-eligible:true,
-
-open:true
-
-}
-
-];
-
-this.filteredSchemes=[...this.schemes];
-
-this.displayedSchemes=[...this.filteredSchemes];
+  });
 
 }
 // ================= APPLY FILTERS =================
@@ -396,27 +184,14 @@ applyFilters(): void {
 
     let matchesCategory = true;
 
-    if (
-      this.categoryAgriculture ||
-      this.categoryHealth ||
-      this.categoryEducation ||
-      this.categoryEmployment ||
-      this.categoryHousing
-    ) {
-
-      matchesCategory =
-
-        (this.categoryAgriculture && scheme.category === 'Agriculture') ||
-
-        (this.categoryHealth && scheme.category === 'Health') ||
-
-        (this.categoryEducation && scheme.category === 'Education') ||
-
-        (this.categoryEmployment && scheme.category === 'Employment') ||
-
-        (this.categoryHousing && scheme.category === 'Housing');
-
-    }
+if (
+  this.categoryEducation ||
+  this.categoryScholarships
+) {
+  matchesCategory =
+    (this.categoryEducation && scheme.category === 'Education') ||
+    (this.categoryScholarships && scheme.category === 'Scholarships');
+}
 
     // ---------- State ----------
 
@@ -430,19 +205,13 @@ applyFilters(): void {
 
       matchesState =
 
-        (this.stateTamilNadu && scheme.state === 'Tamil Nadu') ||
+        (this.stateTamilNadu && scheme.state === 'Taamil Nadu') ||
 
         (this.stateKarnataka && scheme.state === 'Karnataka') ||
 
-        (this.stateAllIndia && scheme.state === 'All India');
+        (this.stateAllIndia && scheme.state === 'All States')
 
     }
-
-    // ---------- Income ----------
-
-    const matchesIncome =
-      scheme.incomeLimit <= this.selectedIncome;
-
     // ---------- Eligible ----------
 
     const matchesEligible =
@@ -453,21 +222,19 @@ applyFilters(): void {
     const matchesOpen =
       !this.currentlyOpen || scheme.open;
 
+    const matchesPublicationDate =
+  this.selectedPublicationDate === '' ||
+  scheme.publicationDate === this.selectedPublicationDate;
+
     return (
-
-      matchesSearch &&
-
-      matchesCategory &&
-
-      matchesState &&
-
-      matchesIncome &&
-
-      matchesEligible &&
-
-      matchesOpen
-
-    );
+  matchesSearch &&
+  matchesCategory &&
+  matchesState &&
+ 
+  matchesEligible &&
+  matchesOpen &&
+  matchesPublicationDate
+);
 
   });
 
@@ -475,11 +242,411 @@ applyFilters(): void {
 
 }
 
-// ================= SEARCH =================
+onPublicationDateChange(date: Date | null): void {
 
-searchPolicies(): void {
+  if (!date) {
+    this.selectedPublicationDate = '';
+    this.applyFilters();
+    return;
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  this.selectedPublicationDate = `${year}-${month}-${day}`;
+
+  console.log('Selected date:', this.selectedPublicationDate);
+  console.log('Schemes:', this.schemes);
 
   this.applyFilters();
+}
+// ================= SEARCH =================
+searchPolicies(): void {
+  this.loadPolicies(this.search.trim() || undefined);
+}
+
+searchByCategory(category: string): void {
+
+  this.policyService.getAllPolicies({
+    category: category
+  }).subscribe({
+
+    next: (response: any) => {
+
+      console.log('Category search response:', response);
+
+      this.schemes = response.data.map((policy: any) => ({
+
+        id: policy.policy_id,
+        icon: 'description',
+        category: policy.category,
+        title: policy.policy_name,
+        description: policy.description,
+        ministry: policy.ministry,
+        deadline: policy.effective_date || 'Ongoing',
+        status: policy.status,
+        statusColor: 'eligible',
+        state: policy.state,
+        incomeLimit: 500000,
+        eligible: true,
+        open: true
+
+      }));
+
+      this.filteredSchemes = this.schemes;
+
+      this.currentPage = 1;
+
+      this.updateDisplayedSchemes();
+
+    },
+
+    error: (error) => {
+      console.error('Category search error:', error);
+    }
+
+  });
+
+}
+searchByState(state: string): void {
+
+  // -------- POLICIES --------
+
+  this.policyService.getAllPolicies({
+    state: state
+  }).subscribe({
+
+    next: (policyResponse: any) => {
+
+      console.log('Policy state response:', policyResponse);
+
+      this.schemes = policyResponse.data.map((policy: any) => ({
+
+        id: policy.policy_id,
+        icon: 'description',
+        category: policy.category,
+        title: policy.policy_name,
+        description: policy.description,
+        ministry: policy.ministry,
+        deadline: policy.effective_date || 'Ongoing',
+        status: policy.status,
+        statusColor: 'eligible',
+        state: policy.state,
+        incomeLimit: 500000,
+        eligible: true,
+        open: true
+
+      }));
+
+      // -------- SCHEMES --------
+
+      this.policyService.searchSchemesByCategory('').subscribe({
+
+        next: (schemeResponse: any) => {
+
+          console.log('Scheme state response:', schemeResponse);
+
+          const stateSchemes = schemeResponse.data.filter(
+            (scheme: any) => scheme.state === state
+          );
+
+          stateSchemes.forEach((scheme: any) => {
+
+            this.schemes.push({
+
+  id: scheme.scheme_id,
+  icon: 'description',
+  category: scheme.category,
+  title: scheme.scheme_name,
+  description: scheme.description,
+  ministry: scheme.department,
+  deadline: scheme.end_date || 'Ongoing',
+  publicationDate: '',
+  status: scheme.status,
+  statusColor: 'eligible',
+  state: scheme.state,
+  eligible: true,
+  open: true
+
+});
+
+          });
+
+          this.filteredSchemes = this.schemes;
+
+          this.currentPage = 1;
+
+          this.updateDisplayedSchemes();
+
+        },
+
+        error: (error) => {
+          console.error('Scheme state search error:', error);
+        }
+
+      });
+
+    },
+
+    error: (error) => {
+      console.error('Policy state search error:', error);
+    }
+
+  });
+
+}
+searchByMinistry(ministry: string): void {
+
+  this.policyService.getAllPolicies({
+    ministry: ministry
+  }).subscribe({
+
+    next: (response: any) => {
+
+      console.log('Ministry search response:', response);
+
+      this.schemes = response.data.map((policy: any) => ({
+
+        id: policy.policy_id,
+        icon: 'description',
+        category: policy.category,
+        title: policy.policy_name,
+        description: policy.description,
+        ministry: policy.ministry,
+        deadline: policy.effective_date || 'Ongoing',
+        status: policy.status,
+        statusColor: 'eligible',
+        state: policy.state,
+        incomeLimit: 500000,
+        eligible: true,
+        open: true
+
+      }));
+
+      this.filteredSchemes = this.schemes;
+
+      this.currentPage = 1;
+
+      this.updateDisplayedSchemes();
+
+    },
+
+    error: (error) => {
+
+      console.error('Ministry search error:', error);
+
+    }
+
+  });
+
+}
+
+searchSchemeByCategory(category: string): void {
+
+  this.policyService.searchSchemesByCategory(category).subscribe({
+
+    next: (response: any) => {
+
+      console.log('Scheme category response:', response);
+
+      this.schemes = response.data.map((scheme: any) => ({
+
+        id: scheme.scheme_id,
+        icon: 'description',
+        category: scheme.category,
+        title: scheme.scheme_name,
+        description: scheme.description,
+        ministry: scheme.department,
+        deadline: scheme.end_date || 'Ongoing',
+        status: scheme.status,
+        statusColor: 'eligible',
+        state: scheme.state,
+        incomeLimit: 500000,
+        eligible: true,
+        open: true
+
+      }));
+
+      this.filteredSchemes = this.schemes;
+
+      this.currentPage = 1;
+
+      this.updateDisplayedSchemes();
+
+    },
+
+    error: (error) => {
+      console.error('Scheme category search error:', error);
+    }
+
+  });
+
+}
+
+searchByDepartment(department: string): void {
+
+  // -------- POLICIES --------
+
+  this.policyService.getAllPolicies({
+    department: department
+  }).subscribe({
+
+    next: (policyResponse: any) => {
+
+      console.log('Policy department response:', policyResponse);
+
+      this.schemes = policyResponse.data.map((policy: any) => ({
+
+        id: policy.policy_id,
+        icon: 'description',
+        category: policy.category,
+        title: policy.policy_name,
+        description: policy.description,
+        ministry: policy.ministry,
+        deadline: policy.effective_date || 'Ongoing',
+        status: policy.status,
+        statusColor: 'eligible',
+        state: policy.state,
+        incomeLimit: 500000,
+        eligible: true,
+        open: true
+
+      }));
+
+      // -------- SCHEMES --------
+
+      this.policyService.searchSchemesByDepartment(department).subscribe({
+
+        next: (schemeResponse: any) => {
+
+          console.log('Scheme department response:', schemeResponse);
+
+          schemeResponse.data.forEach((scheme: any) => {
+
+            this.schemes.push({
+
+              id: scheme.scheme_id,
+              icon: 'description',
+              category: scheme.category,
+              title: scheme.scheme_name,
+              description: scheme.description,
+              ministry: scheme.department,
+              deadline: scheme.end_date || 'Ongoing',
+              status: scheme.status,
+              statusColor: 'eligible',
+              state: scheme.state,
+              eligible: true,
+              open: true
+
+            });
+
+          });
+
+          this.filteredSchemes = this.schemes;
+
+          this.currentPage = 1;
+
+          this.updateDisplayedSchemes();
+
+        },
+
+        error: (error) => {
+          console.error('Scheme department search error:', error);
+        }
+
+      });
+
+    },
+
+    error: (error) => {
+      console.error('Policy department search error:', error);
+    }
+
+  });
+
+}
+
+searchByStatus(status: string): void {
+
+  // -------- POLICIES --------
+
+  this.policyService.getAllPolicies({
+    status: status
+  }).subscribe({
+
+    next: (policyResponse: any) => {
+
+      console.log('Policy status response:', policyResponse);
+
+      this.schemes = policyResponse.data.map((policy: any) => ({
+
+        id: policy.policy_id,
+        icon: 'description',
+        category: policy.category,
+        title: policy.policy_name,
+        description: policy.description,
+        ministry: policy.ministry,
+        deadline: policy.effective_date || 'Ongoing',
+        status: policy.status,
+        statusColor: 'eligible',
+        state: policy.state,
+        incomeLimit: 500000,
+        eligible: true,
+        open: true
+
+      }));
+
+      // -------- SCHEMES --------
+
+      this.policyService.getAllSchemesByStatus(status).subscribe({
+
+        next: (schemeResponse: any) => {
+
+          console.log('Scheme status response:', schemeResponse);
+
+          schemeResponse.data.forEach((scheme: any) => {
+
+            this.schemes.push({
+
+              id: scheme.scheme_id,
+              icon: 'description',
+              category: scheme.category,
+              title: scheme.scheme_name,
+              description: scheme.description,
+              ministry: scheme.department,
+              deadline: scheme.end_date || 'Ongoing',
+              status: scheme.status,
+              statusColor: 'eligible',
+              state: scheme.state,
+              eligible: true,
+              open: true
+
+            });
+
+          });
+
+          this.filteredSchemes = this.schemes;
+
+          this.currentPage = 1;
+
+          this.updateDisplayedSchemes();
+
+        },
+
+        error: (error: any) => {
+          console.error('Scheme status search error:', error);
+        }
+
+      });
+
+    },
+
+    error: (error: any) => {
+      console.error('Policy status search error:', error);
+    }
+
+  });
 
 }
 
@@ -559,7 +726,6 @@ previousPage(): void {
     this.updateDisplayedSchemes();
 
   }
-
 }
 
 // ================= CLEAR =================
@@ -567,39 +733,20 @@ previousPage(): void {
 clearAllFilters(): void {
 
   this.search = '';
-
-  this.categoryAgriculture = false;
-
-  this.categoryHealth = false;
-
   this.categoryEducation = false;
-
-  this.categoryEmployment = false;
-
-  this.categoryHousing = false;
-
   this.stateTamilNadu = false;
-
   this.stateKarnataka = false;
-
   this.stateAllIndia = false;
-
+  this.activeOnly = false;
+  this.selectedPublicationDate = '';
   this.eligibleOnly = false;
-
   this.currentlyOpen = false;
-
-  this.selectedIncome = 500000;
-
+  this.categoryScholarships = false;
   this.selectedSort = 'Most Relevant';
-
   this.applyFilters();
-
 }
-
 // ================= RESET =================
-
 resetFilters(): void {
-
   this.clearAllFilters();
 
 }

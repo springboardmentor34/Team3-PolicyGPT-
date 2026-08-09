@@ -20,23 +20,7 @@
 
     </div>
 
-    <!-- Search -->
-
-    <div class="search-section">
-
-      <mat-form-field appearance="outline" class="nav-search">
-
-        <mat-icon matPrefix>search</mat-icon>
-
-        <input
-          matInput
-          [(ngModel)]="search"
-          (keyup)="applyFilters()"
-          placeholder="Search schemes, policies or eligibility criteria...">
-
-      </mat-form-field>
-
-    </div>
+    
 
     <!-- Right -->
 
@@ -138,37 +122,6 @@
       <div class="active-filters">
 
         <span>Active Filters :</span>
-
-        <div
-          class="chip"
-          *ngIf="categoryAgriculture">
-
-          Agriculture
-
-          <mat-icon
-            (click)="categoryAgriculture=false;applyFilters()">
-
-            close
-
-          </mat-icon>
-
-        </div>
-
-        <div
-          class="chip"
-          *ngIf="categoryHealth">
-
-          Health
-
-          <mat-icon
-            (click)="categoryHealth=false;applyFilters()">
-
-            close
-
-          </mat-icon>
-
-        </div>
-
         <div
           class="chip"
           *ngIf="categoryEducation">
@@ -183,35 +136,7 @@
           </mat-icon>
 
         </div>
-                <div
-          class="chip"
-          *ngIf="categoryEmployment">
-
-          Employment
-
-          <mat-icon
-            (click)="categoryEmployment=false;applyFilters()">
-
-            close
-
-          </mat-icon>
-
-        </div>
-
-        <div
-          class="chip"
-          *ngIf="categoryHousing">
-
-          Housing
-
-          <mat-icon
-            (click)="categoryHousing=false;applyFilters()">
-
-            close
-
-          </mat-icon>
-
-        </div>
+  
 
         <div
           class="chip"
@@ -294,57 +219,22 @@
       <mat-card class="filter-card">
 
         <h3>CATEGORY</h3>
-
-        <mat-checkbox
-          [(ngModel)]="categoryAgriculture"
-          (change)="applyFilters()">
-
-          Agriculture
-
-          <span class="count">42</span>
-
-        </mat-checkbox>
-
-        <mat-checkbox
-          [(ngModel)]="categoryHealth"
-          (change)="applyFilters()">
-
-          Health
-
-          <span class="count">31</span>
-
-        </mat-checkbox>
-
         <mat-checkbox
           [(ngModel)]="categoryEducation"
-          (change)="applyFilters()">
+          (change)="searchByCategory('Education')">
 
           Education
 
           <span class="count">27</span>
 
         </mat-checkbox>
-
         <mat-checkbox
-          [(ngModel)]="categoryEmployment"
-          (change)="applyFilters()">
+  [(ngModel)]="categoryScholarships"
+  (change)="searchSchemeByCategory('Scholarships')">
 
-          Employment
+  Scholarships
 
-          <span class="count">18</span>
-
-        </mat-checkbox>
-
-        <mat-checkbox
-          [(ngModel)]="categoryHousing"
-          (change)="applyFilters()">
-
-          Housing
-
-          <span class="count">15</span>
-
-        </mat-checkbox>
-
+</mat-checkbox>
         <hr>
 
         <!-- ================= STATE ================= -->
@@ -382,36 +272,41 @@
         </mat-checkbox>
 
         <hr>
+<!-- ================= PUBLICATION DATE ================= -->
 
-        <!-- ================= INCOME ================= -->
+<h3>PUBLICATION DATE</h3>
 
-        <h3>ANNUAL INCOME LIMIT</h3>
+<mat-form-field appearance="outline" class="date-field">
 
-        <mat-slider
-          min="0"
-          max="500000"
-          step="10000">
+  <input
+    matInput
+    [matDatepicker]="picker"
+    [(ngModel)]="selectedPublicationDate"
+    (dateChange)="onPublicationDateChange($event.value)"
+    placeholder="Select date">
 
-          <input
-            matSliderThumb
-            [(ngModel)]="selectedIncome"
-            (ngModelChange)="applyFilters()">
+  <mat-datepicker-toggle
+    matIconSuffix
+    [for]="picker">
+  </mat-datepicker-toggle>
 
-        </mat-slider>
+  <mat-datepicker #picker></mat-datepicker>
 
-        <div class="income-label">
-
-          <span>₹0</span>
-
-          <span>₹5,00,000+</span>
-
-        </div>
-
+</mat-form-field>
+  
         <hr>
-
+      
         <!-- ================= STATUS ================= -->
 
         <h3>STATUS</h3>
+
+        <mat-checkbox
+  [(ngModel)]="activeOnly"
+  (change)="searchByStatus('Active')">
+
+  Active
+
+</mat-checkbox>
 
         <mat-checkbox
           [(ngModel)]="eligibleOnly"
