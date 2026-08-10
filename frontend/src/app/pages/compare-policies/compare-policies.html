@@ -205,7 +205,7 @@
     </mat-card>
         <!-- ================= COMPARISON TABLE ================= -->
 
-    <mat-card class="comparison-card">
+    <mat-card class="comparison-card" *ngIf="policyOne && policyTwo">
 
       <div class="comparison-header">
 
@@ -369,7 +369,7 @@
 
     <!-- ================= BENEFITS ================= -->
 
-    <div class="benefit-grid">
+    <div class="benefit-grid" *ngIf="policyOne && policyTwo">
 
       <!-- Policy 1 -->
 
@@ -422,7 +422,7 @@
     </div>
         <!-- ================= SUMMARY ================= -->
 
-    <div class="summary-grid">
+    <div class="summary-grid" *ngIf="policyOne && policyTwo">
 
       <!-- Overall Match -->
 
@@ -484,7 +484,7 @@
 
     <!-- ================= ELIGIBILITY ================= -->
 
-    <mat-card class="eligibility-card">
+    <mat-card class="eligibility-card" *ngIf="policyOne && policyTwo">
 
       <h2>
 
@@ -564,7 +564,7 @@
 
     <!-- ================= DOCUMENTS ================= -->
 
-    <mat-card class="documents-card">
+    <mat-card class="documents-card" *ngIf="policyOne && policyTwo">
 
       <h2>
 
@@ -612,7 +612,7 @@
 
     <!-- ================= FINAL RECOMMENDATION ================= -->
 
-    <mat-card class="recommendation-card">
+    <mat-card class="recommendation-card" *ngIf="policyOne && policyTwo">
 
       <div class="recommendation-header">
 
@@ -631,17 +631,9 @@
       </div>
 
       <p>
-
-        Based on the comparison, the most suitable scheme is
-
-        <strong>
-
-          {{getRecommendation()}}
-
-        </strong>
-
-        considering the processing time, benefits, eligibility, and application status.
-
+          Based on the comparison, the most suitable scheme is
+          <strong>{{ getRecommendation() }}</strong>
+          considering processing time, application mode, and current status.
       </p>
 
     </mat-card>

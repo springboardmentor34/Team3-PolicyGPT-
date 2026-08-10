@@ -174,20 +174,17 @@ selectedPolicy2 = 'Ayushman Bharat PM-JAY';
     // ================= METHODS =================
 
   comparePolicies(): void {
+  this.policyOne = this.policies.find(
+    p => p.name === this.selectedPolicy1
+  );
 
-    this.policyOne = this.policies.find(
+  this.policyTwo = this.policies.find(
+    p => p.name === this.selectedPolicy2
+  );
 
-      p => p.name === this.selectedPolicy1
-
-    );
-
-    this.policyTwo = this.policies.find(
-
-      p => p.name === this.selectedPolicy2
-
-    );
-
-  }
+  console.log('Policy 1:', this.policyOne);
+  console.log('Policy 2:', this.policyTwo);
+}
 
   // ================= SWAP =================
 
@@ -249,50 +246,88 @@ selectedPolicy2 = 'Ayushman Bharat PM-JAY';
 
   // ================= GET MATCH =================
 
-  getOverallMatch(): number{
+getOverallMatch(): number {
 
-    let score=0;
+  let score = 0;
 
-    if(this.policyOne.category===this.policyTwo.category){
-
-      score+=25;
-
-    }
-
-    if(this.policyOne.apply===this.policyTwo.apply){
-
-      score+=25;
-
-    }
-
-    if(this.policyOne.status===this.policyTwo.status){
-
-      score+=25;
-
-    }
-
-    if(this.policyOne.processing===this.policyTwo.processing){
-
-      score+=25;
-
-    }
-
-    return score;
-
+  // Same category
+  if (this.policyOne.category === this.policyTwo.category) {
+    score += 40;
   }
 
+  // Same application mode
+  if (this.policyOne.apply === this.policyTwo.apply) {
+    score += 20;
+  }
+
+  // Same status
+  if (this.policyOne.status === this.policyTwo.status) {
+    score += 10;
+  }
+
+  // Similar processing time
+  const daysOne = parseInt(this.policyOne.processing);
+  const daysTwo = parseInt(this.policyTwo.processing);
+
+  if (Math.abs(daysOne - daysTwo) <= 10) {
+    score += 20;
+  }
+
+  // Similar eligibility
+  if (
+    this.policyOne.eligibility.toLowerCase() ===
+    this.policyTwo.eligibility.toLowerCase()
+  ) {
+    score += 10;
+  }
+
+  return score;
+}
   // ================= RECOMMENDATION =================
 
-  getRecommendation(): string{
+ getRecommendation(): string {
 
-    if(this.policyOne.processing < this.policyTwo.processing){
+  const daysOne = parseInt(this.policyOne.processing);
+  const daysTwo = parseInt(this.policyTwo.processing);
 
-      return this.policyOne.name;
+  let scoreOne = 0;
+  let scoreTwo = 0;
 
-    }
-
-    return this.policyTwo.name;
-
+  // Faster processing
+  if (daysOne < daysTwo) {
+    scoreOne += 2;
+  } else if (daysTwo < daysOne) {
+    scoreTwo += 2;
   }
+
+  // Active status
+  if (this.policyOne.status === 'Active') {
+    scoreOne += 1;
+  }
+
+  if (this.policyTwo.status === 'Active') {
+    scoreTwo += 1;
+  }
+
+  // Online application
+  if (this.policyOne.apply === 'Online') {
+    scoreOne += 1;
+  }
+
+  if (this.policyTwo.apply === 'Online') {
+    scoreTwo += 1;
+  }
+
+  // Return recommendation
+  if (scoreOne > scoreTwo) {
+    return this.policyOne.name;
+  }
+
+  if (scoreTwo > scoreOne) {
+    return this.policyTwo.name;
+  }
+
+  return 'Both policies are equally suitable';
+}
 
 }
