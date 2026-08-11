@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.scheme_schema import Scheme
+from backend.app.schemas.scheme_schema import Scheme
 
 router = APIRouter(
     prefix="/schemes",

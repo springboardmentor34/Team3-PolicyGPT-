@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.notification_schema import Notification
+from backend.app.schemas.notification_schema import Notification
 
 router = APIRouter(
     prefix="/notifications",

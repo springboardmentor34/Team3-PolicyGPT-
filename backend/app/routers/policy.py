@@ -1,6 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.policy_schema import Policy
-
+from backend.app.schemas.policy_schema import Policy
 router = APIRouter(
     prefix="/policies",
     tags=["Policy Management"]

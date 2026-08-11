@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import policy, scheme, notification
+from backend.app.routers import policy, scheme, notification, eligibility
 
 
 
@@ -12,6 +12,7 @@ app = FastAPI(
 app.include_router(policy.router)
 app.include_router(scheme.router)
 app.include_router(notification.router)
+app.include_router(eligibility.router)
 
 
 @app.get("/")
