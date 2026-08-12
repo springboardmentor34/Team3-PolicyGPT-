@@ -549,7 +549,7 @@ searchByDepartment(department: string): void {
 
           this.updateDisplayedSchemes();
 
-        },
+        (this.categoryHealth && scheme.category === 'Healthcare') ||
 
         error: (error) => {
           console.error('Scheme department search error:', error);
@@ -646,7 +646,7 @@ searchByStatus(status: string): void {
       console.error('Policy status search error:', error);
     }
 
-  });
+  this.loadPolicies(this.search.trim() || undefined);
 
 }
 

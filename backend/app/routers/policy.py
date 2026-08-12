@@ -8,7 +8,6 @@ from app.utils.database import get_db
 from app.models.policy import Policy
 from app.schemas.policy_schema import PolicyCreate, PolicyUpdate, PolicyOut
 
-
 router = APIRouter(
     prefix="/policies",
     tags=["Policy Management"]
@@ -140,7 +139,6 @@ def update_policy(
 
     db.commit()
     db.refresh(policy)
-
     return policy
 
 

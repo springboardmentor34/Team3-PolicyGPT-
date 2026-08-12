@@ -61,20 +61,43 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.policyService.getAllPolicies().subscribe((policies) => {
-      this.featuredPolicies = policies.slice(0, 3);
-      this.loadingPolicies = false;
-    });
+    this.policyService.getAllPolicies().subscribe({
+  next: (response: any) => {
+    this.featuredPolicies = response.data.slice(0, 3).map((policy: any) => ({
+  id: policy.policy_id,
+  title: policy.policy_name,
+  description: policy.category,
+  category: policy.category,
+  department: policy.department,
+  state: policy.state,
+  status: policy.status
+  }));
+    this.loadingPolicies = false;
+  },
+  error: (err) => {
+    console.error(err);
+    this.loadingPolicies = false;
+  }
+});
 
-    this.schemeService.getLatestSchemes(3).subscribe((schemes) => {
-      this.latestSchemes = schemes;
-      this.loadingSchemes = false;
-    });
+    this.schemeService.getLatestSchemes(3).subscribe((schemes: any[]) => {
 
-    this.policyService.getPopularCategories().subscribe((categories) => {
-      this.categories = categories;
-      this.loadingCategories = false;
-    });
+  this.latestSchemes = schemes.map((scheme, index) => ({
+    ...scheme,
+    id: scheme.scheme_id
+  }));
+
+  this.loadingSchemes = false;
+
+});
+
+    // this.policyService.getPopularCategories().subscribe((categories) => {
+    //   this.categories = categories;
+    //   this.loadingCategories = false;
+    // });
+
+    this.categories = [];
+    this.loadingCategories = false;
   }
 
   onHeroSearch(query: string): void {

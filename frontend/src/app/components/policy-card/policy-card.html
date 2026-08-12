@@ -24,8 +24,15 @@
 
   <mat-card-actions class="pg-policy-card__actions">
     <span class="pg-text-muted pg-view-count"><mat-icon>visibility</mat-icon> {{ policy.viewCount | number }}</span>
-    <button mat-button color="primary" [routerLink]="['/policy-details', policy.id]" (click)="$event.stopPropagation()">
-      View Details <mat-icon iconPositionEnd>arrow_forward</mat-icon>
-    </button>
+    <button
+  mat-button
+  color="primary"
+  [routerLink]="['/policy-details', policy.id]"
+  (click)="$event.stopPropagation()">
+
+  Learn More
+  <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+
+</button>
   </mat-card-actions>
 </mat-card>

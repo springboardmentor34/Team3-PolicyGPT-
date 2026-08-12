@@ -246,6 +246,7 @@ body{
 /* ================= ROLE ================= */
 .role-selection{
     display:flex;
+    flex-wrap:wrap;
     justify-content:center;
     align-items:center;
     gap:20px;
@@ -437,7 +438,7 @@ body{
 
     margin:0;
 
-    font-size:16px;
+    font-size:14px;
 
     font-weight:600;
 
@@ -448,7 +449,7 @@ body{
 
     margin-top:6px;
 
-    font-size:13px;
+    font-size:10px;
 
     color:#64748B;
 }

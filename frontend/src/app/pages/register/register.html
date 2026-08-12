@@ -129,6 +129,32 @@
 
         </div>
 
+        <div
+          class="role-card"
+          [class.active]="selectedRole==='researcher'"
+          (click)="selectRole('researcher')">
+
+          <mat-icon>science</mat-icon>
+
+          <h3>Researcher</h3>
+
+          <p>Analyze policies & data</p>
+
+        </div>
+
+        <div
+          class="role-card"
+          [class.active]="selectedRole==='organization'"
+          (click)="selectRole('organization')">
+
+          <mat-icon>domain</mat-icon>
+
+          <h3>Organization</h3>
+
+          <p>Access schemes & reports</p>
+
+        </div>
+
       </div>
 
       <!-- ================= ROW 1 ================= -->

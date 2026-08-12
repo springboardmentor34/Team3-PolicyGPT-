@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+
+import { SchemeService } from '../../services/scheme.service';
+import { PolicyService } from '../../services/policy.service';
 
 @Component({
   selector: 'app-policy-details',
@@ -19,21 +22,44 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './policy-details.html',
   styleUrls: ['./policy-details.scss']
 })
-export class PolicyDetailsComponent {
+export class PolicyDetailsComponent implements OnInit{
+
+  constructor(
+  private route: ActivatedRoute,
+  private policyService: PolicyService
+) {}
+
+  ngOnInit(): void {
+
+  const id = this.route.snapshot.paramMap.get('id');
+
+  if (id) {
+
+    this.policyService.getPolicyById(id).subscribe({
+
+      next: (response: any) => {
+
+        this.policy = response.data;
+
+        console.log(this.policy);
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+      }
+
+    });
+
+  }
+
+}
 
   userName = 'Sri';
 
-  scheme = {
-    title: 'PM Kisan Samman Nidhi (PM-KISAN)',
-    category: 'Agriculture Policy',
-    description:
-      'A central sector scheme providing income support of ₹6,000 per year to all eligible farmer families through Direct Benefit Transfer (DBT).',
-    benefit: '₹6,000 / Year',
-    deadline: '30 September 2026',
-    beneficiaries: '11.2 Crore+',
-    coverage: 'All States',
-    ministry: 'Ministry of Agriculture & Farmers Welfare'
-  };
+  policy: any = {};
 
   overview = [
     'Provides financial assistance of ₹6,000 annually.',
