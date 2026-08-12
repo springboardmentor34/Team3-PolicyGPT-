@@ -1,277 +1,284 @@
 <div class="details-page">
 
-<!-- ================= NAVBAR ================= -->
+  <!-- ================= NAVBAR ================= -->
 
-<header class="top-navbar">
+  <header class="top-navbar">
 
-<div class="logo-section">
+    <div class="logo-section">
 
-<div class="logo-box">
-<mat-icon>shield</mat-icon>
-</div>
+      <div class="logo-box">
+        <mat-icon>shield</mat-icon>
+      </div>
 
-<div class="logo-text">
-<h2>PolicyGPT</h2>
-<span>GOVT. SCHEME INTELLIGENCE</span>
-</div>
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+      </div>
 
-</div>
+    </div>
 
-<div class="nav-right">
+    <div class="nav-right">
 
-<button
-mat-stroked-button
-routerLink="/scheme-matches">
+      <button
+        mat-stroked-button
+        routerLink="/scheme-matches">
 
-<mat-icon>arrow_back</mat-icon>
+        <mat-icon>arrow_back</mat-icon>
 
-Back
+        Back
 
-</button>
+      </button>
 
-</div>
+    </div>
 
-</header>
+  </header>
 
-<!-- ================= CONTENT ================= -->
 
-<div class="details-content">
+  <!-- ================= CONTENT ================= -->
 
-<!-- ================= HERO CARD ================= -->
+  <div class="details-content">
 
-<mat-card class="hero-card">
+    <!-- ================= HERO CARD ================= -->
 
-<div class="hero-top">
+    <mat-card class="hero-card">
 
-<div>
+      <div class="hero-top">
 
-<span class="category">
+        <div>
 
-{{scheme.category}}
+          <span class="category">
+            {{ scheme.category }}
+          </span>
 
-</span>
+          <h1>
+            {{ scheme.title }}
+          </h1>
 
-<h1>
-  {{ scheme.title }}
-</h1>
+          <p>
+            {{ scheme.ministry }}
+          </p>
 
-<p>
-  {{ scheme.ministry }}
-</p>
+        </div>
 
-</div>
+        <div class="status">
 
-<div class="status">
+          <mat-icon>
+            check_circle
+          </mat-icon>
 
-<mat-icon>
+          {{ scheme.status }}
 
-check_circle
+        </div>
 
-</mat-icon>
+      </div>
 
-{{scheme.status}}
+    </mat-card>
 
-</div>
 
-</div>
+    <!-- ================= GRID ================= -->
 
-</mat-card>
+    <div class="details-grid">
 
-<!-- ================= GRID ================= -->
 
-<div class="details-grid">
+      <!-- ================= BENEFITS ================= -->
 
-<!-- BENEFITS -->
+      <mat-card class="info-card">
 
-<mat-card class="info-card">
+        <h2>
+          💰 Benefits
+        </h2>
 
-<h2>
+        <div
+          class="list-item"
+          *ngFor="let item of benefits">
 
-💰 Benefits
+          <mat-icon>
+            task_alt
+          </mat-icon>
 
-</h2>
+          <span>
+            {{ item }}
+          </span>
 
-<div
-class="list-item"
-*ngFor="let item of benefits">
+        </div>
 
-<mat-icon>
+        <div
+          *ngIf="benefits.length === 0"
+          class="list-item">
 
-task_alt
+          <span>
+            Benefit information is not available.
+          </span>
 
-</mat-icon>
+        </div>
 
-<span>
+      </mat-card>
 
-{{item}}
 
-</span>
+      <!-- ================= ELIGIBILITY ================= -->
 
-</div>
+      <mat-card class="info-card">
 
-</mat-card>
+        <h2>
+          ✅ Eligibility Criteria
+        </h2>
 
-<!-- ELIGIBILITY -->
+        <div
+          class="list-item"
+          *ngFor="let item of eligibility">
 
-<mat-card class="info-card">
+          <mat-icon>
+            verified
+          </mat-icon>
 
-<h2>
+          <span>
+            {{ item }}
+          </span>
 
-✅ Eligibility Criteria
+        </div>
 
-</h2>
+        <div
+          *ngIf="eligibility.length === 0"
+          class="list-item">
 
-<div
-class="list-item"
-*ngFor="let item of eligibility">
+          <span>
+            Eligibility information is not available.
+          </span>
 
-<mat-icon>
+        </div>
 
-verified
+      </mat-card>
 
-</mat-icon>
 
-<span>
+      <!-- ================= DOCUMENTS ================= -->
 
-{{item}}
+      <mat-card class="info-card">
 
-</span>
+        <h2>
+          📄 Required Documents
+        </h2>
 
-</div>
+        <div
+          class="list-item"
+          *ngFor="let item of documents">
 
-</mat-card>
+          <mat-icon>
+            description
+          </mat-icon>
 
-<!-- DOCUMENTS -->
+          <span>
+            {{ item }}
+          </span>
 
-<mat-card class="info-card">
+        </div>
 
-<h2>
+      </mat-card>
 
-📄 Required Documents
 
-</h2>
+      <!-- ================= IMPORTANT INFORMATION ================= -->
 
-<div
-class="list-item"
-*ngFor="let item of documents">
+      <mat-card class="info-card">
 
-<mat-icon>
+        <h2>
+          📅 Important Information
+        </h2>
 
-description
+        <div class="info-row">
 
-</mat-icon>
+          <span>
+            Application Deadline
+          </span>
 
-<span>
+          <b>
+            {{ scheme.deadline }}
+          </b>
 
-{{item}}
+        </div>
 
-</span>
+        <div class="info-row">
 
-</div>
+          <span>
+            Application Mode
+          </span>
 
-</mat-card>
+          <b>
+            {{ scheme.mode }}
+          </b>
 
-<!-- IMPORTANT -->
+        </div>
 
-<mat-card class="info-card">
+        <div class="info-row">
 
-<h2>
+          <span>
+            Processing Time
+          </span>
 
-📅 Important Information
+          <b>
+            {{ scheme.processing }}
+          </b>
 
-</h2>
+        </div>
 
-<div class="info-row">
+        <div class="info-row">
 
-<span>
+          <span>
+            Official Website
+          </span>
 
-Application Deadline
+          <span>
+            {{ scheme.website !== '#' ? 'Available' : 'Not Available' }}
+          </span>
 
-</span>
+        </div>
 
-<b>
+      </mat-card>
 
-{{scheme.deadline}}
 
-</b>
+      <!-- ================= APPLICATION GUIDANCE ================= -->
 
-</div>
+      <mat-card class="info-card">
 
-<div class="info-row">
+        <h2>
+          📝 Application Guidance
+        </h2>
 
-<span>
+        <div class="list-item">
 
-Application Mode
+          <mat-icon>
+            info
+          </mat-icon>
 
-</span>
+          <span>
+            {{ scheme.applicationGuidance }}
+          </span>
 
-<b>
+        </div>
 
-{{scheme.mode}}
+      </mat-card>
 
-</b>
+    </div>
 
-</div>
 
-<div class="info-row">
+    <!-- ================= APPLY BUTTON ================= -->
 
-<span>
+    <div class="apply-section">
 
-Processing Time
+      <button
+        mat-raised-button
+        color="primary"
+        class="apply-btn"
+        (click)="applyNow()">
 
-</span>
+        <mat-icon>
+          send
+        </mat-icon>
 
-<b>
+        Apply Now
 
-{{scheme.processing}}
+      </button>
 
-</b>
+    </div>
 
-</div>
-
-<div class="info-row">
-
-<span>
-
-Official Website
-
-</span>
-
-<a
-href="{{scheme.website}}"
-target="_blank">
-
-Visit Portal
-
-</a>
-
-</div>
-
-</mat-card>
-
-</div>
-
-<!-- ================= APPLY BUTTON ================= -->
-
-<div class="apply-section">
-
-<button
-mat-raised-button
-color="primary"
-class="apply-btn">
-
-<mat-icon>
-
-send
-
-</mat-icon>
-
-Apply Now
-
-</button>
-
-</div>
-
-</div>
+  </div>
 
 </div>

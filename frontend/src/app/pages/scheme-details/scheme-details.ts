@@ -1,20 +1,12 @@
-//import { Component } from '@angular/core';
-//import { CommonModule } from '@angular/common';
-//import { RouterModule } from '@angular/router';
-
-//import { MatButtonModule } from '@angular/material/button';
-//import { MatCardModule } from '@angular/material/card';
-//import { MatIconModule } from '@angular/material/icon';
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
-import { SchemeService } from '../../services/scheme.service';
+import { EligibilityResultService } from '../../services/eligibility-result.service';
 
 @Component({
   selector: 'app-scheme-details',
@@ -29,79 +21,140 @@ import { SchemeService } from '../../services/scheme.service';
   templateUrl: './scheme-details.html',
   styleUrls: ['./scheme-details.scss']
 })
-export class SchemeDetailsComponent implements OnInit{
+export class SchemeDetailsComponent implements OnInit {
 
   userName = 'Sri';
+
+  scheme: any = {};
+
+  benefits: string[] = [];
+
+  eligibility: string[] = [];
+
+  documents: string[] = [
+    'Aadhaar Card',
+    'Bank Passbook',
+    'Land Ownership Certificate',
+    'Income Certificate',
+    'Passport Size Photo'
+  ];
+
   constructor(
-  private route: ActivatedRoute,
-  private schemeService: SchemeService
-) {}
+    private eligibilityResultService: EligibilityResultService
+  ) {}
 
-ngOnInit(): void {
-
-  const id = this.route.snapshot.paramMap.get('id');
-
-  if (id) {
-
-    this.schemeService.getSchemeById(id).subscribe({
-
-    next: (response: any) => {
-
-  const data = response.data;
-
-  this.scheme = {
-    title: data.scheme_name,
-    category: data.category,
-    ministry: data.department,
-    status: "Available",
-    deadline: "Not Available",
-    mode: "Online",
-    processing: "Not Available",
-    website: "#"
-  };
-
-  this.benefits = [data.benefits];
-  this.documents = ["Documents will be updated soon"];
-
-  console.log(this.scheme);
-
-},
-
-      error: (err) => {
-
-        console.error(err);
-
-      }
-
-    });
-
+  ngOnInit(): void {
+    this.loadSchemeDetails();
   }
 
-}
+  loadSchemeDetails(): void {
 
-scheme: any = {};
+    const result = this.eligibilityResultService.getResult();
 
-benefits = [
-  '₹6,000 financial assistance every year',
-  'Amount credited directly to bank account',
-  'Support for small and marginal farmers',
-  'No application processing fee'
-];
+    if (
+      !result ||
+      !result.eligible_schemes ||
+      result.eligible_schemes.length === 0
+    ) {
+      console.warn('No eligible scheme found.');
+      return;
+    }
 
-eligibility = [
-  'Indian Citizen',
-  'Must be a Farmer',
-  'Own agricultural land',
-  'Valid Aadhaar Card',
-  'Active Bank Account'
-];
+    const data = result.eligible_schemes[0];
 
-documents = [
-  'Aadhaar Card',
-  'Bank Passbook',
-  'Land Ownership Certificate',
-  'Income Certificate',
-  'Passport Size Photo'
-];
+    console.log('Selected matched scheme:', data);
 
+    // ================= SCHEME INFORMATION =================
+
+    this.scheme = {
+      title: data.scheme_name ?? 'Government Scheme',
+
+      category: data.category ?? 'General',
+
+      ministry: data.department ?? 'Government Department',
+
+      status: 'Eligible',
+
+      deadline: data.deadline ?? 'Not Available',
+
+      mode: data.application_mode ?? 'Online',
+
+      processing: data.processing_time ?? 'Not Available',
+
+      website: data.website ?? '#',
+
+      applicationGuidance:
+        data.application_guidance ??
+        'Application guidance is not available.'
+    };
+
+    // ================= BENEFITS =================
+
+    this.benefits = this.convertToList(
+      data.benefits,
+      'Benefit information is not available.'
+    );
+
+    // ================= ELIGIBILITY =================
+
+    this.eligibility = this.convertToList(
+      data.eligibility,
+      'Eligibility information is not available.'
+    );
+
+    console.log('Scheme details:', this.scheme);
+    console.log('Benefits:', this.benefits);
+    console.log('Eligibility:', this.eligibility);
+  }
+
+  // ================= CONVERT TEXT TO LIST =================
+
+  private convertToList(
+    value: any,
+    fallback: string
+  ): string[] {
+
+    if (!value) {
+      return [fallback];
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value : [fallback];
+    }
+
+    if (typeof value === 'string') {
+
+      const items = value
+        .split(/\r?\n|;/)
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+
+      return items.length > 0 ? items : [fallback];
+    }
+
+    return [String(value)];
+  }
+
+  // ================= APPLY NOW =================
+
+  applyNow(): void {
+
+    if (
+      this.scheme.website &&
+      this.scheme.website !== '#'
+    ) {
+
+      window.open(
+        this.scheme.website,
+        '_blank'
+      );
+
+    } else {
+
+      alert(
+        this.scheme.applicationGuidance ??
+        'Official application portal is not available yet.'
+      );
+    }
+  }
 }

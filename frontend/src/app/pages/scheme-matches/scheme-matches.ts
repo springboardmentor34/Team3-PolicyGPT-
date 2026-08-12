@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+
+import { EligibilityResultService } from '../../services/eligibility-result.service';
 
 @Component({
   selector: 'app-scheme-matches',
@@ -25,7 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './scheme-matches.html',
   styleUrls: ['./scheme-matches.scss']
 })
-export class SchemeMatchesComponent {
+export class SchemeMatchesComponent implements OnInit {
 
   // ================= USER =================
 
@@ -33,90 +35,57 @@ export class SchemeMatchesComponent {
 
   search = '';
 
-  totalMatches = 18;
+  // ================= RESULTS =================
 
-  // ================= SCHEME LIST =================
+  totalMatches = 0;
 
-  schemes = [
+  schemes: any[] = [];
 
-    {
-      id: 1,
-      category: 'Agriculture',
-      title: 'PM Kisan Samman Nidhi',
-      description: 'Income support of ₹6,000 per year for eligible farmers.',
-      benefit: '₹6,000 / Year',
-      deadline: '30 Sep 2026',
-      status: 'Eligible',
-      icon: 'agriculture'
-    },
+  // ================= CONSTRUCTOR =================
 
-    {
-      id: 2,
-      category: 'Health',
-      title: 'Ayushman Bharat PM-JAY',
-      description: 'Health insurance coverage up to ₹5 lakh per family.',
-      benefit: '₹5 Lakh Health Cover',
-      deadline: 'Ongoing',
-      status: 'Eligible',
-      icon: 'health_and_safety'
-    },
+  constructor(
+    private eligibilityResultService: EligibilityResultService
+  ) {}
 
-    {
-      id: 3,
-      category: 'Education',
-      title: 'National Scholarship Portal',
-      description: 'Scholarships for eligible school and college students.',
-      benefit: 'Scholarship Assistance',
-      deadline: '15 Oct 2026',
-      status: 'Eligible',
-      icon: 'school'
-    },
+  // ================= INITIALIZE =================
 
-    {
-      id: 4,
-      category: 'Housing',
-      title: 'PM Awas Yojana',
-      description: 'Affordable housing support for eligible families.',
-      benefit: 'Housing Subsidy',
-      deadline: 'Ongoing',
-      status: 'Eligible',
-      icon: 'home'
-    },
+  ngOnInit(): void {
+    this.loadMatchedSchemes();
+  }
 
-    {
-      id: 5,
-      category: 'Employment',
-      title: 'Skill India Mission',
-      description: 'Free skill development training and certification.',
-      benefit: 'Free Skill Training',
-      deadline: 'Always Open',
-      status: 'Eligible',
-      icon: 'work'
-    },
+  // ================= LOAD RESULTS =================
 
-    {
-      id: 6,
-      category: 'Women',
-      title: 'Mahila Shakti Scheme',
-      description: 'Support for women entrepreneurs and self-help groups.',
-      benefit: 'Business Support',
-      deadline: '31 Dec 2026',
-      status: 'Eligible',
-      icon: 'groups'
+  loadMatchedSchemes(): void {
+
+    const result =
+      this.eligibilityResultService.getResult();
+
+    if (!result) {
+      this.totalMatches = 0;
+      this.schemes = [];
+      return;
     }
 
-  ];
+    this.totalMatches =
+      result.eligible_count ?? 0;
+
+    this.schemes =
+      result.eligible_schemes ?? [];
+
+    console.log(
+      'Matched schemes:',
+      this.schemes
+    );
+  }
 
   // ================= METHODS =================
 
   viewScheme(scheme: any): void {
 
-    console.log('Selected Scheme:', scheme);
-
-    // Later we'll navigate to Scheme Details page
-
-    // Example:
-    // this.router.navigate(['/scheme-details', scheme.id]);
+    console.log(
+      'Selected Scheme:',
+      scheme
+    );
 
   }
 
