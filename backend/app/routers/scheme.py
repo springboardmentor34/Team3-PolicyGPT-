@@ -6,8 +6,37 @@ router = APIRouter(
     tags=["Public Scheme Management"]
 )
 
-schemes = []
 
+# ============================================================
+# DEFAULT SCHEMES
+# ============================================================
+
+schemes = [
+    Scheme(
+        scheme_name="Farmer Support Scheme",
+        category="Agriculture",
+        eligibility="Farmers with annual income below 500000",
+        benefits="₹6,000 financial assistance every year",
+        department="Department of Agriculture",
+        state="Tamil Nadu",
+        min_age=18,
+        max_age=60,
+        max_income=500000,
+        gender=None,
+        occupation="Farmer",
+        education=None,
+        social_category=None,
+        disability_required=None,
+        application_guidance=(
+            "Apply through the designated agriculture department portal."
+        )
+    )
+]
+
+
+# ============================================================
+# GET ALL SCHEMES
+# ============================================================
 
 @router.get("/")
 def get_all_schemes():
@@ -17,9 +46,14 @@ def get_all_schemes():
     }
 
 
+# ============================================================
+# CREATE SCHEME
+# ============================================================
+
 @router.post("/")
 def create_scheme(scheme: Scheme):
     schemes.append(scheme)
+
     return {
         "message": "Scheme created successfully",
         "scheme": scheme
