@@ -1,0 +1,226 @@
+<div class="matches-page">
+
+  <!-- ================= NAVBAR ================= -->
+
+  <header class="top-navbar">
+
+    <div class="logo-section">
+
+      <div class="logo-box">
+        <mat-icon>shield</mat-icon>
+      </div>
+
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+      </div>
+
+    </div>
+
+    <div class="search-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+
+        <input
+          matInput
+          [(ngModel)]="search"
+          placeholder="Search schemes...">
+      </mat-form-field>
+    </div>
+
+    <div class="nav-right">
+
+      <button mat-icon-button class="icon-btn">
+        <mat-icon>notifications_none</mat-icon>
+        <span class="badge">3</span>
+      </button>
+
+      <div class="profile">
+
+        <div class="avatar">
+          {{userName.charAt(0)}}
+        </div>
+
+        <div class="profile-info">
+          <h4>{{userName}}</h4>
+          <span>Verified Citizen</span>
+        </div>
+
+      </div>
+
+      <button
+        mat-raised-button
+        class="logout-btn">
+        Logout
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================= CONTENT ================= -->
+
+  <div class="matches-content">
+
+    <div class="top-section">
+
+      <div>
+
+        <button
+          mat-stroked-button
+          routerLink="/eligibility-checker">
+
+          <mat-icon>arrow_back</mat-icon>
+          Back
+
+        </button>
+
+        <h1>
+          My Matched Schemes
+        </h1>
+
+        <p>
+          Based on your profile and eligibility, these government schemes are recommended for you.
+        </p>
+
+      </div>
+
+      <div class="match-box">
+
+        <h2>
+          {{totalMatches}}
+        </h2>
+
+        <span>
+          Matches Found
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= SEARCH ================= -->
+
+    <mat-form-field
+      appearance="outline"
+      class="filter-search">
+
+      <mat-icon matPrefix>
+        search
+      </mat-icon>
+
+      <input
+        matInput
+        [(ngModel)]="search"
+        placeholder="Search matched schemes...">
+
+    </mat-form-field>
+
+
+    <!-- ================= SCHEME CARDS ================= -->
+
+    <div class="scheme-grid">
+
+      <mat-card
+        class="scheme-card"
+        *ngFor="let scheme of schemes">
+
+        <!-- CARD HEADER -->
+
+        <div class="card-header">
+
+          <div class="category">
+
+            <mat-icon>
+              agriculture
+            </mat-icon>
+
+            <span>
+              {{scheme.category}}
+            </span>
+
+          </div>
+
+
+          <div class="status">
+
+            <mat-icon>
+              check_circle
+            </mat-icon>
+
+            Eligible
+
+          </div>
+
+        </div>
+
+
+        <!-- SCHEME NAME -->
+
+        <h2>
+          {{scheme.scheme_name}}
+        </h2>
+
+
+        <!-- ELIGIBILITY -->
+
+        <p class="description">
+          {{scheme.eligibility}}
+        </p>
+
+
+        <!-- BENEFITS -->
+
+        <div class="benefit">
+
+          <mat-icon>
+            payments
+          </mat-icon>
+
+          {{scheme.benefits}}
+
+        </div>
+
+
+        <!-- DEPARTMENT -->
+
+        <div class="deadline">
+
+          <mat-icon>
+            business
+          </mat-icon>
+
+          Department:
+          {{scheme.department}}
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="card-footer">
+
+          <button
+            mat-raised-button
+            color="primary"
+            routerLink="/scheme-details/1">
+
+            View Details
+
+            <mat-icon>
+              arrow_forward
+            </mat-icon>
+
+          </button>
+
+        </div>
+
+      </mat-card>
+
+    </div>
+
+  </div>
+
+</div>
