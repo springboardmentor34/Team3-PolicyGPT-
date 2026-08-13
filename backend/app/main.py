@@ -1,7 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.routers import policy, scheme, notification, eligibility
+from backend.app.routers import (
+    policy,
+    scheme,
+    notification,
+    eligibility,
+    eligibility_rule
+)
 
 
 app = FastAPI(
@@ -26,6 +32,7 @@ app.include_router(policy.router)
 app.include_router(scheme.router)
 app.include_router(notification.router)
 app.include_router(eligibility.router)
+app.include_router(eligibility_rule.router)
 
 
 @app.get("/")

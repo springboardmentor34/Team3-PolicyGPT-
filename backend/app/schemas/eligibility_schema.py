@@ -8,5 +8,6 @@ class EligibilityRequest(BaseModel):
     occupation: str
     education: str
     location: str
+    category: str
     social_category: str
     disability_status: bool
