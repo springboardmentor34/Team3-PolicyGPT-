@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -39,6 +40,13 @@ export const routes: Routes = [
       import('./pages/manage-policies-schemes/manage-policies-schemes').then((m) => m.ManagePoliciesSchemesComponent),
     title: 'PolicyGPT | Manage Policies & Schemes',
     canActivate: [authGuard],
+  },
+  {
+    path: 'policy-approvals',
+    loadComponent: () =>
+      import('./pages/policy-approvals/policy-approvals').then((m) => m.PolicyApprovalsComponent),
+    title: 'PolicyGPT | Policy Approvals',
+    canActivate: [authGuard, adminGuard],
   },
   {
     path: 'policy-search',
@@ -110,4 +118,4 @@ export const routes: Routes = [
       .then((m) => m.ApplicationsComponent),
   title: 'PolicyGPT | Applications',
 },
-];
+];

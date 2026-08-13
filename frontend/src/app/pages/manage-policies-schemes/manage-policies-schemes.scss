@@ -100,6 +100,40 @@
   &.archived { background: #f0f0f0; color: #777; }
 }
 
+// Policy Approval Workflow (Task 4)
+.approval-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 4px 0 8px;
+}
+
+.approval-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px 2px 6px;
+  border-radius: 12px;
+  white-space: nowrap;
+  background: #cce5ff;
+  color: #004085;
+
+  mat-icon { font-size: 15px; height: 15px; width: 15px; }
+
+  &.approved { background: #d4edda; color: #155724; }
+  &.rejected { background: #f8d7da; color: #721c24; }
+  &.pending { background: #cce5ff; color: #004085; }
+}
+
+.rejection-note {
+  font-size: 0.78rem;
+  color: #a94442;
+  font-style: italic;
+}
+
 .item-meta {
   font-size: 0.82rem;
   color: #666;
@@ -177,4 +211,4 @@
   display: flex;
   gap: 2px;
   flex-shrink: 0;
-}
+}

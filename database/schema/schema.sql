@@ -36,8 +36,24 @@ CREATE TABLE policies (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
+    -- Policy Approval Workflow (Task 4)
+    approval_status VARCHAR(20) NOT NULL DEFAULT 'Pending',
+    approved_by BIGINT,
+    approved_at TIMESTAMP,
+    rejection_reason TEXT,
+    rejected_by BIGINT,
+    rejected_at TIMESTAMP,
+
     CONSTRAINT fk_policy_user
         FOREIGN KEY (uploaded_by_user_id)
+        REFERENCES users(user_id),
+
+    CONSTRAINT fk_policy_approved_by
+        FOREIGN KEY (approved_by)
+        REFERENCES users(user_id),
+
+    CONSTRAINT fk_policy_rejected_by
+        FOREIGN KEY (rejected_by)
         REFERENCES users(user_id)
 );
 
@@ -159,4 +175,4 @@ CREATE TABLE search_history (
     CONSTRAINT fk_search_user
         FOREIGN KEY (user_id)
         REFERENCES users(user_id)
-);
+);

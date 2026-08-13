@@ -1,0 +1,110 @@
+<div class="approvals-page">
+
+  <div class="page-header">
+    <h1>Policy Approvals</h1>
+    <span class="pending-count" *ngIf="!loading">{{ pendingPolicies.length }} pending</span>
+  </div>
+
+  <div class="loading" *ngIf="loading">Loading pending policies...</div>
+
+  <mat-card class="error-card" *ngIf="!loading && errorMessage">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+    <button mat-button color="primary" (click)="loadPendingPolicies()">Retry</button>
+  </mat-card>
+
+  <ng-container *ngIf="!loading && !errorMessage">
+
+    <p class="empty-state" *ngIf="pendingPolicies.length === 0">
+      No policies are currently awaiting approval.
+    </p>
+
+    <div class="item-grid" *ngIf="pendingPolicies.length > 0">
+      <mat-card class="item-card" *ngFor="let policy of pendingPolicies">
+
+        <div class="item-header">
+          <h3>{{ policy.policy_name }}</h3>
+          <span class="status-badge pending">Pending Review</span>
+        </div>
+        <p class="item-meta">{{ policy.category }} &middot; {{ policy.department || policy.ministry || 'All India' }} &middot; {{ policy.state || 'All India' }}</p>
+        <p class="item-desc">{{ policy.description }}</p>
+
+        <div class="item-actions">
+          <button mat-button color="primary" (click)="toggleReview(policy.policy_id)">
+            <mat-icon>{{ expandedPolicyId === policy.policy_id ? 'expand_less' : 'visibility' }}</mat-icon>
+            {{ expandedPolicyId === policy.policy_id ? 'Hide Details' : 'Review' }}
+          </button>
+        </div>
+
+        <!-- ================= EXPANDED REVIEW PANEL ================= -->
+        <div class="review-panel" *ngIf="expandedPolicyId === policy.policy_id">
+
+          <div class="detail-grid">
+            <div><span class="label">Category</span><span>{{ policy.category || '—' }}</span></div>
+            <div><span class="label">Ministry</span><span>{{ policy.ministry || '—' }}</span></div>
+            <div><span class="label">Department</span><span>{{ policy.department || '—' }}</span></div>
+            <div><span class="label">Government Level</span><span>{{ policy.government_level || '—' }}</span></div>
+            <div><span class="label">State</span><span>{{ policy.state || 'All India' }}</span></div>
+            <div><span class="label">Publication Date</span><span>{{ policy.publication_date || '—' }}</span></div>
+            <div><span class="label">Effective Date</span><span>{{ policy.effective_date || '—' }}</span></div>
+            <div *ngIf="policy.document_url">
+              <span class="label">Document</span>
+              <a [href]="policy.document_url" target="_blank" rel="noopener">View Document</a>
+            </div>
+          </div>
+
+          <div class="full-description">
+            <span class="label">Full Description</span>
+            <p>{{ policy.description || 'No description provided.' }}</p>
+          </div>
+
+          <!-- Approve / Reject controls -->
+          <div class="decision-row" *ngIf="rejectingPolicyId !== policy.policy_id">
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="actionInProgressId === policy.policy_id"
+              (click)="approve(policy)">
+              <mat-icon>check_circle</mat-icon> Approve
+            </button>
+            <button
+              mat-stroked-button
+              color="warn"
+              [disabled]="actionInProgressId === policy.policy_id"
+              (click)="startReject(policy.policy_id)">
+              <mat-icon>cancel</mat-icon> Reject
+            </button>
+          </div>
+
+          <!-- Reject reason + confirm -->
+          <div class="reject-box" *ngIf="rejectingPolicyId === policy.policy_id">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Reason for rejection</mat-label>
+              <textarea
+                matInput
+                rows="3"
+                [(ngModel)]="rejectReason"
+                placeholder="Explain why this policy is being rejected — the Government Official will see this."
+                required>
+              </textarea>
+            </mat-form-field>
+            <div class="reject-actions">
+              <button
+                mat-raised-button
+                color="warn"
+                [disabled]="actionInProgressId === policy.policy_id || !rejectReason.trim()"
+                (click)="confirmReject(policy)">
+                <mat-icon>cancel</mat-icon> Confirm Rejection
+              </button>
+              <button mat-button (click)="cancelReject()">Cancel</button>
+            </div>
+          </div>
+
+        </div>
+
+      </mat-card>
+    </div>
+
+  </ng-container>
+
+</div>

@@ -100,6 +100,17 @@
               <h3>{{ policy.policy_name }}</h3>
               <span class="status-badge" [ngClass]="policy.status?.toLowerCase()">{{ policy.status }}</span>
             </div>
+            <!-- Policy Approval Workflow (Task 4): read-only indicator only —
+                 Government Officials cannot approve/reject their own policies. -->
+            <div class="approval-row">
+              <span class="approval-badge" [ngClass]="policy.approval_status?.toLowerCase()">
+                <mat-icon>{{ policy.approval_status === 'Approved' ? 'check_circle' : (policy.approval_status === 'Rejected' ? 'cancel' : 'hourglass_empty') }}</mat-icon>
+                {{ policy.approval_status || 'Pending' }} Review
+              </span>
+              <span class="rejection-note" *ngIf="policy.approval_status === 'Rejected' && policy.rejection_reason">
+                Reason: {{ policy.rejection_reason }}
+              </span>
+            </div>
             <p class="item-meta">{{ policy.category }} &middot; {{ policy.state || 'All India' }}</p>
             <p class="item-desc">{{ policy.description }}</p>
             <div class="item-actions">
@@ -359,4 +370,4 @@
 
   </mat-tab-group>
 
-</div>
+</div>

@@ -2,7 +2,15 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class ApprovalStatus(str, Enum):
+    """Moderation state for a policy. Separate from the lifecycle `status`
+    field (Draft/Active/Archived) — this tracks the approval decision."""
+    PENDING = "Pending"
+    APPROVED = "Approved"
+    REJECTED = "Rejected"
 
 
 class PolicyCategory(str, Enum):
@@ -56,4 +64,17 @@ class PolicyOut(PolicyCreate):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    # ---- Policy Approval Workflow (Task 4) -----------------------------
+    approval_status: ApprovalStatus
+    approved_by: Optional[int] = None
+    approved_at: Optional[datetime] = None
+    rejection_reason: Optional[str] = None
+    rejected_by: Optional[int] = None
+    rejected_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+
+class PolicyRejectRequest(BaseModel):
+    """Body for PATCH /policies/{id}/reject — a reason is mandatory."""
+    reason: str = Field(..., min_length=1, max_length=1000)

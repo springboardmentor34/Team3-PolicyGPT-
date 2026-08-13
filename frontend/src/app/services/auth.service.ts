@@ -35,4 +35,24 @@ export class AuthService {
     return this.http.get(`${this.api}/me`);
   }
 
-}
+  /**
+   * Decodes the role out of the stored JWT payload. Used for route
+   * guards / conditional UI (e.g. showing the Policy Approvals link only
+   * to admins). Mirrors the decode logic already used in login.ts for
+   * the post-login redirect — not verified here, since the backend
+   * independently verifies the token's signature on every real request.
+   */
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payloadBase64 = token.split('.')[1];
+      const payloadJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+      const payload = JSON.parse(payloadJson);
+      return payload.role || null;
+    } catch {
+      return null;
+    }
+  }
+
+}

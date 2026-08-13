@@ -31,3 +31,28 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
 
     return user
+
+
+def require_roles(*allowed_roles: str):
+    """
+    Dependency factory for role-gated endpoints.
+
+    Usage:  Depends(require_roles("admin"))
+
+    Compares case-insensitively since existing user.role values in the
+    database aren't consistently cased (e.g. sample data uses "Government
+    Official" while the registration enum uses "official"). Raises 403
+    (not 401 — the user IS authenticated, just not authorized) if the
+    current user's role isn't in the allowed set.
+    """
+    allowed_lower = {r.lower() for r in allowed_roles}
+
+    def checker(current_user: User = Depends(get_current_user)) -> User:
+        if (current_user.role or "").strip().lower() not in allowed_lower:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to perform this action",
+            )
+        return current_user
+
+    return checker
