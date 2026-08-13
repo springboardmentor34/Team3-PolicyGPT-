@@ -15,12 +15,28 @@ class Scheme(Base):
     government_level = Column(String(20))
     state = Column(String(100))
     benefits = Column(Text)
+
+    eligibility = Column(Text)
+    income_limit = Column(Text)
+    processing_time = Column(Text)
+
     application_process = Column(Text)
     required_documents = Column(Text)
+
     official_website = Column(Text)
     start_date = Column(Date)
     end_date = Column(Date)
     status = Column(String(20))
-    uploaded_by_user_id = Column(BigInteger, ForeignKey("users.user_id"), nullable=False)
+
+    uploaded_by_user_id = Column(
+        BigInteger,
+        ForeignKey("users.user_id"),
+        nullable=False
+    )
+
     created_at = Column(TIMESTAMP, server_default=func.now())
-    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+    updated_at = Column(
+        TIMESTAMP,
+        server_default=func.now(),
+        onupdate=func.now()
+    )
