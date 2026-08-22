@@ -15,15 +15,17 @@ export class AnalyticsService {
   // Policy Statistics + Scheme Usage Analytics (Milestone 3, "Develop
   // Analytics Dashboard"). Requires an Official or Admin/Administrator
   // token; the backend enforces the role check.
-  getOverview(): Observable<any> {
-    return this.http.get<any>(`${this.api}/overview`);
+  getOverview(mineOnly: boolean = false): Observable<any> {
+    const params: Record<string, string> = mineOnly ? { mine_only: 'true' } : {};
+    return this.http.get<any>(`${this.api}/overview`, { params });
   }
 
   // Content-popularity half of Usage Statistics (Milestone 3, task vi) —
   // Most Viewed Policies/Schemes, Most Searched Terms. Official-
   // accessible, unlike /admin/usage-stats which also has account-activity
   // data (active users, total users) that stays admin-only.
-  getContentUsage(): Observable<any> {
-    return this.http.get<any>(`${this.api}/content-usage`);
+  getContentUsage(mineOnly: boolean = false): Observable<any> {
+    const params: Record<string, string> = mineOnly ? { mine_only: 'true' } : {};
+    return this.http.get<any>(`${this.api}/content-usage`, { params });
   }
 }

@@ -104,10 +104,6 @@
           <p *ngIf="policiesByDepartment.length === 0" class="chart-empty">No policies yet.</p>
         </mat-card>
         <mat-card class="chart-card">
-          <canvas #schemeDepartmentChart width="280" height="260"></canvas>
-          <p *ngIf="schemesByDepartment.length === 0" class="chart-empty">No schemes yet.</p>
-        </mat-card>
-        <mat-card class="chart-card">
           <canvas #policyStatusChart width="280" height="260"></canvas>
           <p *ngIf="policiesByStatus.length === 0" class="chart-empty">No policies yet.</p>
         </mat-card>
@@ -126,20 +122,16 @@
       </div>
     </div>
   </mat-card>
-  <!-- ================= SCHEME STATUS & PUBLISHING TRENDS =================
-       Note: this is still content analytics (what's IN the platform),
-       not usage tracking. Kept as its own card since it's genuinely
-       useful, but the real Task 6 (who's using the platform) lives in
-       the "Usage Statistics" card below instead. -->
+  <!-- ================= USAGE STATISTICS (Milestone 3, task vi) ================= -->
   <mat-card class="dashboard-card">
     <div class="card-header">
-      <h2>Scheme Status &amp; Publishing Trends</h2>
+      <h2>Scheme Usage Statistics</h2>
     </div>
     <div *ngIf="analyticsError" class="analytics-error">
       {{ analyticsError }}
     </div>
     <div class="analytics-breakdowns" [class.is-loading]="loadingAnalytics">
-      <p *ngIf="loadingAnalytics" class="analytics-loading">Loading...</p>
+      <p *ngIf="loadingAnalytics" class="analytics-loading">Loading usage statistics...</p>
       <div class="chart-grid">
         <mat-card class="chart-card">
           <canvas #schemeStatusChart width="280" height="260"></canvas>
@@ -150,60 +142,30 @@
           <p *ngIf="schemeUsageTrend.length === 0" class="chart-empty">Not enough history yet.</p>
         </mat-card>
       </div>
-    </div>
-  </mat-card>
 
-  <!-- ================= USAGE STATISTICS (Milestone 3, Task 6) =================
-       Genuinely different from the analytics above — this is about how
-       people are USING the platform (who's active, what's viewed, what's
-       searched), not what's in it. -->
-  <mat-card class="dashboard-card">
-    <div class="card-header">
-      <h2>Usage Statistics</h2>
-    </div>
-    <p class="usage-hint">Who's actually using the platform, not just what's in it. Only counts activity from logged-in users.</p>
-    <div *ngIf="usageError" class="analytics-error">
-      {{ usageError }}
-    </div>
-    <p *ngIf="loadingUsage" class="analytics-loading">Loading usage statistics...</p>
-    <div *ngIf="usageStats && !loadingUsage" class="usage-stats-grid">
-      <div class="usage-stat-tile">
-        <span class="usage-value">{{ usageStats.total_users }}</span>
-        <span class="usage-label">Total Registered Users</span>
+      <div *ngIf="contentUsageError" class="analytics-error">
+        {{ contentUsageError }}
       </div>
-      <div class="usage-stat-tile">
-        <span class="usage-value">{{ usageStats.active_users_7d }}</span>
-        <span class="usage-label">Active in Last 7 Days</span>
-      </div>
-      <div class="usage-stat-tile">
-        <span class="usage-value">{{ usageStats.total_eligibility_checks }}</span>
-        <span class="usage-label">Eligibility Checks Run</span>
-      </div>
-    </div>
-    <div *ngIf="usageStats && !loadingUsage" class="usage-lists-grid">
-      <div class="usage-list-card">
-        <h3>Most Viewed Policies</h3>
-        <div class="usage-list-row" *ngFor="let item of usageStats.most_viewed_policies">
-          <span>{{ item.name }}</span>
-          <span class="usage-count">{{ item.views }}</span>
+      <p *ngIf="loadingContentUsage" class="analytics-loading">Loading usage statistics...</p>
+
+      <div class="usage-lists-grid" *ngIf="!loadingContentUsage && !contentUsageError">
+        <div class="usage-list-card">
+          <h3>Most Viewed Policies</h3>
+          <div class="usage-list-row" *ngFor="let item of mostViewedPolicies">
+            <span>{{ item.name }}</span>
+            <span class="usage-count">{{ item.views }}</span>
+          </div>
+          <p *ngIf="mostViewedPolicies.length === 0" class="chart-empty-inline">No policy views recorded yet.</p>
         </div>
-        <p *ngIf="usageStats.most_viewed_policies.length === 0" class="chart-empty-inline">No policy views recorded yet.</p>
-      </div>
-      <div class="usage-list-card">
-        <h3>Most Viewed Schemes</h3>
-        <div class="usage-list-row" *ngFor="let item of usageStats.most_viewed_schemes">
-          <span>{{ item.name }}</span>
-          <span class="usage-count">{{ item.views }}</span>
+
+        <div class="usage-list-card">
+          <h3>Most Viewed Schemes</h3>
+          <div class="usage-list-row" *ngFor="let item of mostViewedSchemes">
+            <span>{{ item.name }}</span>
+            <span class="usage-count">{{ item.views }}</span>
+          </div>
+          <p *ngIf="mostViewedSchemes.length === 0" class="chart-empty-inline">No scheme views recorded yet.</p>
         </div>
-        <p *ngIf="usageStats.most_viewed_schemes.length === 0" class="chart-empty-inline">No scheme views recorded yet.</p>
-      </div>
-      <div class="usage-list-card">
-        <h3>Most Searched Terms</h3>
-        <div class="usage-list-row" *ngFor="let item of usageStats.most_searched_terms">
-          <span>{{ item.term }}</span>
-          <span class="usage-count">{{ item.count }}</span>
-        </div>
-        <p *ngIf="usageStats.most_searched_terms.length === 0" class="chart-empty-inline">No searches recorded yet.</p>
       </div>
     </div>
   </mat-card>

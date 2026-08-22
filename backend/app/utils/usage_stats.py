@@ -7,7 +7,7 @@ from app.models.policy import Policy
 from app.models.scheme import Scheme
 
 
-def most_viewed_policies(db: Session, limit: int = 5) -> list:
+def most_viewed_policies(db: Session, limit: int = 5, owner_user_id: int = None) -> list:
     """
     Content-popularity data, not user-account data — deliberately shared
     between the admin-only /admin/usage-stats and the official-accessible
@@ -16,11 +16,22 @@ def most_viewed_policies(db: Session, limit: int = 5) -> list:
     spec explicitly lists Usage Analytics under the Government Dashboard,
     not just Admin's — unlike raw user/account counts, which stay
     admin-only in admin.py.
+
+    owner_user_id scopes this to one official's own policies only — each
+    official's dashboard shows only their own content's popularity, never
+    another official's. Admin's endpoint doesn't pass this, so it still
+    sees every policy system-wide.
     """
-    rows = (
+    query = (
         db.query(AuditLog.record_id, func.count(AuditLog.log_id).label("views"))
         .filter(AuditLog.action == "view_policy")
-        .group_by(AuditLog.record_id)
+    )
+    if owner_user_id is not None:
+        query = query.join(Policy, Policy.policy_id == AuditLog.record_id).filter(
+            Policy.uploaded_by_user_id == owner_user_id
+        )
+    rows = (
+        query.group_by(AuditLog.record_id)
         .order_by(func.count(AuditLog.log_id).desc())
         .limit(limit)
         .all()
@@ -37,11 +48,17 @@ def most_viewed_policies(db: Session, limit: int = 5) -> list:
     return results
 
 
-def most_viewed_schemes(db: Session, limit: int = 5) -> list:
-    rows = (
+def most_viewed_schemes(db: Session, limit: int = 5, owner_user_id: int = None) -> list:
+    query = (
         db.query(AuditLog.record_id, func.count(AuditLog.log_id).label("views"))
         .filter(AuditLog.action == "view_scheme")
-        .group_by(AuditLog.record_id)
+    )
+    if owner_user_id is not None:
+        query = query.join(Scheme, Scheme.scheme_id == AuditLog.record_id).filter(
+            Scheme.uploaded_by_user_id == owner_user_id
+        )
+    rows = (
+        query.group_by(AuditLog.record_id)
         .order_by(func.count(AuditLog.log_id).desc())
         .limit(limit)
         .all()
@@ -59,6 +76,13 @@ def most_viewed_schemes(db: Session, limit: int = 5) -> list:
 
 
 def most_searched_terms(db: Session, limit: int = 10) -> list:
+    """
+    Deliberately has NO owner_user_id parameter — search terms aren't
+    attached to any policy or scheme's creator, they're citizen search
+    behavior. There's no honest way to say "these are MY search terms"
+    for an official, so this only ever appears on the admin-only
+    endpoint, never on a per-official dashboard.
+    """
     rows = (
         db.query(SearchHistory.search_keyword, func.count(SearchHistory.search_id).label("count"))
         .group_by(SearchHistory.search_keyword)

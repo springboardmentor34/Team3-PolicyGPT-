@@ -30,7 +30,7 @@ def _counts_by(query, column) -> Dict[str, int]:
     return {(value or "Uncategorized"): count for value, count in rows}
 
 
-def _approval_trend(db: Session) -> List[dict]:
+def _approval_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     """
     'Approval rates over time' — every policy bucketed by the month it
     was SUBMITTED (created_at), split into how many of that month's
@@ -38,12 +38,16 @@ def _approval_trend(db: Session) -> List[dict]:
     rather than a Postgres-specific date_trunc query, since the small
     dataset here makes that simpler to read and test than SQL-side
     date bucketing.
+
+    owner_user_id scopes this to one official's own submission history —
+    used by the Government Dashboard so an official only ever sees their
+    own approval trend, never a system-wide one revealing other
+    officials' activity.
     """
-    rows = (
-        db.query(Policy.created_at, Policy.approval_status)
-        .filter(Policy.created_at.isnot(None))
-        .all()
-    )
+    query = db.query(Policy.created_at, Policy.approval_status).filter(Policy.created_at.isnot(None))
+    if owner_user_id is not None:
+        query = query.filter(Policy.uploaded_by_user_id == owner_user_id)
+    rows = query.all()
 
     buckets: "OrderedDict[str, dict]" = OrderedDict()
 
@@ -72,7 +76,7 @@ def _approval_trend(db: Session) -> List[dict]:
     return list(buckets.values())
 
 
-def _scheme_usage_trend(db: Session) -> List[dict]:
+def _scheme_usage_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     """
     Scheme Usage Statistics over time (Milestone 3, task vi) — how many
     schemes were published each month, split by status at query time
@@ -81,12 +85,14 @@ def _scheme_usage_trend(db: Session) -> List[dict]:
     volume and how much of what's been published is actually live for
     citizens to use — not per-scheme applicant counts, which aren't
     tracked anywhere yet.
+
+    owner_user_id scopes this to one official's own schemes, same
+    reasoning as _approval_trend above.
     """
-    rows = (
-        db.query(Scheme.created_at, Scheme.status)
-        .filter(Scheme.created_at.isnot(None))
-        .all()
-    )
+    query = db.query(Scheme.created_at, Scheme.status).filter(Scheme.created_at.isnot(None))
+    if owner_user_id is not None:
+        query = query.filter(Scheme.uploaded_by_user_id == owner_user_id)
+    rows = query.all()
 
     buckets: "OrderedDict[str, dict]" = OrderedDict()
 
@@ -114,18 +120,36 @@ def _scheme_usage_trend(db: Session) -> List[dict]:
 
 @router.get("/overview")
 def get_analytics_overview(
+    mine_only: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles(*_ANALYTICS_ROLES)),
 ):
     """
-    Live Policy Statistics + Scheme Usage Analytics, shared by the
-    Government Dashboard and the Admin Dashboard (Milestone 3,
-    'Develop Analytics Dashboard'). Both roles see identical numbers here
-    — /admin/stats stays admin-only for the user-account/role breakdown,
-    which a Government Official shouldn't see.
+    Live Policy Statistics + Scheme Usage Analytics (Milestone 3,
+    'Develop Analytics Dashboard').
+
+    mine_only=true (Government Dashboard, Officials): every number here
+    is scoped to policies/schemes this specific official created —
+    an official should never see how many policies another official has
+    submitted, approved, or rejected. Only their own activity.
+
+    mine_only omitted (Admin Dashboard): unscoped, system-wide — Admin
+    is the one role that genuinely needs the whole picture, matching the
+    ownership model we use everywhere else (Admin reviews/approves
+    everyone's work but doesn't get special edit access to it either).
     """
+    owner_user_id = current_user.user_id if mine_only else None
+
     live_policies = db.query(Policy).filter(Policy.status != "Archived")
     live_schemes = db.query(Scheme).filter(Scheme.status != "Archived")
+    all_policies = db.query(Policy)
+    all_schemes = db.query(Scheme)
+
+    if mine_only:
+        live_policies = live_policies.filter(Policy.uploaded_by_user_id == owner_user_id)
+        live_schemes = live_schemes.filter(Scheme.uploaded_by_user_id == owner_user_id)
+        all_policies = all_policies.filter(Policy.uploaded_by_user_id == owner_user_id)
+        all_schemes = all_schemes.filter(Scheme.uploaded_by_user_id == owner_user_id)
 
     total_policies = live_policies.count()
     total_schemes = live_schemes.count()
@@ -146,21 +170,22 @@ def get_analytics_overview(
         # These two intentionally cover ALL rows (including Archived) since
         # showing every status/approval bucket — Archived included — is the
         # whole point of a status/approval breakdown.
-        "policies_by_status": _counts_by(db.query(Policy), Policy.status),
-        "policies_by_approval": _counts_by(db.query(Policy), Policy.approval_status),
-        "schemes_by_status": _counts_by(db.query(Scheme), Scheme.status),
+        "policies_by_status": _counts_by(all_policies, Policy.status),
+        "policies_by_approval": _counts_by(all_policies, Policy.approval_status),
+        "schemes_by_status": _counts_by(all_schemes, Scheme.status),
         # "Approval rates over time" — the one genuinely time-based chart,
         # distinct from every other breakdown above which are all
         # point-in-time snapshots.
-        "policy_approval_trend": _approval_trend(db),
+        "policy_approval_trend": _approval_trend(db, owner_user_id=owner_user_id),
         # Usage Statistics Dashboard (Milestone 3, task vi) — scheme
         # publication volume + live-vs-not split over time.
-        "scheme_usage_trend": _scheme_usage_trend(db),
+        "scheme_usage_trend": _scheme_usage_trend(db, owner_user_id=owner_user_id),
     }
 
 
 @router.get("/content-usage")
 def get_content_usage(
+    mine_only: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles(*_ANALYTICS_ROLES)),
 ):
@@ -170,16 +195,18 @@ def get_content_usage(
     stats' account-activity data (active users, total users), which stays
     admin-only.
 
-    The split follows the project spec itself: Module 8 lists "Scheme
-    Usage Analytics" as a Government Dashboard requirement, while Audit
-    Logs (which is genuinely about user accounts, not content) is listed
-    only under Admin Dashboard. Most Viewed Policies/Schemes and Most
-    Searched Terms describe what's popular, not who's using the platform
-    — so they belong here, not gated behind the admin-only endpoint they
-    originally shipped in.
+    mine_only=true (Government Dashboard): Most Viewed Policies/Schemes
+    are scoped to this official's own content only. Most Searched Terms
+    is deliberately omitted here — search terms aren't attached to any
+    policy/scheme's creator, so there's no honest way to scope them to
+    one official; it only ever appears on the admin-only endpoint.
     """
-    return {
-        "most_viewed_policies": most_viewed_policies(db, limit=5),
-        "most_viewed_schemes": most_viewed_schemes(db, limit=5),
-        "most_searched_terms": most_searched_terms(db, limit=10),
+    owner_user_id = current_user.user_id if mine_only else None
+
+    response = {
+        "most_viewed_policies": most_viewed_policies(db, limit=5, owner_user_id=owner_user_id),
+        "most_viewed_schemes": most_viewed_schemes(db, limit=5, owner_user_id=owner_user_id),
     }
+    if not mine_only:
+        response["most_searched_terms"] = most_searched_terms(db, limit=10)
+    return response

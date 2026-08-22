@@ -3,7 +3,6 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AnalyticsService } from '../../services/analytics.service';
-import { AdminService } from '../../services/admin.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -34,7 +33,6 @@ export class GovernmentDashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private analyticsService = inject(AnalyticsService);
-  private adminService = inject(AdminService);
 
   logout(): void {
     this.authService.logout();
@@ -56,7 +54,6 @@ export class GovernmentDashboardComponent implements OnInit {
   approvedPolicies = 0;
   policiesByCategory: { label: string; count: number }[] = [];
   policiesByDepartment: { label: string; count: number }[] = [];
-  schemesByDepartment: { label: string; count: number }[] = [];
   schemesByCategory: { label: string; count: number }[] = [];
   policiesByStatus: { label: string; count: number }[] = [];
   policiesByState: { label: string; count: number }[] = [];
@@ -69,23 +66,6 @@ export class GovernmentDashboardComponent implements OnInit {
   // ===== Approval trend (the one time-series chart for Task 1) =====
   approvalTrend: { month: string; approved: number; pending: number; rejected: number }[] = [];
 
-  // ================= REAL USAGE STATISTICS (Milestone 3, Task 6) =================
-  // Distinct from the content-analytics charts above (which describe
-  // what's IN the platform) — this describes how people are actually
-  // USING it: who's active, what's viewed, what's searched. Reuses the
-  // same /admin/usage-stats endpoint the Admin Dashboard uses; now that
-  // officials are permitted to call it too.
-  loadingUsage = true;
-  usageError = '';
-  usageStats: {
-    total_users: number;
-    active_users_7d: number;
-    total_eligibility_checks: number;
-    most_viewed_policies: { policy_id: number; name: string; views: number }[];
-    most_viewed_schemes: { scheme_id: number; name: string; views: number }[];
-    most_searched_terms: { term: string; count: number }[];
-  } | null = null;
-
   // Canvases are always in the DOM (never behind *ngIf), and charts are
   // created exactly once, right after the API call genuinely completes
   // — no readiness-flag juggling, no setTimeout guessing. This mirrors
@@ -96,7 +76,6 @@ export class GovernmentDashboardComponent implements OnInit {
   @ViewChild('policyCategoryChart') policyCategoryCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('schemeCategoryChart') schemeCategoryCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('policyDepartmentChart') policyDepartmentCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('schemeDepartmentChart') schemeDepartmentCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('policyStatusChart') policyStatusCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('policyStateChart') policyStateCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('schemeStateChart') schemeStateCanvas!: ElementRef<HTMLCanvasElement>;
@@ -111,22 +90,32 @@ export class GovernmentDashboardComponent implements OnInit {
     '#0891B2', '#DB2777', '#65A30D', '#EA580C', '#4338CA'
   ];
 
+  // ===== Content usage — Most Viewed / Most Searched (Milestone 3, task
+  // vi, the official-accessible half; see analytics.service.ts) =====
+  loadingContentUsage = true;
+  contentUsageError = '';
+  mostViewedPolicies: { policy_id: number; name: string; views: number }[] = [];
+  mostViewedSchemes: { scheme_id: number; name: string; views: number }[] = [];
+  mostSearchedTerms: { term: string; count: number }[] = [];
+
   ngOnInit(): void {
     this.loadAnalytics();
-    this.loadUsageStats();
+    this.loadContentUsage();
   }
 
-  loadUsageStats(): void {
-    this.loadingUsage = true;
-    this.usageError = '';
-    this.adminService.getUsageStats().subscribe({
+  loadContentUsage(): void {
+    this.loadingContentUsage = true;
+    this.contentUsageError = '';
+    this.analyticsService.getContentUsage(true).subscribe({
       next: (data: any) => {
-        this.usageStats = data;
-        this.loadingUsage = false;
+        this.mostViewedPolicies = data.most_viewed_policies ?? [];
+        this.mostViewedSchemes = data.most_viewed_schemes ?? [];
+        this.mostSearchedTerms = data.most_searched_terms ?? [];
+        this.loadingContentUsage = false;
       },
       error: (err) => {
-        this.loadingUsage = false;
-        this.usageError = err?.status === 403
+        this.loadingContentUsage = false;
+        this.contentUsageError = err?.status === 403
           ? 'You do not have permission to view usage statistics.'
           : 'Unable to load usage statistics right now.';
       }
@@ -136,7 +125,7 @@ export class GovernmentDashboardComponent implements OnInit {
   loadAnalytics(): void {
     this.loadingAnalytics = true;
     this.analyticsError = '';
-    this.analyticsService.getOverview().subscribe({
+    this.analyticsService.getOverview(true).subscribe({
       next: (data: any) => {
         this.totalPolicies = data.total_policies ?? 0;
         this.totalSchemes = data.total_schemes ?? 0;
@@ -144,7 +133,6 @@ export class GovernmentDashboardComponent implements OnInit {
         this.approvedPolicies = data.policies_by_approval?.['Approved'] ?? 0;
         this.policiesByCategory = this.toBreakdownList(data.policies_by_category);
         this.policiesByDepartment = this.toBreakdownList(data.policies_by_department);
-        this.schemesByDepartment = this.toBreakdownList(data.schemes_by_department);
         this.schemesByCategory = this.toBreakdownList(data.schemes_by_category);
         this.policiesByStatus = this.toBreakdownList(data.policies_by_status);
         this.policiesByState = this.toBreakdownList(data.policies_by_state);
@@ -181,7 +169,6 @@ export class GovernmentDashboardComponent implements OnInit {
     this.renderCategoryChart(this.policyCategoryCanvas, this.policiesByCategory, 'Policies by Category');
     this.renderCategoryChart(this.schemeCategoryCanvas, this.schemesByCategory, 'Scheme Usage by Category');
     this.renderDepartmentChart(this.policyDepartmentCanvas, this.policiesByDepartment, 'Policies by Department');
-    this.renderDepartmentChart(this.schemeDepartmentCanvas, this.schemesByDepartment, 'Schemes by Department');
     this.renderCategoryChart(this.policyStatusCanvas, this.policiesByStatus, 'Policies by Status');
     this.renderDepartmentChart(this.policyStateCanvas, this.policiesByState, 'Policies by State');
     this.renderDepartmentChart(this.schemeStateCanvas, this.schemesByState, 'Schemes by State');
