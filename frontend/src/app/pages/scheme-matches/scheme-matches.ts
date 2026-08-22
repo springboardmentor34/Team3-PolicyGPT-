@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
@@ -29,22 +29,29 @@ import { EligibilityResultService } from '../../services/eligibility-result.serv
 })
 export class SchemeMatchesComponent implements OnInit {
 
-  // ================= USER =================
-
-  userName = 'Sri';
-
-  search = '';
+  goBack(): void {
+    this.location.back();
+  }
 
   // ================= RESULTS =================
 
   totalMatches = 0;
 
+  search = '';
+
   schemes: any[] = [];
+
+  // (ii) User Profile Analysis
+  profileSummary = '';
+
+  // (iv) Eligibility Summary
+  eligibilitySummary: any = null;
 
   // ================= CONSTRUCTOR =================
 
   constructor(
-    private eligibilityResultService: EligibilityResultService
+    private eligibilityResultService: EligibilityResultService,
+    private location: Location
   ) {}
 
   // ================= INITIALIZE =================
@@ -71,6 +78,12 @@ export class SchemeMatchesComponent implements OnInit {
 
     this.schemes =
       result.eligible_schemes ?? [];
+
+    this.profileSummary =
+      result.profile_summary ?? '';
+
+    this.eligibilitySummary =
+      result.eligibility_summary ?? null;
 
     console.log(
       'Matched schemes:',

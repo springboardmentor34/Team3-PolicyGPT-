@@ -66,6 +66,9 @@ CREATE TABLE schemes (
     government_level VARCHAR(20),
     state VARCHAR(100),
     benefits TEXT,
+    eligibility TEXT,
+    income_limit TEXT,
+    processing_time TEXT,
     application_process TEXT,
     required_documents TEXT,
     official_website TEXT,
@@ -175,4 +178,22 @@ CREATE TABLE search_history (
     CONSTRAINT fk_search_user
         FOREIGN KEY (user_id)
         REFERENCES users(user_id)
-);
+);
+
+CREATE TABLE saved_policies (
+    saved_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    policy_id BIGINT NOT NULL,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_saved_policy_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id),
+
+    CONSTRAINT fk_saved_policy_policy
+        FOREIGN KEY (policy_id)
+        REFERENCES policies(policy_id),
+
+    CONSTRAINT uq_saved_policy_per_user
+        UNIQUE (user_id, policy_id)
+);

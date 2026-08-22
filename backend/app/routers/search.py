@@ -9,6 +9,8 @@ from app.utils.database import get_db
 from app.models.policy import Policy
 from app.models.scheme import Scheme
 from app.models.search_history import SearchHistory
+from app.models.user import User
+from app.auth.dependencies import get_current_user
 from app.schemas.policy_schema import PolicyOut
 from app.schemas.scheme_schema import SchemeOut
 
@@ -167,5 +169,33 @@ def search(
         "schemes": [
             SchemeOut.model_validate(scheme)
             for scheme in schemes
+        ]
+    }
+
+
+@router.get("/history/me")
+def get_my_search_history(
+    limit: int = 10,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Returns the logged-in citizen's own most recent searches, newest first."""
+    history = (
+        db.query(SearchHistory)
+        .filter(SearchHistory.user_id == current_user.user_id)
+        .order_by(SearchHistory.searched_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return {
+        "message": "Search history",
+        "count": len(history),
+        "data": [
+            {
+                "search_id": h.search_id,
+                "keyword": h.search_keyword,
+                "searched_at": h.searched_at,
+            }
+            for h in history
         ]
     }

@@ -1,77 +1,5 @@
 <div class="notifications-page">
 
-<!-- ================= NAVBAR ================= -->
-
-<header class="top-navbar">
-
-<div class="logo-section">
-
-<div class="logo-box">
-<mat-icon>shield</mat-icon>
-</div>
-
-<div class="logo-text">
-<h2>PolicyGPT</h2>
-<span>GOVT. SCHEME INTELLIGENCE</span>
-</div>
-
-</div>
-
-<div class="search-section">
-
-<mat-form-field appearance="outline" class="search-field">
-
-<mat-icon matPrefix>search</mat-icon>
-
-<input
-  matInput
-  [(ngModel)]="search"
-  placeholder="Search schemes, policies or eligibility criteria...">
-
-</mat-form-field>
-
-</div>
-
-<div class="nav-right">
-
-<button mat-icon-button class="icon-btn">
-
-<mat-icon>notifications_none</mat-icon>
-
-<span class="badge">3</span>
-
-</button>
-
-<div class="profile">
-
-<div class="avatar">
-
-{{userName.charAt(0)}}
-
-</div>
-
-<div class="profile-info">
-
-<h4>{{userName}}</h4>
-
-<span>Verified Citizen</span>
-
-</div>
-
-</div>
-
-<button
-mat-raised-button
-class="logout-btn">
-
-Logout
-
-</button>
-
-</div>
-
-</header>
-
 <!-- ================= CONTENT ================= -->
 
 <div class="notifications-content">
@@ -207,10 +135,3 @@ class="empty-card"
   </p>
 
 </mat-card>
-
-
-
-
-
-
-

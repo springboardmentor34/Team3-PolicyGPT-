@@ -34,10 +34,6 @@ applicationChart!: ElementRef<HTMLCanvasElement>;
 @ViewChild('categoryChart')
 categoryChart!: ElementRef<HTMLCanvasElement>;
 
-  // ================= USER =================
-
-  userName = 'Sri';
-
   // ================= FILTER =================
 
   selectedPeriod = 'Last 6 Months';

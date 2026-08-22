@@ -1,282 +1,721 @@
-/* ================= PAGE ================= */
+/* =========================================================
+   SCHEME DETAILS PAGE
+   ========================================================= */
 
-.details-page{
-min-height:100vh;
-background:#F5F7FB;
-font-family:'Inter',sans-serif;
+.details-page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #172033;
 }
 
-/* ================= NAVBAR ================= */
 
-.top-navbar{
-height:75px;
-background:#0F4C97;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:0 30px;
-color:#fff;
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.top-navbar {
+  height: 76px;
+  padding: 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: linear-gradient(135deg, #124f94, #0d4380);
+  color: #fff;
+
+  box-shadow: 0 3px 14px rgba(15, 76, 151, 0.18);
+
+  box-sizing: border-box;
 }
 
-.logo-section{
-display:flex;
-align-items:center;
-gap:12px;
+
+/* ---------- Logo ---------- */
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 13px;
 }
 
-.logo-box{
-width:45px;
-height:45px;
-border-radius:10px;
-background:#16A34A;
-display:flex;
-justify-content:center;
-align-items:center;
+.logo-box {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #16a34a;
+  border-radius: 11px;
+
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
 }
 
-.logo-box mat-icon{
-color:#fff;
-font-size:24px;
+.logo-box mat-icon {
+  color: #fff !important;
+  font-size: 25px;
+  width: 25px;
+  height: 25px;
 }
 
-.logo-text h2{
-margin:0;
-font-size:24px;
-font-weight:700;
+.logo-text h2 {
+  margin: 0;
+
+  color: #fff !important;
+
+  font-size: 25px;
+  line-height: 1.1;
+  font-weight: 700;
 }
 
-.logo-text span{
-font-size:10px;
-letter-spacing:1px;
-color:#D1D5DB;
+.logo-text span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #dbeafe !important;
+
+  font-size: 10px;
+  letter-spacing: 1.1px;
 }
 
-.nav-right{
-display:flex;
-align-items:center;
+
+/* ---------- Back button ---------- */
+
+.nav-right {
+  display: flex;
+  align-items: center;
 }
 
-.profile{
-display:flex;
-align-items:center;
-gap:10px;
+.nav-right button {
+  height: 42px;
+
+  padding: 0 18px;
+
+  color: #fff !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  transition: 0.2s ease;
 }
 
-.avatar{
-width:42px;
-height:42px;
-border-radius:50%;
-background:#2563EB;
-display:flex;
-justify-content:center;
-align-items:center;
-font-weight:700;
-color:white;
+.nav-right button mat-icon {
+  margin-right: 6px;
+  color: #fff !important;
 }
 
-.profile-info h4{
-margin:0;
-font-size:15px;
-color:white;
+.nav-right button:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
-.profile-info span{
-font-size:12px;
-color:#D1FAE5;
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.details-content {
+  width: min(1180px, calc(100% - 48px));
+
+  margin: 0 auto;
+
+  padding: 34px 0 70px;
+
+  box-sizing: border-box;
 }
 
-/* ================= CONTENT ================= */
 
-.details-content{
-max-width:1200px;
-margin:auto;
-padding:35px 20px;
+/* =========================================================
+   HERO CARD
+   ========================================================= */
+
+.hero-card {
+  position: relative;
+
+  padding: 34px 38px !important;
+
+  margin: 0 0 26px;
+
+  background: #fff;
+
+  border: 1px solid #e5ebf3;
+
+  border-radius: 18px !important;
+
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.07) !important;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
 }
 
-/* ================= BANNER ================= */
 
-.scheme-banner{
-margin-top:20px;
-padding:30px;
-border-radius:18px !important;
-display:flex;
-justify-content:space-between;
-align-items:center;
-background:linear-gradient(135deg,#2563EB,#0F4C97);
-color:white;
+/* Blue accent line */
+
+.hero-card::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #1557a6,
+    #2563eb
+  );
 }
 
-.category{
-display:inline-block;
-padding:8px 18px;
-background:rgba(255,255,255,.2);
-border-radius:20px;
-font-size:18px;
-font-weight:600;
-margin-bottom:22px;
-}
-.scheme-banner{
-padding:45px;
-}
-.scheme-banner h1{
-margin:10px 0 20px;
-font-size:42px;
-font-weight:700;
-line-height:1.2;
+
+/* =========================================================
+   HERO CONTENT
+   ========================================================= */
+
+.hero-top {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 30px;
 }
 
-.scheme-banner p{
-margin-top:0;
-margin-bottom:28px;
-font-size:18px;
-color:#E5E7EB;
-line-height:1.6;
+
+/* Category badge */
+
+.category {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 14px;
+
+  margin-bottom: 13px;
+
+  background: #eff6ff;
+  color: #1d4ed8;
+
+  border: 1px solid #dbeafe;
+  border-radius: 20px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-transform: capitalize;
 }
 
-.status{
-display:flex;
-align-items:center;
-gap:8px;
-padding:10px 18px;
-background:#DCFCE7;
-color:#15803D;
-border-radius:30px;
-font-weight:600;
+
+/* Scheme title */
+
+.hero-card h1 {
+  margin: 0 0 10px;
+
+  color: #123f73 !important;
+
+  font-size: 34px;
+  line-height: 1.25;
+
+  font-weight: 700;
+
+  letter-spacing: -0.4px;
 }
 
-.status mat-icon{
-font-size:20px;
+
+/* Ministry */
+
+.hero-card .hero-top p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-/* ================= GRID ================= */
 
-.details-grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:25px;
-margin-top:30px;
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 17px;
+
+  background: #dcfce7;
+  color: #15803d;
+
+  border: 1px solid #bbf7d0;
+
+  border-radius: 30px;
+
+  font-size: 14px;
+  font-weight: 600;
 }
 
-/* ================= CARDS ================= */
+.status mat-icon {
+  width: 19px;
+  height: 19px;
 
-.info-card{
-padding:25px;
-border-radius:18px !important;
-box-shadow:0 8px 20px rgba(0,0,0,.08) !important;
+  font-size: 19px;
+
+  color: #15803d !important;
 }
 
-.info-card h2{
-display:flex;
-align-items:center;
-gap:10px;
-margin-bottom:20px;
-font-size:22px;
-color:#111827;
+
+/* =========================================================
+   DETAILS GRID
+   ========================================================= */
+
+.details-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 22px;
+
+  align-items: stretch;
 }
 
-.info-card h2 mat-icon{
-color:#2563EB;
+
+/* =========================================================
+   INFORMATION CARDS
+   ========================================================= */
+
+.info-card {
+  min-width: 0;
+
+  padding: 26px 28px !important;
+
+  background: #fff;
+
+  border: 1px solid #e6ebf2;
+
+  border-radius: 17px !important;
+
+  box-shadow: 0 7px 23px rgba(15, 23, 42, 0.055) !important;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
-/* ================= LIST ================= */
+.info-card:hover {
+  transform: translateY(-3px);
 
-.list-item{
-display:flex;
-align-items:center;
-gap:12px;
-padding:12px 0;
-border-bottom:1px solid #E5E7EB;
+  border-color: #d7e3f3;
+
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09) !important;
 }
 
-.list-item:last-child{
-border-bottom:none;
+
+/* =========================================================
+   CARD HEADINGS
+   ========================================================= */
+
+.info-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 0 0 23px;
+
+  color: #16263d;
+
+  font-size: 21px;
+  line-height: 1.3;
+
+  font-weight: 700;
 }
 
-.list-item mat-icon{
-color:#16A34A;
+
+/*
+   The headings currently contain emojis.
+   Keep them visually consistent with the rest of the UI.
+*/
+
+.info-card h2::first-letter {
+  font-size: 20px;
 }
 
-.list-item span{
-font-size:15px;
-color:#374151;
+
+/* =========================================================
+   LIST ITEMS
+   ========================================================= */
+
+.list-item {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 13px;
+
+  padding: 13px 0;
+
+  color: #334155;
+
+  border-bottom: 1px solid #edf1f5;
+
+  line-height: 1.6;
+
+  box-sizing: border-box;
 }
 
-/* ================= INFO ROW ================= */
-
-.info-row{
-display:flex;
-justify-content:space-between;
-padding:14px 0;
-border-bottom:1px solid #E5E7EB;
+.list-item:last-child {
+  border-bottom: none;
 }
 
-.info-row:last-child{
-border-bottom:none;
+.list-item mat-icon {
+  flex-shrink: 0;
+
+  width: 22px;
+  height: 22px;
+
+  margin-top: 2px;
+
+  color: #16a34a !important;
+
+  font-size: 22px;
 }
 
-.info-row span{
-color:#6B7280;
+.list-item span {
+  color: #3f4d60;
+
+  font-size: 15px;
+  line-height: 1.65;
 }
 
-.info-row strong{
-color:#111827;
+
+/* Empty information message */
+
+.list-item span:only-child {
+  color: #64748b;
 }
 
-/* ================= APPLY ================= */
 
-.apply-section{
-margin-top:35px;
-display:flex;
-justify-content:center;
+/* =========================================================
+   IMPORTANT INFORMATION
+   ========================================================= */
+
+.info-row {
+  display: grid;
+
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.5fr);
+
+  gap: 20px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #e8edf3;
+
+  line-height: 1.55;
 }
 
-.apply-btn{
-height:52px !important;
-padding:0 40px !important;
-font-size:16px;
-font-weight:600;
-border-radius:12px !important;
+.info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
-.apply-btn mat-icon{
-margin-right:8px;
+.info-row:first-of-type {
+  padding-top: 0;
 }
 
-/* ================= HOVER ================= */
 
-.info-card{
-transition:.3s;
+/* Label */
+
+.info-row span:first-child {
+  color: #64748b;
+
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.info-card:hover{
-transform:translateY(-5px);
-box-shadow:0 15px 30px rgba(37,99,235,.15) !important;
+
+/* Value */
+
+.info-row b {
+  color: #172033;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-align: right;
+
+  overflow-wrap: anywhere;
 }
 
-/* ================= RESPONSIVE ================= */
 
-@media(max-width:992px){
+/*
+   Official website row has a normal span
+   as its value rather than <b>.
+*/
 
-.details-grid{
-grid-template-columns:1fr;
+.info-row span:last-child:not(:first-child) {
+  color: #475569;
+
+  font-size: 14px;
+
+  text-align: right;
 }
 
-.scheme-banner{
-flex-direction:column;
-align-items:flex-start;
-gap:20px;
+
+/* =========================================================
+   APPLICATION GUIDANCE
+   ========================================================= */
+
+/*
+   Make the final guidance card span the complete width.
+   This gives the page a much cleaner visual ending.
+*/
+
+.details-grid .info-card:last-child {
+  grid-column: 1 / -1;
 }
 
-.scheme-banner h1{
-font-size:28px;
+.details-grid .info-card:last-child .list-item {
+  border-bottom: none;
+
+  padding: 4px 0 0;
 }
 
-.top-navbar{
-padding:0 15px;
+.details-grid .info-card:last-child .list-item mat-icon {
+  width: 24px;
+  height: 24px;
+
+  font-size: 24px;
 }
 
-.profile-info{
-display:none;
+
+/* =========================================================
+   APPLY BUTTON
+   ========================================================= */
+
+.apply-section {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 34px;
 }
 
+.apply-btn {
+  min-width: 210px;
+
+  height: 52px !important;
+
+  padding: 0 32px !important;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border-radius: 11px !important;
+
+  background: #3154c6 !important;
+
+  color: #fff !important;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  box-shadow: 0 5px 12px rgba(49, 84, 198, 0.28) !important;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.apply-btn mat-icon {
+  margin: 0 !important;
+
+  color: #fff !important;
+}
+
+.apply-btn:hover {
+  background: #2847ae !important;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 18px rgba(49, 84, 198, 0.32) !important;
+}
+
+.apply-btn:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-grid .info-card:last-child {
+    grid-column: auto;
+  }
+
+  .hero-top {
+    flex-direction: column;
+
+    gap: 20px;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .top-navbar {
+    height: 70px;
+
+    padding: 0 20px;
+  }
+
+  .details-content {
+    width: calc(100% - 30px);
+
+    padding-top: 22px;
+    padding-bottom: 50px;
+  }
+
+  .hero-card {
+    padding: 28px 23px !important;
+  }
+
+  .hero-card h1 {
+    font-size: 28px;
+  }
+
+  .info-card {
+    padding: 23px !important;
+  }
+
+  .info-card h2 {
+    font-size: 20px;
+  }
+
+  .info-row {
+    grid-template-columns: 1fr;
+
+    gap: 5px;
+  }
+
+  .info-row b,
+  .info-row span:last-child:not(:first-child) {
+    text-align: left;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .top-navbar {
+    padding: 0 14px;
+  }
+
+  .logo-section {
+    gap: 9px;
+  }
+
+  .logo-box {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-box mat-icon {
+    font-size: 22px;
+  }
+
+  .logo-text h2 {
+    font-size: 20px;
+  }
+
+  .logo-text span {
+    display: none;
+  }
+
+  .nav-right button {
+    min-width: auto;
+
+    padding: 0 12px;
+  }
+
+  .nav-right button mat-icon {
+    margin-right: 0;
+  }
+
+  .nav-right button {
+    font-size: 0;
+  }
+
+  .nav-right button mat-icon {
+    font-size: 20px;
+  }
+
+  .hero-card {
+    padding: 24px 19px !important;
+  }
+
+  .hero-card h1 {
+    font-size: 25px;
+  }
+
+  .category {
+    font-size: 12px;
+  }
+
+  .status {
+    padding: 8px 14px;
+
+    font-size: 13px;
+  }
+
+  .info-card {
+    padding: 20px !important;
+  }
+
+  .info-card h2 {
+    font-size: 19px;
+  }
+
+  .list-item span {
+    font-size: 14px;
+  }
+
+  .apply-btn {
+    width: 100%;
+
+    min-width: 0;
+  }
 }

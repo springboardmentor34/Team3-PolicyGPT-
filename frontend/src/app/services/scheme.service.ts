@@ -12,7 +12,7 @@ export class SchemeService {
 
   private api = 'http://127.0.0.1:8000/schemes';
 
-  getAllSchemes(filters?: { category?: string; state?: string; department?: string; status?: string; keyword?: string; include_archived?: boolean }): Observable<any> {
+  getAllSchemes(filters?: { category?: string; state?: string; department?: string; status?: string; keyword?: string; include_archived?: boolean; mine_only?: boolean }): Observable<any> {
     let params = new HttpParams();
     if (filters) {
       Object.keys(filters).forEach(key => {

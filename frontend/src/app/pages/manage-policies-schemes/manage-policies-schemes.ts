@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { MatTabsModule } from '@angular/material/tabs';
@@ -11,6 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { AuthService } from '../../services/auth.service';
 import { PolicyService } from '../../services/policy.service';
@@ -27,7 +29,77 @@ const SCHEME_CATEGORIES = [
   'Women Empowerment', 'Senior Citizen Welfare', 'Student Schemes', 'Employment Programs', 'Social Security'
 ];
 
-const STATUS_OPTIONS = ['Draft', 'Pending', 'Active', 'Archived'];
+// Policy status is now fully derived from approval_status (see backend
+// policy.py), so 'Draft' is no longer a reachable policy state — every
+// policy starts Pending. Scheme status has no approval workflow though,
+// so schemes keep 'Draft' as a legitimate, manually-selectable state.
+const POLICY_STATUS_OPTIONS = ['Pending', 'Active', 'Rejected', 'Archived'];
+const SCHEME_STATUS_OPTIONS = ['Draft', 'Pending', 'Active', 'Archived'];
+
+// These four lists must stay in sync with the Eligibility Checker
+// (eligibility-checker.ts) — an official picking a rule value from a
+// different vocabulary than what citizens actually submit means the
+// eligibility matcher silently never matches (e.g. rule says "Farming"
+// but the checker only ever sends "Farmer").
+const ELIGIBILITY_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman and Nicobar Islands', 'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu', 'Delhi',
+  'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+];
+
+const ELIGIBILITY_OCCUPATIONS = [
+  'Student', 'Farmer', 'Salaried', 'Self-employed', 'Daily Wage Labourer',
+  'Homemaker', 'Retired / Pensioner', 'Unemployed', 'Other'
+];
+
+const ELIGIBILITY_EDUCATION_LEVELS = [
+  'Below 10th', '10th Pass', '12th Pass', 'Undergraduate',
+  'Graduate', 'Postgraduate', 'Doctorate'
+];
+
+const ELIGIBILITY_CASTE_CATEGORIES = [
+  'General', 'OBC', 'SC', 'ST', 'EWS', 'Minority'
+];
+
+const ELIGIBILITY_GENDER_OPTIONS = [
+  'Male', 'Female', 'Other', 'Prefer not to say'
+];
+
+const GOVERNMENT_LEVELS = ['Central', 'State', 'Local'];
+
+// Common central ministries — used as autocomplete suggestions, not a
+// closed list. State-level departments vary too much to enumerate, so
+// officials can still type anything not on this list.
+const COMMON_MINISTRIES = [
+  'Ministry of Education', 'Ministry of Health and Family Welfare',
+  'Ministry of Agriculture and Farmers Welfare', 'Ministry of Rural Development',
+  'Ministry of Housing and Urban Affairs', 'Ministry of Labour and Employment',
+  'Ministry of Social Justice and Empowerment', 'Ministry of Women and Child Development',
+  'Ministry of Skill Development and Entrepreneurship', 'Ministry of Micro, Small and Medium Enterprises',
+  'Ministry of Finance', 'Ministry of Electronics and Information Technology',
+  'Ministry of Environment, Forest and Climate Change', 'Ministry of Tribal Affairs',
+  'Ministry of Minority Affairs', 'Ministry of Panchayati Raj',
+  'Ministry of Power', 'Ministry of Road Transport and Highways',
+  'Ministry of Home Affairs', 'Ministry of Commerce and Industry'
+];
+
+const COMMON_DEPARTMENTS = [
+  'Department of School Education', 'Department of Higher Education',
+  'Department of Health Services', 'Department of Agriculture and Farmers Welfare',
+  'Department of Rural Development', 'Department of Urban Development',
+  'Department of Social Justice and Empowerment', 'Department of Women and Child Development',
+  'Department of Labour and Employment', 'Department of Industries and Commerce',
+  'Department of Revenue', 'Department of Finance',
+  'Department of Panchayati Raj', 'Department of Information Technology',
+  'Department of Housing', 'Department of Environment and Forests',
+  'Department of Skill Development'
+];
 
 @Component({
   selector: 'app-manage-policies-schemes',
@@ -43,7 +115,9 @@ const STATUS_OPTIONS = ['Draft', 'Pending', 'Active', 'Archived'];
     MatInputModule,
     MatSelectModule,
     MatCheckboxModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatAutocompleteModule,
+    MatChipsModule
   ],
   templateUrl: './manage-policies-schemes.html',
   styleUrl: './manage-policies-schemes.scss'
@@ -52,12 +126,41 @@ export class ManagePoliciesSchemesComponent implements OnInit {
 
   policyCategories = POLICY_CATEGORIES;
   schemeCategories = SCHEME_CATEGORIES;
-  statusOptions = STATUS_OPTIONS;
+  statusOptions = POLICY_STATUS_OPTIONS;
+  schemeStatusOptions = SCHEME_STATUS_OPTIONS;
+  eligibilityStates = ELIGIBILITY_STATES;
+  eligibilityOccupations = ELIGIBILITY_OCCUPATIONS;
+  eligibilityEducationLevels = ELIGIBILITY_EDUCATION_LEVELS;
+  eligibilityCasteCategories = ELIGIBILITY_CASTE_CATEGORIES;
+  eligibilityGenderOptions = ELIGIBILITY_GENDER_OPTIONS;
+  governmentLevels = GOVERNMENT_LEVELS;
+  commonMinistries = COMMON_MINISTRIES;
+  commonDepartments = COMMON_DEPARTMENTS;
+  filteredMinistries = COMMON_MINISTRIES;
+  filteredDepartments = COMMON_DEPARTMENTS;
+
+  // ===== Collapsible forms: closed by default, open automatically when
+  // creating (via the "+ Add" button) or editing an existing item =====
+  isPolicyFormOpen = false;
+  isSchemeFormOpen = false;
+
+  // ===== Search/filter bar for the existing-items lists =====
+  policySearchText = '';
+  policyFilterCategory = '';
+  policyFilterStatus = '';
+
+  schemeSearchText = '';
+  schemeFilterCategory = '';
+  schemeFilterStatus = '';
 
   currentUserId: number | null = null;
   currentUserRole: string | null = null;
 
-  showArchived = false;
+  // Archived items are always fetched — whether to show them is entirely
+  // controlled by the Status filter dropdown ("All Statuses" includes
+  // them, "Archived" shows only them). There's no separate toggle for
+  // this anymore; a second control that also gated archived visibility
+  // was fighting the dropdown and made "Archived" silently show nothing.
 
   policies: any[] = [];
   schemes: any[] = [];
@@ -66,6 +169,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
   schemeForm: any = this.emptySchemeForm();
 
   editingPolicyId: number | null = null;
+  editingPolicyStatus = '';
   editingSchemeId: number | null = null;
 
   // ===== Eligibility rules state =====
@@ -83,13 +187,71 @@ export class ManagePoliciesSchemesComponent implements OnInit {
     private policyService: PolicyService,
     private schemeService: SchemeService,
     private eligibilityRuleService: EligibilityRuleService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private location: Location
   ) {}
+
+  goBack(): void {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     this.loadCurrentUser();
     this.loadPolicies();
     this.loadSchemes();
+  }
+
+  // ================= COLLAPSIBLE FORMS =================
+
+  openNewPolicyForm(): void {
+    this.editingPolicyId = null;
+    this.policyForm = this.emptyPolicyForm();
+    this.isPolicyFormOpen = true;
+  }
+
+  openNewSchemeForm(): void {
+    this.editingSchemeId = null;
+    this.schemeForm = this.emptySchemeForm();
+    this.isSchemeFormOpen = true;
+  }
+
+  // ================= LIST FILTERING =================
+
+  get filteredPolicies(): any[] {
+    const text = this.policySearchText.trim().toLowerCase();
+    return this.policies.filter((p) => {
+      const matchesText = !text ||
+        (p.policy_name || '').toLowerCase().includes(text) ||
+        (p.ministry || '').toLowerCase().includes(text) ||
+        (p.department || '').toLowerCase().includes(text);
+      const matchesCategory = !this.policyFilterCategory || p.category === this.policyFilterCategory;
+      const matchesStatus = !this.policyFilterStatus || p.status === this.policyFilterStatus;
+      return matchesText && matchesCategory && matchesStatus;
+    });
+  }
+
+  get filteredSchemes(): any[] {
+    const text = this.schemeSearchText.trim().toLowerCase();
+    return this.schemes.filter((s) => {
+      const matchesText = !text ||
+        (s.scheme_name || '').toLowerCase().includes(text) ||
+        (s.department || '').toLowerCase().includes(text);
+      const matchesCategory = !this.schemeFilterCategory || s.category === this.schemeFilterCategory;
+      const matchesStatus = !this.schemeFilterStatus || s.status === this.schemeFilterStatus;
+      return matchesText && matchesCategory && matchesStatus;
+    });
+  }
+
+  // ================= AUTOCOMPLETE FILTERING =================
+
+  filterMinistries(value: string): void {
+    const v = (value || '').toLowerCase();
+    this.filteredMinistries = this.commonMinistries.filter((m) => m.toLowerCase().includes(v));
+  }
+
+  filterDepartments(value: string): void {
+    const v = (value || '').toLowerCase();
+    this.filteredDepartments = this.commonDepartments.filter((d) => d.toLowerCase().includes(v));
   }
 
   private emptyPolicyForm() {
@@ -101,7 +263,6 @@ export class ManagePoliciesSchemesComponent implements OnInit {
       department: '',
       government_level: '',
       state: '',
-      status: 'Draft',
       publication_date: '',
       effective_date: '',
       document_url: ''
@@ -144,7 +305,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
 
   loadPolicies(): void {
     this.loadingPolicies = true;
-    this.policyService.getAllPolicies({ include_archived: this.showArchived })
+    this.policyService.getAllPolicies({ include_archived: true, mine_only: true })
       .subscribe({
         next: (response: any) => {
           this.policies = response.data || [];
@@ -164,9 +325,11 @@ export class ManagePoliciesSchemesComponent implements OnInit {
     }
 
     if (this.editingPolicyId) {
-      // Editing: send only fields the update endpoint accepts
-      const { policy_name, description, category, ministry, department, government_level, state, status, publication_date, effective_date, document_url } = this.policyForm;
-      this.policyService.updatePolicy(this.editingPolicyId, { policy_name, description, category, ministry, department, government_level, state, status, publication_date, effective_date, document_url })
+      // Editing: send only fields the update endpoint accepts. `status` is
+      // deliberately excluded — the backend now derives it from
+      // approval_status and ignores it even if sent (see PolicyUpdate).
+      const { policy_name, description, category, ministry, department, government_level, state, publication_date, effective_date, document_url } = this.policyForm;
+      this.policyService.updatePolicy(this.editingPolicyId, { policy_name, description, category, ministry, department, government_level, state, publication_date, effective_date, document_url })
         .subscribe({
           next: () => {
             this.snackBar.open('Policy updated', 'Close', { duration: 2500 });
@@ -185,6 +348,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
         next: () => {
           this.snackBar.open('Policy created', 'Close', { duration: 2500 });
           this.policyForm = this.emptyPolicyForm();
+          this.isPolicyFormOpen = false;
           this.loadPolicies();
         },
         error: (err) => this.showApiError(err, 'create policy')
@@ -194,6 +358,8 @@ export class ManagePoliciesSchemesComponent implements OnInit {
 
   editPolicy(policy: any): void {
     this.editingPolicyId = policy.policy_id;
+    this.editingPolicyStatus = policy.status || 'Pending';
+    this.isPolicyFormOpen = true;
     this.policyForm = {
       policy_name: policy.policy_name || '',
       description: policy.description || '',
@@ -202,7 +368,6 @@ export class ManagePoliciesSchemesComponent implements OnInit {
       department: policy.department || '',
       government_level: policy.government_level || '',
       state: policy.state || '',
-      status: policy.status || 'Draft',
       publication_date: policy.publication_date || '',
       effective_date: policy.effective_date || '',
       document_url: policy.document_url || ''
@@ -212,6 +377,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
   cancelPolicyEdit(): void {
     this.editingPolicyId = null;
     this.policyForm = this.emptyPolicyForm();
+    this.isPolicyFormOpen = false;
   }
 
   archivePolicy(id: number): void {
@@ -238,7 +404,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
 
   loadSchemes(): void {
     this.loadingSchemes = true;
-    this.schemeService.getAllSchemes({ include_archived: this.showArchived }).subscribe({
+    this.schemeService.getAllSchemes({ include_archived: true, mine_only: true }).subscribe({
       next: (response: any) => {
         this.schemes = response.data || [];
         this.loadingSchemes = false;
@@ -277,6 +443,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
         next: () => {
           this.snackBar.open('Scheme created', 'Close', { duration: 2500 });
           this.schemeForm = this.emptySchemeForm();
+          this.isSchemeFormOpen = false;
           this.loadSchemes();
         },
         error: (err) => this.showApiError(err, 'create scheme')
@@ -286,6 +453,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
 
   editScheme(scheme: any): void {
     this.editingSchemeId = scheme.scheme_id;
+    this.isSchemeFormOpen = true;
     this.schemeForm = {
       scheme_name: scheme.scheme_name || '',
       description: scheme.description || '',
@@ -306,6 +474,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
   cancelSchemeEdit(): void {
     this.editingSchemeId = null;
     this.schemeForm = this.emptySchemeForm();
+    this.isSchemeFormOpen = false;
   }
 
   archiveScheme(id: number): void {
@@ -424,12 +593,6 @@ export class ManagePoliciesSchemesComponent implements OnInit {
   }
 
   // ================= SHARED =================
-
-  toggleShowArchived(): void {
-    this.showArchived = !this.showArchived;
-    this.loadPolicies();
-    this.loadSchemes();
-  }
 
   private showApiError(err: any, action: string): void {
     const detail = err?.error?.detail;

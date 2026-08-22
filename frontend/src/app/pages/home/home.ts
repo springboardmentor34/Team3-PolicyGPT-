@@ -61,7 +61,9 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.policyService.getAllPolicies().subscribe({
+    // public_only=true keeps Pending/Rejected policies out of the public
+    // homepage — same reasoning as policy-search.ts.
+    this.policyService.getAllPolicies({ public_only: true }).subscribe({
   next: (response: any) => {
     this.featuredPolicies = response.data.slice(0, 3).map((policy: any) => ({
   id: policy.policy_id,

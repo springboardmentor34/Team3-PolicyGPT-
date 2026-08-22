@@ -1,0 +1,197 @@
+<div class="admin-dashboard-page">
+  <!-- ================= NAVBAR ================= -->
+  <header class="top-navbar no-print">
+    <div class="logo-section">
+      <div class="logo-box"><mat-icon>shield</mat-icon></div>
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>ADMIN CONTROL PANEL</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button mat-raised-button class="logout-btn" (click)="logout()">
+        Logout
+      </button>
+    </div>
+  </header>
+  <div class="dashboard-content">
+    <h1>Admin Dashboard</h1>
+    <p class="subtitle">Live overview of everything on the platform.</p>
+    <div *ngIf="loading" class="loading-state">
+      Loading statistics...
+    </div>
+    <div *ngIf="error" class="error-state">
+      {{ error }}
+    </div>
+    <div *ngIf="!loading && !error" class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-icon>group</mat-icon>
+        <div class="stat-value">{{ stats.total_users }}</div>
+        <div class="stat-label">Total Users</div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon>description</mat-icon>
+        <div class="stat-value">{{ stats.total_policies }}</div>
+        <div class="stat-label">Total Policies</div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon>card_giftcard</mat-icon>
+        <div class="stat-value">{{ stats.total_schemes }}</div>
+        <div class="stat-label">Total Schemes</div>
+      </mat-card>
+      <mat-card class="stat-card pending">
+        <mat-icon>hourglass_top</mat-icon>
+        <div class="stat-value">{{ stats.pending_policies }}</div>
+        <div class="stat-label">Pending Approval</div>
+      </mat-card>
+      <mat-card class="stat-card approved">
+        <mat-icon>check_circle</mat-icon>
+        <div class="stat-value">{{ stats.approved_policies }}</div>
+        <div class="stat-label">Approved Policies</div>
+      </mat-card>
+      <mat-card class="stat-card rejected">
+        <mat-icon>cancel</mat-icon>
+        <div class="stat-value">{{ stats.rejected_policies }}</div>
+        <div class="stat-label">Rejected Policies</div>
+      </mat-card>
+    </div>
+    <div *ngIf="!loading && !error" class="role-breakdown">
+      <h2>Users by Role</h2>
+      <div class="role-row" *ngFor="let entry of roleEntries()">
+        <span class="role-name">{{ entry[0] }}</span>
+        <span class="role-count">{{ entry[1] }}</span>
+      </div>
+    </div>
+    <div *ngIf="analyticsError" class="error-state">
+      {{ analyticsError }}
+    </div>
+    <div class="analytics-section" [class.is-loading]="loadingAnalytics">
+      <div class="analytics-header">
+        <div>
+          <h2>Analytics</h2>
+          <p class="analytics-hint">Tip: click a category slice to jump to filtered search results.</p>
+        </div>
+        <div class="export-actions no-print" *ngIf="!loadingAnalytics && !analyticsError">
+          <button mat-stroked-button color="primary" (click)="exportAnalyticsCsv()">
+            <mat-icon>download</mat-icon>
+            Download CSV
+          </button>
+          <button mat-stroked-button color="primary" (click)="printAnalytics()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Save as PDF
+          </button>
+        </div>
+      </div>
+      <p *ngIf="loadingAnalytics" class="analytics-loading-note">Loading analytics...</p>
+      <!-- Pie/doughnut charts: compact grid, few legend entries fit fine -->
+      <div class="chart-grid">
+        <mat-card class="chart-card">
+          <canvas #approvalStatusChart width="280" height="260"></canvas>
+        </mat-card>
+        <mat-card class="chart-card pie-card">
+          <canvas #policyCategoryChart width="280" height="300"></canvas>
+          <p *ngIf="policiesByCategory.length === 0" class="chart-empty">No policies yet.</p>
+        </mat-card>
+        <mat-card class="chart-card pie-card">
+          <canvas #schemeCategoryChart width="280" height="300"></canvas>
+          <p *ngIf="schemesByCategory.length === 0" class="chart-empty">No schemes yet.</p>
+        </mat-card>
+      </div>
+      <!-- Department/State bar charts: wide grid, real labels need real room -->
+      <div class="chart-grid-bars">
+        <mat-card class="chart-card bar-card">
+          <canvas #policyDepartmentChart width="420" height="280"></canvas>
+          <p *ngIf="policiesByDepartment.length === 0" class="chart-empty">No policies yet.</p>
+        </mat-card>
+        <mat-card class="chart-card bar-card">
+          <canvas #schemeDepartmentChart width="420" height="280"></canvas>
+          <p *ngIf="schemesByDepartment.length === 0" class="chart-empty">No schemes yet.</p>
+        </mat-card>
+        <mat-card class="chart-card bar-card">
+          <canvas #policyStateChart width="420" height="280"></canvas>
+          <p *ngIf="policiesByState.length === 0" class="chart-empty">No policies yet.</p>
+          <p *ngIf="policiesUncategorizedCount > 0" class="chart-footnote">
+            +{{ policiesUncategorizedCount }} {{ policiesUncategorizedCount === 1 ? 'policy has' : 'policies have' }} no state set (excluded above).
+          </p>
+        </mat-card>
+        <mat-card class="chart-card bar-card">
+          <canvas #schemeStateChart width="420" height="280"></canvas>
+          <p *ngIf="schemesByState.length === 0" class="chart-empty">No schemes yet.</p>
+          <p *ngIf="schemesUncategorizedCount > 0" class="chart-footnote">
+            +{{ schemesUncategorizedCount }} {{ schemesUncategorizedCount === 1 ? 'scheme has' : 'schemes have' }} no state set (excluded above).
+          </p>
+        </mat-card>
+      </div>
+      <div class="chart-grid-wide">
+        <mat-card class="chart-card wide">
+          <canvas #approvalTrendChart width="900" height="280" *ngIf="policyApprovalTrend.length >= 2"></canvas>
+          <p *ngIf="policyApprovalTrend.length < 2" class="chart-empty">
+            {{ policyApprovalTrend.length === 0
+              ? 'Not enough submission history yet to show a trend.'
+              : 'Only one month of data so far — the trend line will appear once there is more submission history.' }}
+          </p>
+        </mat-card>
+      </div>
+    </div>
+    <!-- ================= USAGE STATISTICS (Milestone 3, Task 6) ================= -->
+    <div class="usage-section" *ngIf="usageStats">
+      <h2>Usage Statistics</h2>
+      <p class="analytics-hint">
+        Who's actually using the platform, not just what's in it. Only counts activity from logged-in users.
+      </p>
+      <div class="usage-stats-grid">
+        <div class="usage-stat-tile">
+          <span class="usage-value">{{ usageStats.total_users }}</span>
+          <span class="usage-label">Total Registered Users</span>
+        </div>
+        <div class="usage-stat-tile">
+          <span class="usage-value">{{ usageStats.active_users_7d }}</span>
+          <span class="usage-label">Active in Last 7 Days</span>
+        </div>
+        <div class="usage-stat-tile">
+          <span class="usage-value">{{ usageStats.total_eligibility_checks }}</span>
+          <span class="usage-label">Eligibility Checks Run</span>
+        </div>
+      </div>
+      <div class="usage-lists-grid">
+        <div class="usage-list-card">
+          <h3>Most Viewed Policies</h3>
+          <div class="usage-list-row" *ngFor="let item of usageStats.most_viewed_policies">
+            <span>{{ item.name }}</span>
+            <span class="usage-count">{{ item.views }}</span>
+          </div>
+          <p *ngIf="usageStats.most_viewed_policies.length === 0" class="chart-empty-inline">No policy views recorded yet.</p>
+        </div>
+        <div class="usage-list-card">
+          <h3>Most Viewed Schemes</h3>
+          <div class="usage-list-row" *ngFor="let item of usageStats.most_viewed_schemes">
+            <span>{{ item.name }}</span>
+            <span class="usage-count">{{ item.views }}</span>
+          </div>
+          <p *ngIf="usageStats.most_viewed_schemes.length === 0" class="chart-empty-inline">No scheme views recorded yet.</p>
+        </div>
+        <div class="usage-list-card">
+          <h3>Most Searched Terms</h3>
+          <div class="usage-list-row" *ngFor="let item of usageStats.most_searched_terms">
+            <span>{{ item.term }}</span>
+            <span class="usage-count">{{ item.count }}</span>
+          </div>
+          <p *ngIf="usageStats.most_searched_terms.length === 0" class="chart-empty-inline">No searches recorded yet.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quick-actions no-print">
+      <h2>Quick Actions</h2>
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" routerLink="/policy-approvals">
+          <mat-icon>fact_check</mat-icon>
+          Review Pending Policies
+        </button>
+        <button mat-raised-button color="primary" routerLink="/user-management">
+          <mat-icon>group</mat-icon>
+          Manage Users
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

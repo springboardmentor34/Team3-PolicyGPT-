@@ -35,6 +35,18 @@ export class AuthService {
     return this.http.get(`${this.api}/me`);
   }
 
+  updateProfile(data: any): Observable<any> {
+    return this.http.put(`${this.api}/profile`, data);
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.api}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, new_password: string): Observable<any> {
+    return this.http.post(`${this.api}/reset-password`, { token, new_password });
+  }
+
   /**
    * Decodes the role out of the stored JWT payload. Used for route
    * guards / conditional UI (e.g. showing the Policy Approvals link only
@@ -55,4 +67,4 @@ export class AuthService {
     }
   }
 
-}
+}

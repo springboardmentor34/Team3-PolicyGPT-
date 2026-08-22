@@ -49,17 +49,20 @@ export class RegisterComponent {
 
   agree = false;
 
+  // Full list of Indian states and union territories — matches the
+  // Eligibility Checker's state list exactly, so a citizen's selected
+  // state during registration lines up with anything filtered/matched
+  // against it elsewhere in the app.
   states = [
-    'Tamil Nadu',
-    'Kerala',
-    'Karnataka',
-    'Andhra Pradesh',
-    'Telangana',
-    'Maharashtra',
-    'Delhi',
-    'Gujarat',
-    'Punjab',
-    'West Bengal'
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+    'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+    'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+    'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+    'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+    'Andaman and Nicobar Islands', 'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu', 'Delhi',
+    'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
   ];
 
   selectRole(role: string) {

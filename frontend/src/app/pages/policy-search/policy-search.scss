@@ -25,6 +25,18 @@ color:#6B7280;
 margin-bottom:30px;
 }
 
+.mode-toggle{
+display:flex;
+gap:12px;
+margin-bottom:20px;
+}
+
+.mode-toggle button{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
 /* ================= SEARCH CARD ================= */
 
 .search-card{

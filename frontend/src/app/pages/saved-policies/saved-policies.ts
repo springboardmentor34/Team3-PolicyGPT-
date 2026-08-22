@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+
+import { SavedPolicyService } from '../../services/saved-policy.service';
 
 @Component({
   selector: 'app-saved-policies',
@@ -17,58 +20,51 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './saved-policies.html',
   styleUrls: ['./saved-policies.scss']
 })
-export class SavedPoliciesComponent {
+export class SavedPoliciesComponent implements OnInit {
 
-  savedPolicies = [
+  private savedPolicyService = inject(SavedPolicyService);
+  private router = inject(Router);
 
-    {
-      id:1,
-      title:'PM Kisan Samman Nidhi',
-      category:'Agriculture',
-      description:'Income support of ₹6,000 every year for eligible farmers.',
-      savedOn:'02 Aug 2026'
-    },
+  savedPolicies: any[] = [];
+  loading = true;
 
-    {
-      id:2,
-      title:'Ayushman Bharat',
-      category:'Health',
-      description:'Health insurance coverage up to ₹5 lakh per family.',
-      savedOn:'30 Jul 2026'
-    },
-
-    {
-      id:3,
-      title:'PM Awas Yojana',
-      category:'Housing',
-      description:'Affordable housing assistance for eligible families.',
-      savedOn:'28 Jul 2026'
-    },
-
-    {
-      id:4,
-      title:'National Scholarship Portal',
-      category:'Education',
-      description:'Scholarships for school and college students.',
-      savedOn:'25 Jul 2026'
-    }
-
-  ];
-
-  removePolicy(id:number){
-
-    this.savedPolicies=this.savedPolicies.filter(
-
-      item=>item.id!==id
-
-    );
-
+  ngOnInit(): void {
+    this.loadSavedPolicies();
   }
 
-  viewDetails(id:number){
+  loadSavedPolicies(): void {
+    this.loading = true;
+    this.savedPolicyService.getMySaved().subscribe({
+      next: (response: any) => {
+        this.savedPolicies = (response.data || []).map((item: any) => ({
+          id: item.policy.policy_id,
+          title: item.policy.policy_name,
+          category: item.policy.category,
+          description: item.policy.description,
+          savedOn: new Date(item.saved_at).toLocaleDateString('en-IN', {
+            day: '2-digit', month: 'short', year: 'numeric'
+          })
+        }));
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+      }
+    });
+  }
 
-    alert("Open Scheme Details : "+id);
+  removePolicy(id: number): void {
+    this.savedPolicyService.unsave(id).subscribe({
+      next: () => {
+        this.savedPolicies = this.savedPolicies.filter(item => item.id !== id);
+      },
+      error: (err) => console.error(err)
+    });
+  }
 
+  viewDetails(id: number): void {
+    this.router.navigate(['/policy-details', id]);
   }
 
 }

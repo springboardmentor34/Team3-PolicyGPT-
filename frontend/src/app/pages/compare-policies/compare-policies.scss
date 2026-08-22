@@ -6,6 +6,76 @@ background:#F4F7FC;
 font-family:'Inter',sans-serif;
 }
 
+/* ================= MODE TOGGLE ================= */
+
+.mode-toggle{
+display:flex;
+gap:12px;
+margin-bottom:20px;
+}
+
+.mode-toggle button.active{
+background:#0F4C97;
+color:#fff;
+}
+
+/* ================= FEATURE COMPARISON BLOCKS ================= */
+/* Used by Compare Benefits / Eligibility / Departments / Application
+   Process / Required Documents — plain, no icons, no scoring. */
+
+.feature-block{
+max-width:900px;
+margin:0 auto 20px;
+padding:24px 28px;
+border-radius:14px;
+
+h2{
+  margin:0 0 16px;
+  font-size:18px;
+  font-weight:700;
+  color:#0F172A;
+}
+}
+
+.feature-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+gap:24px;
+}
+
+.feature-panel{
+padding:16px 18px;
+background:#F8FAFC;
+border-radius:10px;
+border:1px solid #E7ECF4;
+
+h3{
+  margin:0 0 8px;
+  font-size:14px;
+  font-weight:600;
+  color:#0F4C97;
+}
+
+p{
+  margin:0;
+  font-size:14px;
+  line-height:1.6;
+  color:#334155;
+}
+
+&.diff{
+  border-color:#F59E0B;
+  background:#FFFBEB;
+}
+}
+
+.feature-sub{
+display:block;
+margin-top:8px;
+font-size:12px;
+color:#64748B;
+}
+
 /* ================= NAVBAR ================= */
 
 .top-navbar{
@@ -149,10 +219,35 @@ box-shadow:0 8px 20px rgba(0,0,0,.06)!important;
 }
 
 .compare-row{
-display:grid;
-grid-template-columns:1fr auto 1fr auto auto;
+display:flex;
+flex-wrap:wrap;
 gap:18px;
 align-items:center;
+}
+
+.compare-row.multi{
+align-items:flex-start;
+}
+
+.compare-slot{
+display:flex;
+align-items:center;
+gap:4px;
+min-width:220px;
+flex:1 1 220px;
+}
+
+.remove-slot-btn{
+margin-top:-14px;
+}
+
+.add-slot-btn{
+height:56px;
+white-space:nowrap;
+}
+
+.reset-btn{
+height:40px;
 }
 
 .policy-select{
@@ -170,6 +265,11 @@ box-shadow:0 8px 20px rgba(0,0,0,.06)!important;
 
 .comparison-header{
 margin-bottom:20px;
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:16px;
+flex-wrap:wrap;
 }
 
 .comparison-header h2{
@@ -180,6 +280,38 @@ font-size:28px;
 .comparison-header p{
 margin-top:8px;
 color:#6B7280;
+}
+
+.export-actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.export-actions button mat-icon{
+margin-right:4px;
+vertical-align:middle;
+}
+
+/* ================= PRINT / SAVE AS PDF ================= */
+
+@media print{
+
+  .no-print{
+    display:none !important;
+  }
+
+  .compare-page{
+    background:#fff !important;
+  }
+
+  .comparison-card,
+  .feature-block{
+    box-shadow:none !important;
+    border:1px solid #E2E8F0;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
 }
 
 .comparison-table{

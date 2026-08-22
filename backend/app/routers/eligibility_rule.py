@@ -6,11 +6,13 @@ from sqlalchemy.orm import Session
 from app.utils.database import get_db
 from app.models.eligibility_rule import EligibilityRule
 from app.models.scheme import Scheme
+from app.models.user import User
 from app.schemas.eligibility_rule_schema import (
     EligibilityRuleCreate,
     EligibilityRuleUpdate,
     EligibilityRuleOut,
 )
+from app.auth.dependencies import require_roles
 
 router = APIRouter(
     prefix="/eligibility-rules",
@@ -41,7 +43,11 @@ def get_rule_by_id(rule_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=EligibilityRuleOut)
-def create_rule(rule: EligibilityRuleCreate, db: Session = Depends(get_db)):
+def create_rule(
+    rule: EligibilityRuleCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("official", "admin", "administrator")),
+):
     scheme = db.query(Scheme).filter(Scheme.scheme_id == rule.scheme_id).first()
     if not scheme:
         raise HTTPException(status_code=404, detail=f"Scheme with id {rule.scheme_id} not found")
@@ -54,7 +60,12 @@ def create_rule(rule: EligibilityRuleCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/{rule_id}", response_model=EligibilityRuleOut)
-def update_rule(rule_id: int, rule_update: EligibilityRuleUpdate, db: Session = Depends(get_db)):
+def update_rule(
+    rule_id: int,
+    rule_update: EligibilityRuleUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("official", "admin", "administrator")),
+):
     rule = db.query(EligibilityRule).filter(EligibilityRule.rule_id == rule_id).first()
     if not rule:
         raise HTTPException(status_code=404, detail="Eligibility rule not found")
@@ -69,7 +80,11 @@ def update_rule(rule_id: int, rule_update: EligibilityRuleUpdate, db: Session = 
 
 
 @router.delete("/{rule_id}")
-def delete_rule(rule_id: int, db: Session = Depends(get_db)):
+def delete_rule(
+    rule_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("official", "admin", "administrator")),
+):
     rule = db.query(EligibilityRule).filter(EligibilityRule.rule_id == rule_id).first()
     if not rule:
         raise HTTPException(status_code=404, detail="Eligibility rule not found")

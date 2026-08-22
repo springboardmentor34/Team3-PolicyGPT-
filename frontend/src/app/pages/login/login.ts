@@ -60,6 +60,8 @@ export class LoginComponent {
 
       if (role === 'official') {
         this.router.navigate(['/government-dashboard']);
+      } else if (role === 'admin' || role === 'administrator') {
+        this.router.navigate(['/admin-dashboard']);
       } else {
         this.router.navigate(['/citizen-dashboard']);
       }

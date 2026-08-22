@@ -44,7 +44,7 @@
 
         </mat-icon>
 
-        Verified Citizen
+        {{ getRoleLabel() }}
 
       </span>
 
@@ -186,27 +186,6 @@ matInput
 
         <div class="detail-box">
 
-  <label>Aadhaar Number</label>
-
-  <span *ngIf="!isEditing">
-    {{user.aadhaar}}
-  </span>
-
-  <mat-form-field
-    appearance="outline"
-    class="full-width"
-    *ngIf="isEditing">
-
-    <input
-      matInput
-      [(ngModel)]="user.aadhaar">
-
-  </mat-form-field>
-
-</div>
-
-        <div class="detail-box">
-
   <label>Date of Birth</label>
 
   <span *ngIf="!isEditing">
@@ -239,9 +218,12 @@ matInput
     class="full-width"
     *ngIf="isEditing">
 
-    <input
-      matInput
-      [(ngModel)]="user.gender">
+    <mat-select [(ngModel)]="user.gender">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Male">Male</mat-option>
+      <mat-option value="Female">Female</mat-option>
+      <mat-option value="Other">Other</mat-option>
+    </mat-select>
 
   </mat-form-field>
 
@@ -259,9 +241,45 @@ matInput
     class="full-width"
     *ngIf="isEditing">
 
-    <input
-      matInput
-      [(ngModel)]="user.state">
+    <mat-select [(ngModel)]="user.state">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Andhra Pradesh">Andhra Pradesh</mat-option>
+      <mat-option value="Arunachal Pradesh">Arunachal Pradesh</mat-option>
+      <mat-option value="Assam">Assam</mat-option>
+      <mat-option value="Bihar">Bihar</mat-option>
+      <mat-option value="Chhattisgarh">Chhattisgarh</mat-option>
+      <mat-option value="Goa">Goa</mat-option>
+      <mat-option value="Gujarat">Gujarat</mat-option>
+      <mat-option value="Haryana">Haryana</mat-option>
+      <mat-option value="Himachal Pradesh">Himachal Pradesh</mat-option>
+      <mat-option value="Jharkhand">Jharkhand</mat-option>
+      <mat-option value="Karnataka">Karnataka</mat-option>
+      <mat-option value="Kerala">Kerala</mat-option>
+      <mat-option value="Madhya Pradesh">Madhya Pradesh</mat-option>
+      <mat-option value="Maharashtra">Maharashtra</mat-option>
+      <mat-option value="Manipur">Manipur</mat-option>
+      <mat-option value="Meghalaya">Meghalaya</mat-option>
+      <mat-option value="Mizoram">Mizoram</mat-option>
+      <mat-option value="Nagaland">Nagaland</mat-option>
+      <mat-option value="Odisha">Odisha</mat-option>
+      <mat-option value="Punjab">Punjab</mat-option>
+      <mat-option value="Rajasthan">Rajasthan</mat-option>
+      <mat-option value="Sikkim">Sikkim</mat-option>
+      <mat-option value="Tamil Nadu">Tamil Nadu</mat-option>
+      <mat-option value="Telangana">Telangana</mat-option>
+      <mat-option value="Tripura">Tripura</mat-option>
+      <mat-option value="Uttar Pradesh">Uttar Pradesh</mat-option>
+      <mat-option value="Uttarakhand">Uttarakhand</mat-option>
+      <mat-option value="West Bengal">West Bengal</mat-option>
+      <mat-option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</mat-option>
+      <mat-option value="Chandigarh">Chandigarh</mat-option>
+      <mat-option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</mat-option>
+      <mat-option value="Delhi">Delhi</mat-option>
+      <mat-option value="Jammu and Kashmir">Jammu and Kashmir</mat-option>
+      <mat-option value="Ladakh">Ladakh</mat-option>
+      <mat-option value="Lakshadweep">Lakshadweep</mat-option>
+      <mat-option value="Puducherry">Puducherry</mat-option>
+    </mat-select>
 
   </mat-form-field>
 
@@ -285,6 +303,129 @@ matInput
       [(ngModel)]="user.district">
 
   </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Occupation</label>
+
+  <span *ngIf="!isEditing">
+    {{user.occupation || 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.occupation">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Student">Student</mat-option>
+      <mat-option value="Farmer">Farmer</mat-option>
+      <mat-option value="Salaried">Salaried</mat-option>
+      <mat-option value="Self-employed">Self-employed</mat-option>
+      <mat-option value="Daily Wage Labourer">Daily Wage Labourer</mat-option>
+      <mat-option value="Homemaker">Homemaker</mat-option>
+      <mat-option value="Retired / Pensioner">Retired / Pensioner</mat-option>
+      <mat-option value="Unemployed">Unemployed</mat-option>
+      <mat-option value="Other">Other</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Education</label>
+
+  <span *ngIf="!isEditing">
+    {{user.education || 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.education">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Below 10th">Below 10th</mat-option>
+      <mat-option value="10th Pass">10th Pass</mat-option>
+      <mat-option value="12th Pass">12th Pass</mat-option>
+      <mat-option value="Undergraduate">Undergraduate</mat-option>
+      <mat-option value="Graduate">Graduate</mat-option>
+      <mat-option value="Postgraduate">Postgraduate</mat-option>
+      <mat-option value="Doctorate">Doctorate</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Annual Income (₹)</label>
+
+  <span *ngIf="!isEditing">
+    {{user.income !== null && user.income !== '' ? ('₹' + user.income) : 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <input
+      matInput
+      type="number"
+      [(ngModel)]="user.income">
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Social Category</label>
+
+  <span *ngIf="!isEditing">
+    {{user.socialCategory || 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.socialCategory">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="General">General</mat-option>
+      <mat-option value="OBC">OBC</mat-option>
+      <mat-option value="SC">SC</mat-option>
+      <mat-option value="ST">ST</mat-option>
+      <mat-option value="EWS">EWS</mat-option>
+      <mat-option value="Minority">Minority</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Disability Status</label>
+
+  <span *ngIf="!isEditing">
+    {{user.disabilityStatus ? 'Yes' : 'No'}}
+  </span>
+
+  <mat-checkbox
+    *ngIf="isEditing"
+    [(ngModel)]="user.disabilityStatus">
+    I have a disability
+  </mat-checkbox>
 
 </div>
 
@@ -474,7 +615,8 @@ matInput
     <button
       mat-raised-button
       color="warn"
-      class="logout-profile-btn">
+      class="logout-profile-btn"
+      (click)="logout()">
 
       <mat-icon>
 
@@ -491,4 +633,3 @@ matInput
 </mat-card>
 
 </div>
-

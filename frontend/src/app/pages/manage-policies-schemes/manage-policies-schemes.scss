@@ -10,6 +10,16 @@
   align-items: center;
   margin-bottom: 20px;
 
+  .page-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .back-btn {
+    flex-shrink: 0;
+  }
+
   h1 {
     font-size: 1.6rem;
     font-weight: 700;
@@ -29,6 +39,37 @@
     margin-top: 0;
     margin-bottom: 16px;
     font-size: 1.15rem;
+  }
+}
+
+.form-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.add-new-btn {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.form-section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #21549C;
+  margin: 20px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e3e9f2;
+
+  &:first-of-type {
+    margin-top: 4px;
   }
 }
 
@@ -53,6 +94,63 @@
   margin: 24px 0 12px;
 }
 
+.status-note {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #5b6b82;
+  background: #F4F7FB;
+  border: 1px solid #e3e9f2;
+  border-radius: 6px;
+  padding: 8px 12px;
+
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    color: #21549C;
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: #173E73;
+  }
+}
+
+.list-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+
+  .list-heading {
+    margin: 0;
+  }
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+
+  mat-form-field {
+    margin-bottom: -1.25em;
+  }
+
+  .filter-search {
+    flex: 2 1 280px;
+    min-width: 220px;
+  }
+
+  .filter-select {
+    flex: 1 1 160px;
+    max-width: 220px;
+  }
+}
+
 .loading, .empty-state {
   color: #666;
   padding: 16px 0;
@@ -62,6 +160,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
+  margin-top: 20px;
 }
 
 .item-card {
@@ -96,6 +195,7 @@
 
   &.active { background: #d4edda; color: #155724; }
   &.draft { background: #fff3cd; color: #856404; }
+  &.rejected { background: #f8d7da; color: #721c24; }
   &.pending { background: #cce5ff; color: #004085; }
   &.archived { background: #f0f0f0; color: #777; }
 }
@@ -211,4 +311,4 @@
   display: flex;
   gap: 2px;
   flex-shrink: 0;
-}
+}

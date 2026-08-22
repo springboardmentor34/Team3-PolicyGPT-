@@ -1,10 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
-
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-
   {
     path: 'home',
     loadComponent: () => import('./pages/home/home').then((m) => m.HomeComponent),
@@ -21,6 +19,18 @@ export const routes: Routes = [
     title: 'PolicyGPT | Register',
   },
   {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./pages/forgot-password/forgot-password').then((m) => m.ForgotPasswordComponent),
+    title: 'PolicyGPT | Forgot Password',
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./pages/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
+    title: 'PolicyGPT | Reset Password',
+  },
+  {
     path: 'citizen-dashboard',
     loadComponent: () =>
       import('./pages/citizen-dashboard/citizen-dashboard').then((m) => m.CitizenDashboardComponent),
@@ -33,6 +43,20 @@ export const routes: Routes = [
       import('./pages/government-dashboard/government-dashboard').then((m) => m.GovernmentDashboardComponent),
     title: 'PolicyGPT | Government Dashboard',
     canActivate: [authGuard],
+  },
+  {
+    path: 'admin-dashboard',
+    loadComponent: () =>
+      import('./pages/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboardComponent),
+    title: 'PolicyGPT | Admin Dashboard',
+    canActivate: [authGuard, adminGuard],
+  },
+  {
+    path: 'user-management',
+    loadComponent: () =>
+      import('./pages/user-management/user-management').then((m) => m.UserManagementComponent),
+    title: 'PolicyGPT | User Management',
+    canActivate: [authGuard, adminGuard],
   },
   {
     path: 'manage-policies-schemes',
@@ -101,7 +125,6 @@ export const routes: Routes = [
     title: 'PolicyGPT | Profile',
     canActivate: [authGuard],
   },
-
   
   {
   path: 'saved-policies',
@@ -110,7 +133,6 @@ export const routes: Routes = [
       .then(m => m.SavedPoliciesComponent),
   title: 'PolicyGPT | Saved Policies',
 },
-
 {
   path: 'applications',
   loadComponent: () =>
@@ -118,4 +140,4 @@ export const routes: Routes = [
       .then((m) => m.ApplicationsComponent),
   title: 'PolicyGPT | Applications',
 },
-];
+];

@@ -1,70 +1,12 @@
 <div class="policy-search-page">
 
-  <!-- ================= NAVBAR ================= -->
-
-  <header class="top-navbar">
-
-    <div class="logo-section">
-
-      <div class="logo-box">
-        <mat-icon>shield</mat-icon>
-      </div>
-
-      <div class="logo-text">
-
-        <h2>PolicyGPT</h2>
-
-        <span>GOVT. SCHEME INTELLIGENCE</span>
-
-      </div>
-
-    </div>
-
-    
-
-    <!-- Right -->
-
-    <div class="nav-right">
-
-      
-
-      <div class="profile">
-
-        <div class="avatar">
-
-          {{userName.charAt(0)}}
-
-        </div>
-
-        <div class="profile-info">
-
-          <h4>{{userName}}</h4>
-
-          <span>Verified Citizen</span>
-
-        </div>
-
-      </div>
-
-      <button
-        mat-raised-button
-        class="logout-btn">
-
-        Logout
-
-      </button>
-
-    </div>
-
-  </header>
-
   <!-- ================= CONTENT ================= -->
 
   <div class="page-content">
 
     <div class="page-title">
 
-      <h1>Policy Search</h1>
+      <h1>{{ searchMode === 'policies' ? 'Policy Search' : 'Scheme Search' }}</h1>
 
       <p>
 
@@ -72,6 +14,23 @@
         categories and states.
 
       </p>
+
+      <div class="mode-toggle">
+        <button
+          mat-stroked-button
+          [color]="searchMode === 'policies' ? 'primary' : ''"
+          (click)="toggleSearchMode('policies')">
+          <mat-icon>description</mat-icon>
+          Policies
+        </button>
+        <button
+          mat-stroked-button
+          [color]="searchMode === 'schemes' ? 'primary' : ''"
+          (click)="toggleSearchMode('schemes')">
+          <mat-icon>card_giftcard</mat-icon>
+          Schemes
+        </button>
+      </div>
 
     </div>
 
@@ -140,12 +99,12 @@
 
         <div
           class="chip"
-          *ngIf="stateTamilNadu">
+          *ngIf="stateFilter">
 
-          Tamil Nadu
+          {{ stateFilter }}
 
           <mat-icon
-            (click)="stateTamilNadu=false;applyFilters()">
+            (click)="stateFilter='';applyFilters()">
 
             close
 
@@ -155,42 +114,12 @@
 
         <div
           class="chip"
-          *ngIf="stateKarnataka">
+          *ngIf="availabilityFilter">
 
-          Karnataka
-
-          <mat-icon
-            (click)="stateKarnataka=false;applyFilters()">
-
-            close
-
-          </mat-icon>
-
-        </div>
-
-        <div
-          class="chip"
-          *ngIf="stateAllIndia">
-
-          All India
+          {{ availabilityFilter }}
 
           <mat-icon
-            (click)="stateAllIndia=false;applyFilters()">
-
-            close
-
-          </mat-icon>
-
-        </div>
-
-        <div
-          class="chip"
-          *ngIf="eligibleOnly">
-
-          Eligible Only
-
-          <mat-icon
-            (click)="eligibleOnly=false;applyFilters()">
+            (click)="availabilityFilter='';applyFilters()">
 
             close
 
@@ -219,57 +148,159 @@
       <mat-card class="filter-card">
 
         <h3>CATEGORY</h3>
-        <mat-checkbox
-          [(ngModel)]="categoryEducation"
-          (change)="searchByCategory('Education')">
 
-          Education
+        <ng-container *ngIf="searchMode === 'policies'">
+          <mat-checkbox
+            [(ngModel)]="categoryEducation"
+            (change)="applyFilters()">
+            Education
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryHealth"
+            (change)="applyFilters()">
+            Healthcare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryAgriculture"
+            (change)="applyFilters()">
+            Agriculture
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryEmployment"
+            (change)="applyFilters()">
+            Employment
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryHousing"
+            (change)="applyFilters()">
+            Housing
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryFinance"
+            (change)="applyFilters()">
+            Finance
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryWomenChildWelfare"
+            (change)="applyFilters()">
+            Women & Child Welfare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryEnvironment"
+            (change)="applyFilters()">
+            Environment
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryDigitalGovernance"
+            (change)="applyFilters()">
+            Digital Governance
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryInfrastructure"
+            (change)="applyFilters()">
+            Infrastructure
+          </mat-checkbox>
+        </ng-container>
 
-          <span class="count">27</span>
+        <ng-container *ngIf="searchMode === 'schemes'">
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryScholarships"
+            (change)="applyFilters()">
+            Scholarships
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryFarmerWelfare"
+            (change)="applyFilters()">
+            Farmer Welfare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryHealthcare"
+            (change)="applyFilters()">
+            Healthcare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryHousing"
+            (change)="applyFilters()">
+            Housing
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryBusinessSupport"
+            (change)="applyFilters()">
+            Business Support
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryWomenEmpowerment"
+            (change)="applyFilters()">
+            Women Empowerment
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategorySeniorCitizen"
+            (change)="applyFilters()">
+            Senior Citizen Welfare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryStudentSchemes"
+            (change)="applyFilters()">
+            Student Schemes
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryEmploymentPrograms"
+            (change)="applyFilters()">
+            Employment Programs
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategorySocialSecurity"
+            (change)="applyFilters()">
+            Social Security
+          </mat-checkbox>
+        </ng-container>
 
-        </mat-checkbox>
-        <mat-checkbox
-  [(ngModel)]="categoryScholarships"
-  (change)="searchSchemeByCategory('Scholarships')">
-
-  Scholarships
-
-</mat-checkbox>
         <hr>
 
         <!-- ================= STATE ================= -->
 
         <h3>STATE</h3>
 
-        <mat-checkbox
-          [(ngModel)]="stateTamilNadu"
-          (change)="applyFilters()">
+        <mat-form-field appearance="outline" class="state-field">
+          <mat-label>Filter by state</mat-label>
+          <input
+            matInput
+            [(ngModel)]="stateFilter"
+            (ngModelChange)="applyFilters()"
+            placeholder="e.g. Tamil Nadu, Karnataka, All India">
+        </mat-form-field>
 
-          Tamil Nadu
+        <hr>
 
-          <span class="count">64</span>
+        <!-- ================= MINISTRY ================= -->
 
-        </mat-checkbox>
+        <ng-container *ngIf="searchMode === 'policies'">
+          <h3>MINISTRY</h3>
 
-        <mat-checkbox
-          [(ngModel)]="stateKarnataka"
-          (change)="applyFilters()">
+          <mat-form-field appearance="outline" class="state-field">
+            <mat-label>Filter by ministry</mat-label>
+            <input
+              matInput
+              [(ngModel)]="ministryFilter"
+              (ngModelChange)="applyFilters()"
+              placeholder="e.g. Ministry of Health">
+          </mat-form-field>
 
-          Karnataka
+          <hr>
+        </ng-container>
 
-          <span class="count">51</span>
+        <!-- ================= DEPARTMENT ================= -->
 
-        </mat-checkbox>
+        <h3>DEPARTMENT</h3>
 
-        <mat-checkbox
-          [(ngModel)]="stateAllIndia"
-          (change)="applyFilters()">
-
-          All India
-
-          <span class="count">92</span>
-
-        </mat-checkbox>
+        <mat-form-field appearance="outline" class="state-field">
+          <mat-label>Filter by department</mat-label>
+          <input
+            matInput
+            [(ngModel)]="departmentFilter"
+            (ngModelChange)="applyFilters()"
+            placeholder="e.g. Department of School Education">
+        </mat-form-field>
 
         <hr>
 <!-- ================= PUBLICATION DATE ================= -->
@@ -308,21 +339,21 @@
 
 </mat-checkbox>
 
-        <mat-checkbox
-          [(ngModel)]="eligibleOnly"
-          (change)="applyFilters()">
+        <hr>
 
-          Eligible for me
+        <!-- ================= AVAILABILITY ================= -->
 
-        </mat-checkbox>
+        <h3>AVAILABILITY</h3>
 
-        <mat-checkbox
-          [(ngModel)]="currentlyOpen"
-          (change)="applyFilters()">
-
-          Currently Open
-
-        </mat-checkbox>
+        <mat-form-field appearance="outline" class="state-field">
+          <mat-label>Filter by availability</mat-label>
+          <mat-select [(ngModel)]="availabilityFilter" (selectionChange)="applyFilters()">
+            <mat-option value="">All</mat-option>
+            <mat-option value="Upcoming">Upcoming</mat-option>
+            <mat-option value="Open">Open</mat-option>
+            <mat-option value="Closed">Closed</mat-option>
+          </mat-select>
+        </mat-form-field>
 
         <button
           mat-stroked-button
@@ -482,7 +513,7 @@
 
             <a
               class="view-btn"
-              [routerLink]="['/policy-details', scheme.id]">
+              [routerLink]="[searchMode === 'policies' ? '/policy-details' : '/scheme-details', scheme.id]">
 
               View Details →
 

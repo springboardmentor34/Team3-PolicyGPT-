@@ -11,7 +11,7 @@ export class PolicyService {
 
   constructor(private http: HttpClient) {}
 
-  getAllPolicies(filters?: { category?: string; state?: string; department?: string; ministry?: string; status?: string; keyword?: string; include_archived?: boolean; public_only?: boolean }): Observable<any> {
+  getAllPolicies(filters?: { category?: string; state?: string; department?: string; ministry?: string; status?: string; keyword?: string; include_archived?: boolean; public_only?: boolean; mine_only?: boolean }): Observable<any> {
     let params = new HttpParams();
     if (filters) {
       Object.keys(filters).forEach(key => {
@@ -69,4 +69,4 @@ export class PolicyService {
     ]);
   }
 
-}
+}

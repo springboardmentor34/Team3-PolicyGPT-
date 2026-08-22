@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 
 import { MatCardModule } from '@angular/material/card';
@@ -8,6 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { SchemeService } from '../../services/scheme.service';
 import { PolicyService } from '../../services/policy.service';
+import { SavedPolicyService } from '../../services/saved-policy.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-policy-details',
@@ -26,12 +28,24 @@ export class PolicyDetailsComponent implements OnInit{
 
   constructor(
   private route: ActivatedRoute,
-  private policyService: PolicyService
+  private policyService: PolicyService,
+  private savedPolicyService: SavedPolicyService,
+  private authService: AuthService,
+  private location: Location
 ) {}
+
+  goBack(): void {
+    this.location.back();
+  }
+
+  policyId: string | null = null;
+  isSaved = false;
+  savingInProgress = false;
 
   ngOnInit(): void {
 
   const id = this.route.snapshot.paramMap.get('id');
+  this.policyId = id;
 
   if (id) {
 
@@ -53,73 +67,54 @@ export class PolicyDetailsComponent implements OnInit{
 
     });
 
+    // Only check saved-state if actually logged in — guests can't save.
+    if (this.authService.isLoggedIn()) {
+      this.savedPolicyService.isSaved(id).subscribe({
+        next: (res: any) => {
+          this.isSaved = !!res.saved;
+        },
+        error: (err) => console.error(err)
+      });
+    }
+
   }
 
 }
 
-  userName = 'Sri';
+  toggleSave(): void {
+
+    if (!this.authService.isLoggedIn() || !this.policyId) {
+      return;
+    }
+
+    this.savingInProgress = true;
+
+    if (this.isSaved) {
+      this.savedPolicyService.unsave(this.policyId).subscribe({
+        next: () => {
+          this.isSaved = false;
+          this.savingInProgress = false;
+        },
+        error: (err) => {
+          console.error(err);
+          this.savingInProgress = false;
+        }
+      });
+    } else {
+      this.savedPolicyService.save(this.policyId).subscribe({
+        next: () => {
+          this.isSaved = true;
+          this.savingInProgress = false;
+        },
+        error: (err) => {
+          console.error(err);
+          this.savingInProgress = false;
+        }
+      });
+    }
+
+  }
 
   policy: any = {};
-
-  overview = [
-    'Provides financial assistance of ₹6,000 annually.',
-    'Transferred directly into Aadhaar-linked bank accounts.',
-    'Paid in three equal installments.',
-    'Supports small and marginal farmers.'
-  ];
-
-  eligibility = [
-    'Indian citizen.',
-    'Must own cultivable agricultural land.',
-    'Valid Aadhaar card.',
-    'Active bank account linked with Aadhaar.',
-    'Institutional landholders are not eligible.'
-  ];
-
-  documents = [
-    'Aadhaar Card',
-    'Land Ownership Certificate',
-    'Bank Passbook',
-    'Income Certificate (if required)',
-    'Passport-size Photograph'
-  ];
-
-  faqs = [
-
-    {
-      question: 'Who can apply?',
-      answer: 'All eligible landholding farmer families.'
-    },
-
-    {
-      question: 'How much financial assistance is provided?',
-      answer: '₹6,000 per year in three equal installments.'
-    },
-
-    {
-      question: 'How will the amount be received?',
-      answer: 'Through Direct Benefit Transfer (DBT) into the registered bank account.'
-    }
-
-  ];
-
-  relatedSchemes = [
-
-    {
-      name: 'PM Fasal Bima Yojana',
-      description: 'Crop Insurance Scheme'
-    },
-
-    {
-      name: 'Kisan Credit Card',
-      description: 'Agricultural Credit Support'
-    },
-
-    {
-      name: 'Soil Health Card',
-      description: 'Soil Nutrient Assessment'
-    }
-
-  ];
 
 }

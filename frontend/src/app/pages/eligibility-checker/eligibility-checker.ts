@@ -37,9 +37,8 @@ export class EligibilityCheckerComponent {
     private eligibilityResultService: EligibilityResultService
   ) {}
 
-  // ================= USER =================
 
-  userName = 'Sri';
+  today = new Date().toISOString().split('T')[0];
 
   search = '';
 
@@ -47,73 +46,80 @@ export class EligibilityCheckerComponent {
 
   currentStep = 1;
 
-  // ================= PERSONAL INFO =================
+  // ================= STEP 1: PERSONAL DETAILS =================
 
-  fullName = '';
-  mobile = '';
-  email = '';
-  aadhaar = '';
   dob = '';
+
+  // Gender is intentionally not restricted to a Male/Female binary —
+  // several government schemes explicitly target "Other"/transgender
+  // applicants (e.g. under social welfare categories), so excluding it
+  // would silently make the checker unusable for those citizens.
   gender = '';
 
-  state = 'Tamil Nadu';
-  district = '';
-
-  districts = [
-    'Chennai',
-    'Coimbatore',
-    'Salem',
-    'Madurai',
-    'Erode',
-    'Trichy',
-    'Tiruppur'
+  genderOptions = [
+    'Male',
+    'Female',
+    'Other',
+    'Prefer not to say'
   ];
 
-  // ================= INCOME =================
+  // Full list of Indian states and union territories — the previous
+  // version only listed 7 states, which meant most citizens outside
+  // South India couldn't even select their real state.
+  states = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+    'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+    'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+    'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+    'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+    'Andaman and Nicobar Islands', 'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu', 'Delhi',
+    'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+  ];
+
+  state = '';
+
+  // District is a free-text field (see template) rather than a dropdown,
+  // since a hardcoded district list can only ever cover one state at a
+  // time and India has 700+ districts across 36 states/UTs.
+  district = '';
+
+  // ================= STEP 2: WORK & EDUCATION =================
 
   annualIncome = '';
 
-  selectedOccupation = 'Farmer';
+  selectedOccupation = '';
+
+  customOccupation = '';
 
   occupations = [
-    {
-      name: 'Farmer',
-      icon: 'agriculture',
-      description: 'Agriculture & allied activities'
-    },
-    {
-      name: 'Self-employed',
-      icon: 'store',
-      description: 'Own business or freelance'
-    },
-    {
-      name: 'Salaried',
-      icon: 'work',
-      description: 'Private / Government employee'
-    },
-    {
-      name: 'Unemployed',
-      icon: 'person',
-      description: 'Currently not employed'
-    }
+    { name: 'Student', icon: 'school', description: 'Currently studying' },
+    { name: 'Farmer', icon: 'agriculture', description: 'Agriculture & allied activities' },
+    { name: 'Salaried', icon: 'work', description: 'Private / Government employee' },
+    { name: 'Self-employed', icon: 'store', description: 'Own business or freelance' },
+    { name: 'Daily Wage Labourer', icon: 'construction', description: 'Informal / daily wage work' },
+    { name: 'Homemaker', icon: 'home', description: 'Managing household' },
+    { name: 'Retired / Pensioner', icon: 'elderly', description: 'Retired from work' },
+    { name: 'Unemployed', icon: 'person_search', description: 'Currently not employed' },
+    { name: 'Other', icon: 'more_horiz', description: 'None of the above' }
   ];
 
-  // ================= CATEGORY =================
+  selectedEducation = '';
 
-  selectedCategory = '';
+  educationLevels = [
+    'Below 10th',
+    '10th Pass',
+    '12th Pass',
+    'Undergraduate',
+    'Graduate',
+    'Postgraduate',
+    'Doctorate'
+  ];
+
+  // ================= STEP 3: INCOME & CATEGORY =================
+
   selectedCaste = '';
-  disability = 'No';
-
-  categories = [
-    'Student',
-    'Farmer',
-    'Women',
-    'Senior Citizen',
-    'Business',
-    'Government Employee',
-    'Self Employed',
-    'Unemployed'
-  ];
 
   casteCategories = [
     'General',
@@ -124,17 +130,7 @@ export class EligibilityCheckerComponent {
     'Minority'
   ];
 
-  // ================= STATES =================
-
-  states = [
-    'Tamil Nadu',
-    'Kerala',
-    'Karnataka',
-    'Andhra Pradesh',
-    'Telangana',
-    'Maharashtra',
-    'Delhi'
-  ];
+  disability = 'No';
 
   // ================= RESULTS =================
 
@@ -142,12 +138,17 @@ export class EligibilityCheckerComponent {
 
   eligibilityResults: any[] = [];
 
+  profileSummary = '';
+
   loading = false;
 
   // ================= METHODS =================
 
   selectOccupation(name: string): void {
     this.selectedOccupation = name;
+    if (name !== 'Other') {
+      this.customOccupation = '';
+    }
   }
 
   nextStep(): void {
@@ -168,13 +169,19 @@ export class EligibilityCheckerComponent {
 
     this.loading = true;
 
+    const occupation =
+      this.selectedOccupation === 'Other'
+        ? this.customOccupation
+        : this.selectedOccupation;
+
     const request = {
       age: this.calculateAge(),
       gender: this.gender,
       income: Number(this.annualIncome),
-      occupation: this.selectedOccupation,
-      education: 'Undergraduate',
+      occupation,
+      education: this.selectedEducation,
       location: this.state,
+      district: this.district,
       social_category: this.selectedCaste,
       disability_status: this.disability === 'Yes'
     };
@@ -186,23 +193,18 @@ export class EligibilityCheckerComponent {
 
       next: (response) => {
 
-        console.log(
-          'Eligibility response:',
-          response
-        );
+        console.log('Eligibility response:', response);
 
-        this.eligibleCount =
-          response.eligible_count ?? 0;
+        this.eligibleCount = response.eligible_count ?? 0;
 
-        this.eligibilityResults =
-          response.eligible_schemes ?? [];
+        this.eligibilityResults = response.eligible_schemes ?? [];
 
-        // Store the COMPLETE backend response.
-        // This preserves benefits, eligibility,
-        // category, department, application guidance, etc.
-        this.eligibilityResultService.setResult(
-          response
-        );
+        this.profileSummary = response.profile_summary ?? '';
+
+        // Store the COMPLETE backend response — preserves benefits,
+        // eligibility, category, department, application guidance,
+        // profile summary and eligibility summary for the results page.
+        this.eligibilityResultService.setResult(response);
 
         this.loading = false;
 
@@ -211,16 +213,11 @@ export class EligibilityCheckerComponent {
 
       error: (error) => {
 
-        console.error(
-          'Eligibility check failed:',
-          error
-        );
+        console.error('Eligibility check failed:', error);
 
         this.loading = false;
 
-        alert(
-          'Unable to check eligibility. Please make sure the backend server is running.'
-        );
+        alert('Unable to check eligibility. Please make sure the backend server is running.');
       }
 
     });
@@ -231,26 +228,19 @@ export class EligibilityCheckerComponent {
   calculateAge(): number {
 
     if (!this.dob) {
-      return 25;
+      return 0;
     }
 
     const birthDate = new Date(this.dob);
     const today = new Date();
 
-    let age =
-      today.getFullYear() -
-      birthDate.getFullYear();
+    let age = today.getFullYear() - birthDate.getFullYear();
 
-    const monthDifference =
-      today.getMonth() -
-      birthDate.getMonth();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
 
     if (
       monthDifference < 0 ||
-      (
-        monthDifference === 0 &&
-        today.getDate() < birthDate.getDate()
-      )
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
     ) {
       age--;
     }
@@ -261,7 +251,6 @@ export class EligibilityCheckerComponent {
   // ================= NAVIGATION =================
 
   previousStep(): void {
-
     if (this.currentStep > 1) {
       this.currentStep--;
     }
@@ -277,26 +266,22 @@ export class EligibilityCheckerComponent {
 
     this.currentStep = 1;
 
-    this.fullName = '';
-    this.mobile = '';
-    this.email = '';
-    this.aadhaar = '';
     this.dob = '';
     this.gender = '';
-
-    this.state = 'Tamil Nadu';
+    this.state = '';
     this.district = '';
 
     this.annualIncome = '';
+    this.selectedOccupation = '';
+    this.customOccupation = '';
+    this.selectedEducation = '';
 
-    this.selectedOccupation = 'Farmer';
-
-    this.selectedCategory = '';
     this.selectedCaste = '';
     this.disability = 'No';
 
     this.eligibleCount = 0;
     this.eligibilityResults = [];
+    this.profileSummary = '';
     this.loading = false;
 
     this.eligibilityResultService.clearResult();

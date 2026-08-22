@@ -51,3 +51,28 @@ def decode_access_token(token: str):
         return None
 
 
+# Password Reset: short-lived, single-purpose token. Stateless (no DB
+# column/migration needed) — signed with the same SECRET_KEY, but tagged
+# with purpose="password_reset" and a short 15-minute expiry so it can
+# never be reused as a normal login/access token even if it leaks.
+RESET_TOKEN_EXPIRE_MINUTES = 15
+
+
+def create_password_reset_token(email: str) -> str:
+    expire = datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
+    to_encode = {"sub": email, "purpose": "password_reset", "exp": expire}
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def decode_password_reset_token(token: str) -> str | None:
+    """Returns the email if the token is valid, unexpired, and actually a
+    password-reset token (not a normal login access token). Returns None
+    otherwise."""
+    payload = decode_access_token(token)
+    if payload is None:
+        return None
+    if payload.get("purpose") != "password_reset":
+        return None
+    return payload.get("sub")
+
+

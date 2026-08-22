@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -11,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 
 import { ComparisonService } from '../../services/comparison.service';
+import { SchemeService } from '../../services/scheme.service';
+import { PolicyService } from '../../services/policy.service';
 
 @Component({
   selector: 'app-compare',
@@ -30,622 +34,383 @@ import { ComparisonService } from '../../services/comparison.service';
   styleUrls: ['./compare-policies.scss']
 })
 export class CompareComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 
   // ================= USER =================
 
   userName = 'Sri';
 
-
   // ================= SEARCH =================
 
   search = '';
 
+  // ================= COMPARE MODE =================
 
-  // ================= SELECTED POLICIES =================
+  compareMode: 'policy' | 'scheme' = 'scheme';
 
-  selectedPolicy1 = 'PM Kisan Samman Nidhi';
+  // ================= OPTION LISTS =================
+  // Loaded from the real database instead of being hardcoded, so the
+  // dropdowns always reflect what's actually in the policies/schemes
+  // tables.
 
-  selectedPolicy2 = 'Ayushman Bharat PM-JAY';
+  policyOptions: { id: number; name: string }[] = [];
 
+  schemeOptions: { id: number; name: string }[] = [];
 
-  // ================= POLICY LIST =================
+  get policies(): { id: number; name: string }[] {
+    return this.compareMode === 'policy' ? this.policyOptions : this.schemeOptions;
+  }
 
-  policies = [
+  // ================= MULTI-SELECT SLOTS (2-4 items) =================
 
-    {
-      id: 1,
-      name: 'PM Kisan Samman Nidhi',
-      category: 'Agriculture',
-      ministry: 'Ministry of Agriculture',
-      benefit: '₹6,000 per year',
-      eligibility: 'Farmers',
-      income: 'No Income Limit',
-      documents: 'Aadhaar, Bank Passbook',
-      deadline: '30 Sep 2026',
-      status: 'Active',
-      apply: 'Online',
-      processing: '15 Days'
-    },
+  readonly minCompare = 2;
 
-    {
-      id: 2,
-      name: 'Ayushman Bharat PM-JAY',
-      category: 'Health',
-      ministry: 'Ministry of Health',
-      benefit: '₹5 Lakh Health Insurance',
-      eligibility: 'BPL Families',
-      income: 'Below Poverty Line',
-      documents: 'Aadhaar, Ration Card',
-      deadline: 'Ongoing',
-      status: 'Active',
-      apply: 'Online',
-      processing: '10 Days'
-    },
+  readonly maxCompare = 4;
 
-    {
-      id: 7,
-      name: 'PM Awas Yojana',
-      category: 'Housing',
-      ministry: 'Ministry of Housing',
-      benefit: 'Housing Subsidy',
-      eligibility: 'Economically Weaker Sections',
-      income: 'Below ₹6 Lakhs',
-      documents: 'Aadhaar, Income Certificate',
-      deadline: '31 Dec 2026',
-      status: 'Active',
-      apply: 'Online',
-      processing: '30 Days'
-    },
+  selectedNames: string[] = ['', ''];
 
-    {
-      id: 8,
-      name: 'National Scholarship Portal',
-      category: 'Education',
-      ministry: 'Ministry of Education',
-      benefit: 'Scholarship',
-      eligibility: 'Students',
-      income: 'Below ₹2.5 Lakhs',
-      documents: 'Aadhaar, Income Certificate',
-      deadline: '15 Oct 2026',
-      status: 'Active',
-      apply: 'Online',
-      processing: '20 Days'
-    },
+  comparedItems: any[] = [];
 
-    {
-      id: 9,
-      name: 'Skill India Mission',
-      category: 'Employment',
-      ministry: 'MSDE',
-      benefit: 'Free Skill Training',
-      eligibility: 'Youth',
-      income: 'No Limit',
-      documents: 'Aadhaar',
-      deadline: 'Ongoing',
-      status: 'Active',
-      apply: 'Online',
-      processing: '7 Days'
-    }
+  get canAddMore(): boolean {
+    return this.selectedNames.length < this.maxCompare;
+  }
 
-  ];
-
-
-  // ================= COMPARE DATA =================
-
-  policyOne: any = null;
-
-  policyTwo: any = null;
-
+  get canRemove(): boolean {
+    return this.selectedNames.length > this.minCompare;
+  }
 
   // ================= CONSTRUCTOR =================
 
   constructor(
-    private comparisonService: ComparisonService
+    private comparisonService: ComparisonService,
+    private schemeService: SchemeService,
+    private policyService: PolicyService
   ) {
-    this.comparePolicies();
+    this.loadOptions();
   }
 
+  // ================= LOAD OPTIONS =================
 
-  // ================= METHODS =================
+  loadOptions(): void {
+    this.schemeService.getAllSchemes().subscribe({
+      next: (response: any) => {
+        this.schemeOptions = (response.data || []).map((s: any) => ({
+          id: s.scheme_id,
+          name: s.scheme_name
+        }));
+        this.initSelectionIfReady();
+      },
+      error: (error) => console.error('Failed to load schemes for comparison:', error)
+    });
 
-  comparePolicies(): void {
+    this.policyService.getAllPolicies({ public_only: true }).subscribe({
+      next: (response: any) => {
+        this.policyOptions = (response.data || []).map((p: any) => ({
+          id: p.policy_id,
+          name: p.policy_name
+        }));
+        this.initSelectionIfReady();
+      },
+      error: (error) => console.error('Failed to load policies for comparison:', error)
+    });
+  }
 
-    // Find selected policies from local list
+  private initSelectionIfReady(): void {
+    if (this.policies.length > 0 && !this.selectedNames[0]) {
+      this.selectedNames[0] = this.policies[0].name;
+      this.selectedNames[1] =
+        this.policies.length > 1 ? this.policies[1].name : this.policies[0].name;
+      this.runComparison();
+    }
+  }
 
-    const policy1 = this.policies.find(
-      p => p.name === this.selectedPolicy1
-    );
+  // ================= SWITCH MODE =================
 
-    const policy2 = this.policies.find(
-      p => p.name === this.selectedPolicy2
-    );
+  switchMode(mode: 'policy' | 'scheme'): void {
+    if (this.compareMode === mode) return;
 
+    this.compareMode = mode;
+    this.selectedNames = ['', ''];
+    this.comparedItems = [];
 
-    if (!policy1 || !policy2) {
-      console.error('Selected policies not found');
+    if (this.policies.length > 0) {
+      this.selectedNames[0] = this.policies[0].name;
+      this.selectedNames[1] =
+        this.policies.length > 1 ? this.policies[1].name : this.policies[0].name;
+      this.runComparison();
+    }
+  }
+
+  // ================= SLOT MANAGEMENT (Add / Remove up to 4) =================
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  addSlot(): void {
+    if (!this.canAddMore) return;
+
+    const used = new Set(this.selectedNames);
+    const next = this.policies.find(p => !used.has(p.name));
+
+    this.selectedNames.push(next ? next.name : '');
+    this.onSelectionChange();
+  }
+
+  removeSlot(index: number): void {
+    if (!this.canRemove) return;
+
+    this.selectedNames.splice(index, 1);
+    this.onSelectionChange();
+  }
+
+  onSelectionChange(): void {
+    const filled = this.selectedNames.filter(n => !!n);
+
+    if (filled.length >= this.minCompare) {
+      this.runComparison();
+    } else {
+      this.comparedItems = [];
+    }
+  }
+
+  // ================= COMPARE (2-4 items) =================
+
+  runComparison(): void {
+
+    const ids = this.selectedNames
+      .map(name => this.policies.find(p => p.name === name))
+      .filter((item): item is { id: number; name: string } => !!item)
+      .map(item => item.id);
+
+    if (ids.length < this.minCompare) {
       return;
     }
 
+    const request$ = this.compareMode === 'policy'
+      ? this.comparisonService.comparePoliciesMulti(ids)
+      : this.comparisonService.compareSchemesMulti(ids);
 
-    console.log('Selected Policy 1:', policy1);
-
-    console.log('Selected Policy 2:', policy2);
-
-
-    // Call backend
-
-    this.comparisonService.compareSchemes(
-      policy1.id,
-      policy2.id
-    ).subscribe({
+    request$.subscribe({
 
       next: (response: any) => {
 
-        console.log(
-          'API Response:',
-          JSON.stringify(response, null, 2)
+        const rawItems = this.compareMode === 'policy'
+          ? response.policies
+          : response.schemes;
+
+        this.comparedItems = (rawItems || []).map((item: any) =>
+          this.compareMode === 'policy'
+            ? this.normalizePolicy(item)
+            : this.normalizeScheme(item)
         );
-
-
-        // ================= POLICY 1 =================
-
-        this.policyOne = {
-
-          name: response.scheme_1.scheme_name,
-
-          category: response.scheme_1.category,
-
-          ministry: response.scheme_1.department,
-
-          government_level: response.scheme_1.government_level,
-
-          state: response.scheme_1.state,
-
-          benefit: response.scheme_1.benefits,
-
-          eligibility: response.scheme_1.eligibility,
-
-          income: response.scheme_1.income_limit,
-
-          documents: response.scheme_1.required_documents,
-
-          deadline: response.scheme_1.end_date || 'Ongoing',
-
-          status: response.scheme_1.status,
-
-          apply: response.scheme_1.application_process,
-
-          processing: response.scheme_1.processing_time,
-
-          officialWebsite: response.scheme_1.official_website,
-
-          description: response.scheme_1.description
-
-        };
-
-
-        // ================= POLICY 2 =================
-
-        this.policyTwo = {
-
-          name: response.scheme_2.scheme_name,
-
-          category: response.scheme_2.category,
-
-          ministry: response.scheme_2.department,
-
-          government_level: response.scheme_2.government_level,
-
-          state: response.scheme_2.state,
-
-          benefit: response.scheme_2.benefits,
-
-          eligibility: response.scheme_2.eligibility,
-
-          income: response.scheme_2.income_limit,
-
-          documents: response.scheme_2.required_documents,
-
-          deadline: response.scheme_2.end_date || 'Ongoing',
-
-          status: response.scheme_2.status,
-
-          apply: response.scheme_2.application_process,
-
-          processing: response.scheme_2.processing_time,
-
-          officialWebsite: response.scheme_2.official_website,
-
-          description: response.scheme_2.description
-
-        };
-
-
-        console.log(
-          'Policy 1:',
-          this.policyOne
-        );
-
-        console.log(
-          'Policy 2:',
-          this.policyTwo
-        );
-
       },
-
 
       error: (error) => {
 
-        console.error(
-          'Comparison API Error:',
-          error
-        );
+        console.error('Comparison API Error:', error);
 
+        alert(`Unable to compare these ${this.compareMode === 'policy' ? 'policies' : 'schemes'}. Please try again.`);
       }
 
     });
-
   }
 
+  // ================= NORMALIZE =================
+  // Both Policy and Scheme records get mapped to the same shape so the
+  // template can render either mode without branching per field.
 
-  // ================= SWAP =================
+  private normalizePolicy(p: any): any {
+    return {
+      name: p.policy_name,
+      category: p.category,
+      ministry: p.ministry,
+      department: p.department,
+      government_level: p.government_level,
+      state: p.state,
+      status: p.status,
+      approval_status: p.approval_status,
+      deadline: p.effective_date || 'Ongoing',
+      description: p.description,
+      benefit: p.description || 'Not specified',
+      eligibility: null,
+      income: null,
+      documents: p.document_url ? 'Official document available' : 'Not available',
+      documentUrl: p.document_url || '',
+      apply: null,
+      processing: null,
+      officialWebsite: p.document_url || ''
+    };
+  }
+
+  private normalizeScheme(s: any): any {
+    return {
+      name: s.scheme_name,
+      category: s.category,
+      ministry: null,
+      department: s.department,
+      government_level: s.government_level,
+      state: s.state,
+      benefit: s.benefits,
+      eligibility: s.eligibility,
+      income: s.income_limit,
+      documents: s.required_documents,
+      deadline: s.end_date || 'Ongoing',
+      status: s.status,
+      apply: s.application_process,
+      processing: s.processing_time,
+      officialWebsite: s.official_website,
+      description: s.description
+    };
+  }
+
+  // ================= TEMPLATE HELPER =================
+  // Used for plain "differs across items" highlighting (Department row) -
+  // not a score, just a visual cue when values aren't all identical.
+
+  allSame(field: string): boolean {
+    if (this.comparedItems.length < 2) return true;
+    const first = this.comparedItems[0][field];
+    return this.comparedItems.every(item => item[field] === first);
+  }
+
+  // ================= SWAP (only meaningful for exactly 2 items) =================
 
   swapPolicies(): void {
+    if (this.selectedNames.length !== 2) return;
 
-    const temp = this.selectedPolicy1;
+    const temp = this.selectedNames[0];
+    this.selectedNames[0] = this.selectedNames[1];
+    this.selectedNames[1] = temp;
 
-    this.selectedPolicy1 = this.selectedPolicy2;
-
-    this.selectedPolicy2 = temp;
-
-    this.comparePolicies();
-
+    this.runComparison();
   }
-
 
   // ================= RESET =================
 
   resetComparison(): void {
 
-    this.selectedPolicy1 =
-      'PM Kisan Samman Nidhi';
+    this.selectedNames = ['', ''];
 
-    this.selectedPolicy2 =
-      'Ayushman Bharat PM-JAY';
+    if (this.policies.length > 0) {
+      this.selectedNames[0] = this.policies[0].name;
+      this.selectedNames[1] =
+        this.policies.length > 1 ? this.policies[1].name : this.policies[0].name;
+    }
 
     this.search = '';
 
-    this.comparePolicies();
-
+    this.runComparison();
   }
-
 
   // ================= SEARCH =================
 
   searchPolicy(): void {
 
     if (this.search.trim() === '') {
-
-      this.comparePolicies();
-
+      this.runComparison();
       return;
-
     }
-
 
     const keyword = this.search.toLowerCase();
 
-
     const result = this.policies.find(
-      policy =>
-        policy.name.toLowerCase().includes(keyword)
+      policy => policy.name.toLowerCase().includes(keyword)
     );
 
-
     if (result) {
+      this.selectedNames[0] = result.name;
+      this.runComparison();
+    }
+  }
 
-      this.selectedPolicy1 = result.name;
+  // ================= EXPORT: CSV DOWNLOAD =================
 
-      this.comparePolicies();
+  exportCsv(): void {
 
+    if (this.comparedItems.length < 2) {
+      return;
     }
 
+    const isPolicy = this.compareMode === 'policy';
+
+    const rows: { label: string; getValue: (item: any) => string }[] = [
+      { label: 'Category', getValue: item => item.category },
+      ...(isPolicy
+        ? [{ label: 'Ministry', getValue: (item: any) => item.ministry }]
+        : []),
+      { label: 'Department', getValue: item => item.department },
+      { label: 'Government Level', getValue: item => item.government_level },
+      { label: 'State', getValue: item => item.state },
+      { label: 'Last Date', getValue: item => item.deadline },
+      { label: 'Status', getValue: item => item.status },
+      { label: 'Benefit', getValue: item => item.benefit },
+      ...(!isPolicy
+        ? [
+            { label: 'Eligibility', getValue: (item: any) => item.eligibility },
+            { label: 'Application Process', getValue: (item: any) => item.apply },
+            { label: 'Processing Time', getValue: (item: any) => item.processing }
+          ]
+        : []),
+      { label: 'Required Documents', getValue: item => item.documents }
+    ];
+
+    const escapeCsv = (value: any): string => {
+      const text = value === null || value === undefined ? '' : String(value);
+      return `"${text.replace(/"/g, '""')}"`;
+    };
+
+    const header = ['Feature', ...this.comparedItems.map(item => item.name)];
+
+    const lines = [header.map(escapeCsv).join(',')];
+
+    rows.forEach(row => {
+      const line = [
+        row.label,
+        ...this.comparedItems.map(item => row.getValue(item))
+      ];
+      lines.push(line.map(escapeCsv).join(','));
+    });
+
+    // Leading BOM so Excel opens the file with correct UTF-8 encoding
+    // instead of mangling the ₹ symbol and other non-ASCII characters.
+    const csvContent = '\uFEFF' + lines.join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    const fileName = `${this.compareMode}-comparison-${dateStamp}.csv`;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
   }
 
+  // ================= EXPORT: PRINT / SAVE AS PDF =================
+  // Uses the browser's own print dialog (choosing "Save as PDF" there
+  // produces a real PDF) instead of a bundled PDF library, since a new
+  // dependency added this close to a demo is a real risk if it doesn't
+  // install cleanly on someone else's machine.
 
-  // ================= GET MATCH =================
+  printComparison(): void {
 
-  // getOverallMatch(): number {
+    if (this.comparedItems.length < 2) {
+      return;
+    }
 
-  //   if (!this.policyOne || !this.policyTwo) {
-
-  //     return 0;
-
-  //   }
-
-
-  //   let score = 0;
-
-
-  //   if (
-  //     this.policyOne.category ===
-  //     this.policyTwo.category
-  //   ) {
-
-  //     score += 40;
-
-  //   }
-
-
-  //   if (
-  //     this.policyOne.apply ===
-  //     this.policyTwo.apply
-  //   ) {
-
-  //     score += 20;
-
-  //   }
-
-
-  //   if (
-  //     this.policyOne.status ===
-  //     this.policyTwo.status
-  //   ) {
-
-  //     score += 20;
-
-  //   }
-
-
-  //   if (
-  //     this.policyOne.documents ===
-  //     this.policyTwo.documents
-  //   ) {
-
-  //     score += 20;
-
-  //   }
-
-
-  //   return score;
-
-  // }
-
-
-  getOverallMatch(): number {
-
-  if (!this.policyOne || !this.policyTwo) {
-    return 0;
+    window.print();
   }
-
-  let score = 0;
-
-  // Same category
-  if (this.policyOne.category === this.policyTwo.category) {
-    score += 25;
-  }
-
-  // Same application mode
-  if (
-    this.policyOne.apply &&
-    this.policyTwo.apply &&
-    this.policyOne.apply.toLowerCase().includes('online') ===
-    this.policyTwo.apply.toLowerCase().includes('online')
-  ) {
-    score += 20;
-  }
-
-  // Same status
-  if (this.policyOne.status === this.policyTwo.status) {
-    score += 20;
-  }
-
-  // Similar processing time
-  const processingOne = parseInt(this.policyOne.processing) || 0;
-  const processingTwo = parseInt(this.policyTwo.processing) || 0;
-
-  if (processingOne === processingTwo) {
-    score += 20;
-  } else if (Math.abs(processingOne - processingTwo) <= 5) {
-    score += 10;
-  }
-
-  // Same government level
-  if (
-    this.policyOne.government_level &&
-    this.policyTwo.government_level &&
-    this.policyOne.government_level === this.policyTwo.government_level
-  ) {
-    score += 15;
-  }
-
-  return score;
-}
-
-
-  // ================= RECOMMENDATION =================
-
-  // getRecommendation(): string {
-
-  //   if (!this.policyOne || !this.policyTwo) {
-
-  //     return 'No recommendation available';
-
-  //   }
-
-
-  //   let scoreOne = 0;
-
-  //   let scoreTwo = 0;
-
-
-  //   // Same category
-
-  //   if (
-  //     this.policyOne.category ===
-  //     this.policyTwo.category
-  //   ) {
-
-  //     scoreOne += 1;
-
-  //     scoreTwo += 1;
-
-  //   }
-
-
-  //   // Active status
-
-  //   if (this.policyOne.status === 'Active') {
-
-  //     scoreOne += 1;
-
-  //   }
-
-
-  //   if (this.policyTwo.status === 'Active') {
-
-  //     scoreTwo += 1;
-
-  //   }
-
-
-  //   // Same government level
-
-  //   if (
-  //     this.policyOne.government_level ===
-  //     this.policyTwo.government_level
-  //   ) {
-
-  //     scoreOne += 1;
-
-  //     scoreTwo += 1;
-
-  //   }
-
-
-  //   if (scoreOne > scoreTwo) {
-
-  //     return this.policyOne.name;
-
-  //   }
-
-
-  //   if (scoreTwo > scoreOne) {
-
-  //     return this.policyTwo.name;
-
-  //   }
-
-
-  //   return 'Both policies are equally suitable';
-
-  // }
-
-  getRecommendation(): string {
-
-  if (!this.policyOne || !this.policyTwo) {
-    return 'No recommendation available';
-  }
-
-  let scoreOne = 0;
-  let scoreTwo = 0;
-
-  // ================= STATUS =================
-
-  if (this.policyOne.status === 'Active') {
-    scoreOne += 2;
-  }
-
-  if (this.policyTwo.status === 'Active') {
-    scoreTwo += 2;
-  }
-
-  // ================= PROCESSING TIME =================
-  // Lower processing time is better
-
-  const processingOne = parseInt(this.policyOne.processing) || 999;
-  const processingTwo = parseInt(this.policyTwo.processing) || 999;
-
-  if (processingOne < processingTwo) {
-    scoreOne += 3;
-  } else if (processingTwo < processingOne) {
-    scoreTwo += 3;
-  }
-
-  // ================= APPLICATION MODE =================
-
-  if (
-    this.policyOne.apply &&
-    this.policyOne.apply.toLowerCase().includes('online')
-  ) {
-    scoreOne += 1;
-  }
-
-  if (
-    this.policyTwo.apply &&
-    this.policyTwo.apply.toLowerCase().includes('online')
-  ) {
-    scoreTwo += 1;
-  }
-
-  // ================= ELIGIBILITY =================
-  // More general eligibility gets a small advantage
-
-  if (
-    this.policyOne.eligibility &&
-    (
-      this.policyOne.eligibility.toLowerCase().includes('youth') ||
-      this.policyOne.eligibility.toLowerCase().includes('students') ||
-      this.policyOne.eligibility.toLowerCase().includes('farmers')
-    )
-  ) {
-    scoreOne += 1;
-  }
-
-  if (
-    this.policyTwo.eligibility &&
-    (
-      this.policyTwo.eligibility.toLowerCase().includes('youth') ||
-      this.policyTwo.eligibility.toLowerCase().includes('students') ||
-      this.policyTwo.eligibility.toLowerCase().includes('farmers')
-    )
-  ) {
-    scoreTwo += 1;
-  }
-
-  // ================= DOCUMENTS =================
-  // Fewer required documents gets an advantage
-
-  const documentsOne =
-    this.policyOne.documents
-      ? this.policyOne.documents.split(',').length
-      : 999;
-
-  const documentsTwo =
-    this.policyTwo.documents
-      ? this.policyTwo.documents.split(',').length
-      : 999;
-
-  if (documentsOne < documentsTwo) {
-    scoreOne += 2;
-  } else if (documentsTwo < documentsOne) {
-    scoreTwo += 2;
-  }
-
-  // ================= FINAL RECOMMENDATION =================
-
-  console.log('Recommendation Score 1:', scoreOne);
-  console.log('Recommendation Score 2:', scoreTwo);
-
-  if (scoreOne > scoreTwo) {
-    return this.policyOne.name;
-  }
-
-  if (scoreTwo > scoreOne) {
-    return this.policyTwo.name;
-  }
-
-  return 'Both policies are equally suitable';
-}
 
 }

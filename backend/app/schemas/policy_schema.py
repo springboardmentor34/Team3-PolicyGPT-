@@ -34,7 +34,8 @@ class PolicyCreate(BaseModel):
     department: Optional[str] = None
     government_level: Optional[str] = None
     state: Optional[str] = None
-    status: Optional[str] = None
+    # `status` isn't accepted at creation time either — every new policy
+    # starts life as Pending (see create_policy), matching approval_status.
     publication_date: Optional[date] = None
     effective_date: Optional[date] = None
     document_url: Optional[str] = None
@@ -51,7 +52,12 @@ class PolicyUpdate(BaseModel):
     department: Optional[str] = None
     government_level: Optional[str] = None
     state: Optional[str] = None
-    status: Optional[str] = None
+    # `status` is intentionally NOT editable here — it's derived from
+    # approval_status (see policy.py's _sync_status_from_approval) so an
+    # Official can't self-approve by just typing "Active" into the edit
+    # form, or resurrect a Rejected policy without going back through
+    # approval. Archived/restored is handled by the dedicated
+    # archive/unarchive endpoints instead.
     publication_date: Optional[date] = None
     effective_date: Optional[date] = None
     document_url: Optional[str] = None
@@ -63,6 +69,9 @@ class PolicyOut(PolicyCreate):
     policy_id: int
     created_at: datetime
     updated_at: datetime
+    # Readable in responses (and used for filtering/badges), but not
+    # accepted as input on PolicyCreate/PolicyUpdate — see the note there.
+    status: Optional[str] = None
 
     # ---- Policy Approval Workflow (Task 4) -----------------------------
     approval_status: ApprovalStatus
@@ -77,4 +86,4 @@ class PolicyOut(PolicyCreate):
 
 class PolicyRejectRequest(BaseModel):
     """Body for PATCH /policies/{id}/reject — a reason is mandatory."""
-    reason: str = Field(..., min_length=1, max_length=1000)
+    reason: str = Field(..., min_length=1, max_length=1000)

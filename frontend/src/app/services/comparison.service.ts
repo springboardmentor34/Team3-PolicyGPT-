@@ -22,4 +22,18 @@ export class ComparisonService {
       `${this.apiUrl}/schemes/${scheme1Id}/${scheme2Id}`
     );
   }
+
+  comparePoliciesMulti(ids: number[]): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/policies/multi`,
+      { ids }
+    );
+  }
+
+  compareSchemesMulti(ids: number[]): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/schemes/multi`,
+      { ids }
+    );
+  }
 }

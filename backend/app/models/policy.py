@@ -32,4 +32,4 @@ class Policy(Base):
     approved_at = Column(TIMESTAMP, nullable=True)
     rejection_reason = Column(Text, nullable=True)
     rejected_by = Column(BigInteger, ForeignKey("users.user_id"), nullable=True)
-    rejected_at = Column(TIMESTAMP, nullable=True)
+    rejected_at = Column(TIMESTAMP, nullable=True)

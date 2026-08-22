@@ -6,6 +6,96 @@ background:#F4F7FC;
 font-family:'Inter',sans-serif;
 }
 
+/* ================= PROFILE SUMMARY & ELIGIBILITY SUMMARY ================= */
+
+.profile-summary-box{
+display:flex;
+align-items:flex-start;
+gap:12px;
+background:#EEF4FF;
+border:1px solid #C7DBFF;
+border-radius:12px;
+padding:14px 18px;
+margin:16px 20px;
+max-width:900px;
+color:#1B3A6B;
+
+mat-icon{ margin-top:2px; }
+p{ margin:0; line-height:1.5; }
+}
+
+.eligibility-summary-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:12px;
+margin:0 20px 16px;
+max-width:900px;
+}
+
+.summary-tile{
+background:#fff;
+border-radius:12px;
+padding:14px;
+text-align:center;
+box-shadow:0 1px 4px rgba(0,0,0,.06);
+
+.summary-value{ display:block; font-size:24px; font-weight:700; color:#0F4C97; }
+.summary-label{ font-size:12px; color:#64748B; }
+
+&.eligible .summary-value{ color:#16A34A; }
+&.not-eligible .summary-value{ color:#DC2626; }
+
+&.categories{
+text-align:left;
+grid-column:1 / -1;
+}
+}
+
+.category-chips{
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+margin-top:6px;
+}
+
+.chip{
+background:#E0ECFF;
+color:#0F4C97;
+font-size:12px;
+padding:4px 10px;
+border-radius:999px;
+}
+
+/* ================= APPLICATION GUIDANCE ================= */
+
+.guidance-box{
+background:#F8FAFC;
+border-radius:10px;
+padding:10px 14px;
+margin:8px 0;
+}
+
+.guidance-title{
+display:flex;
+align-items:center;
+gap:6px;
+font-size:13px;
+font-weight:600;
+color:#334155;
+margin-bottom:6px;
+
+mat-icon{ font-size:18px; height:18px; width:18px; }
+}
+
+.guidance-steps{
+margin:0;
+padding-left:18px;
+font-size:13px;
+color:#475569;
+
+li{ margin-bottom:4px; }
+}
+
 /* ================= NAVBAR ================= */
 
 .top-navbar{

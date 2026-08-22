@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { CommonModule, Location } from '@angular/common';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
-import { EligibilityResultService } from '../../services/eligibility-result.service';
+import { SchemeService } from '../../services/scheme.service';
 
 @Component({
   selector: 'app-scheme-details',
@@ -31,80 +31,86 @@ export class SchemeDetailsComponent implements OnInit {
 
   eligibility: string[] = [];
 
-  documents: string[] = [
-    'Aadhaar Card',
-    'Bank Passbook',
-    'Land Ownership Certificate',
-    'Income Certificate',
-    'Passport Size Photo'
-  ];
+  documents: string[] = [];
 
   constructor(
-    private eligibilityResultService: EligibilityResultService
+    private route: ActivatedRoute,
+    private schemeService: SchemeService,
+    private location: Location
   ) {}
 
-  ngOnInit(): void {
-    this.loadSchemeDetails();
+  goBack(): void {
+    this.location.back();
   }
 
-  loadSchemeDetails(): void {
-
-    const result = this.eligibilityResultService.getResult();
-
-    if (
-      !result ||
-      !result.eligible_schemes ||
-      result.eligible_schemes.length === 0
-    ) {
-      console.warn('No eligible scheme found.');
-      return;
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadSchemeDetails(id);
     }
+  }
 
-    const data = result.eligible_schemes[0];
+  loadSchemeDetails(id: string): void {
 
-    console.log('Selected matched scheme:', data);
+    this.schemeService.getSchemeById(id).subscribe({
 
-    // ================= SCHEME INFORMATION =================
+      next: (response: any) => {
 
-    this.scheme = {
-      title: data.scheme_name ?? 'Government Scheme',
+        const data = response.data ?? response;
 
-      category: data.category ?? 'General',
+        console.log('Scheme from database:', data);
 
-      ministry: data.department ?? 'Government Department',
+        // ================= SCHEME INFORMATION =================
 
-      status: 'Eligible',
+        this.scheme = {
+          title: data.scheme_name ?? 'Government Scheme',
 
-      deadline: data.deadline ?? 'Not Available',
+          category: data.category ?? 'General',
 
-      mode: data.application_mode ?? 'Online',
+          ministry: data.department ?? 'Government Department',
 
-      processing: data.processing_time ?? 'Not Available',
+          status: data.status ?? 'Active',
 
-      website: data.website ?? '#',
+          deadline: data.end_date ?? 'Not Available',
 
-      applicationGuidance:
-        data.application_guidance ??
-        'Application guidance is not available.'
-    };
+          mode: data.application_process ?? 'Online',
 
-    // ================= BENEFITS =================
+          processing: data.processing_time ?? 'Not Available',
 
-    this.benefits = this.convertToList(
-      data.benefits,
-      'Benefit information is not available.'
-    );
+          website: data.official_website ?? '#',
 
-    // ================= ELIGIBILITY =================
+          applicationGuidance:
+            data.application_process ??
+            'Application guidance is not available.'
+        };
 
-    this.eligibility = this.convertToList(
-      data.eligibility,
-      'Eligibility information is not available.'
-    );
+        // ================= BENEFITS =================
 
-    console.log('Scheme details:', this.scheme);
-    console.log('Benefits:', this.benefits);
-    console.log('Eligibility:', this.eligibility);
+        this.benefits = this.convertToList(
+          data.benefits,
+          'Benefit information is not available.'
+        );
+
+        // ================= ELIGIBILITY =================
+
+        this.eligibility = this.convertToList(
+          data.eligibility,
+          'Eligibility information is not available.'
+        );
+
+        // ================= DOCUMENTS =================
+
+        this.documents = this.convertToList(
+          data.required_documents,
+          'Document information is not available.'
+        );
+      },
+
+      error: (err) => {
+        console.error('Failed to load scheme:', err);
+      }
+
+    });
   }
 
   // ================= CONVERT TEXT TO LIST =================

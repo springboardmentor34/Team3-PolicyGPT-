@@ -31,12 +31,6 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class NotificationsComponent {
 
-  // ================= USER =================
-
-  userName = 'Sri';
-
-  search = '';
-
   selectedFilter = 'All';
 
 filteredNotifications:any[] = [];

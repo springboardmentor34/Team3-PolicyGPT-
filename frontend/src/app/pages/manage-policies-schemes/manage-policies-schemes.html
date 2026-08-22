@@ -1,10 +1,13 @@
 <div class="manage-page">
 
   <div class="page-header">
-    <h1>Manage Policies &amp; Schemes</h1>
-    <mat-checkbox [(ngModel)]="showArchived" (change)="toggleShowArchived()">
-      Show archived
-    </mat-checkbox>
+    <div class="page-header-left">
+      <button mat-stroked-button (click)="goBack()" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+      <h1>Manage Policies &amp; Schemes</h1>
+    </div>
   </div>
 
   <mat-tab-group>
@@ -14,9 +17,21 @@
 
       <div class="tab-content">
 
-        <mat-card class="form-card">
-          <h2>{{ editingPolicyId ? 'Edit Policy' : 'Add New Policy' }}</h2>
+        <mat-card class="form-card" *ngIf="!isPolicyFormOpen">
+          <button mat-stroked-button color="primary" class="add-new-btn" (click)="openNewPolicyForm()">
+            <mat-icon>add</mat-icon> Add New Policy
+          </button>
+        </mat-card>
 
+        <mat-card class="form-card" *ngIf="isPolicyFormOpen">
+          <div class="form-card-header">
+            <h2>{{ editingPolicyId ? 'Edit Policy' : 'Add New Policy' }}</h2>
+            <button mat-icon-button (click)="editingPolicyId ? cancelPolicyEdit() : (isPolicyFormOpen = false)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <h3 class="form-section-label">Basic Info</h3>
           <div class="form-grid">
 
             <mat-form-field appearance="outline">
@@ -31,32 +46,67 @@
               </mat-select>
             </mat-form-field>
 
+            <div class="status-note" *ngIf="editingPolicyId">
+              <mat-icon>info</mat-icon>
+              Status is set automatically from the approval decision, not editable here.
+              Current: <strong>{{ editingPolicyStatus }}</strong>
+            </div>
+            <div class="status-note" *ngIf="!editingPolicyId">
+              <mat-icon>info</mat-icon>
+              New policies start as <strong>Pending</strong> until an admin approves them.
+            </div>
+
+          </div>
+
+          <h3 class="form-section-label">Authority &amp; Location</h3>
+          <div class="form-grid">
+
             <mat-form-field appearance="outline">
               <mat-label>Ministry</mat-label>
-              <input matInput [(ngModel)]="policyForm.ministry" name="ministry">
+              <input matInput
+                [(ngModel)]="policyForm.ministry"
+                name="ministry"
+                [matAutocomplete]="ministryAuto"
+                (ngModelChange)="filterMinistries($event)"
+                (focus)="filterMinistries(policyForm.ministry)">
+              <mat-autocomplete #ministryAuto="matAutocomplete">
+                <mat-option *ngFor="let m of filteredMinistries" [value]="m">{{ m }}</mat-option>
+              </mat-autocomplete>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Department</mat-label>
-              <input matInput [(ngModel)]="policyForm.department" name="department">
+              <input matInput
+                [(ngModel)]="policyForm.department"
+                name="department"
+                [matAutocomplete]="deptAuto"
+                (ngModelChange)="filterDepartments($event)"
+                (focus)="filterDepartments(policyForm.department)">
+              <mat-autocomplete #deptAuto="matAutocomplete">
+                <mat-option *ngFor="let d of filteredDepartments" [value]="d">{{ d }}</mat-option>
+              </mat-autocomplete>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Government Level</mat-label>
-              <input matInput [(ngModel)]="policyForm.government_level" name="government_level" placeholder="Central / State">
+              <mat-select [(ngModel)]="policyForm.government_level" name="government_level">
+                <mat-option value="">Not specified</mat-option>
+                <mat-option *ngFor="let g of governmentLevels" [value]="g">{{ g }}</mat-option>
+              </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>State</mat-label>
-              <input matInput [(ngModel)]="policyForm.state" name="policy_state">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select [(ngModel)]="policyForm.status" name="policy_status">
-                <mat-option *ngFor="let s of statusOptions" [value]="s">{{ s }}</mat-option>
+              <mat-select [(ngModel)]="policyForm.state" name="policy_state">
+                <mat-option value="">All India</mat-option>
+                <mat-option *ngFor="let s of eligibilityStates" [value]="s">{{ s }}</mat-option>
               </mat-select>
             </mat-form-field>
+
+          </div>
+
+          <h3 class="form-section-label">Timeline</h3>
+          <div class="form-grid">
 
             <mat-form-field appearance="outline">
               <mat-label>Publication Date</mat-label>
@@ -68,7 +118,12 @@
               <input matInput type="date" [(ngModel)]="policyForm.effective_date" name="effective_date">
             </mat-form-field>
 
-            <mat-form-field appearance="outline">
+          </div>
+
+          <h3 class="form-section-label">Links &amp; Details</h3>
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline" class="full-width">
               <mat-label>Document URL</mat-label>
               <input matInput [(ngModel)]="policyForm.document_url" name="document_url">
             </mat-form-field>
@@ -84,18 +139,41 @@
             <button mat-raised-button color="primary" (click)="submitPolicy()">
               {{ editingPolicyId ? 'Update Policy' : 'Create Policy' }}
             </button>
-            <button mat-stroked-button *ngIf="editingPolicyId" (click)="cancelPolicyEdit()">
+            <button mat-stroked-button (click)="editingPolicyId ? cancelPolicyEdit() : (isPolicyFormOpen = false)">
               Cancel
             </button>
           </div>
         </mat-card>
 
-        <h2 class="list-heading">Existing Policies ({{ policies.length }})</h2>
+        <div class="list-toolbar">
+          <h2 class="list-heading">Existing Policies ({{ filteredPolicies.length }} of {{ policies.length }})</h2>
+          <div class="filter-bar">
+            <mat-form-field appearance="outline" class="filter-search">
+              <mat-label>Search by name, ministry, department</mat-label>
+              <input matInput [(ngModel)]="policySearchText" name="policy_search_text">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="filter-select">
+              <mat-label>Category</mat-label>
+              <mat-select [(ngModel)]="policyFilterCategory" name="policy_filter_category">
+                <mat-option value="">All Categories</mat-option>
+                <mat-option *ngFor="let cat of policyCategories" [value]="cat">{{ cat }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="filter-select">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="policyFilterStatus" name="policy_filter_status">
+                <mat-option value="">All Statuses</mat-option>
+                <mat-option *ngFor="let s of statusOptions" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
 
         <div class="loading" *ngIf="loadingPolicies">Loading policies...</div>
 
         <div class="item-grid" *ngIf="!loadingPolicies">
-          <mat-card class="item-card" *ngFor="let policy of policies" [class.archived]="policy.status === 'Archived'">
+          <mat-card class="item-card" *ngFor="let policy of filteredPolicies" [class.archived]="policy.status === 'Archived'">
             <div class="item-header">
               <h3>{{ policy.policy_name }}</h3>
               <span class="status-badge" [ngClass]="policy.status?.toLowerCase()">{{ policy.status }}</span>
@@ -127,6 +205,7 @@
           </mat-card>
 
           <p class="empty-state" *ngIf="policies.length === 0">No policies yet — create one above.</p>
+          <p class="empty-state" *ngIf="policies.length > 0 && filteredPolicies.length === 0">No policies match your filters.</p>
         </div>
 
       </div>
@@ -137,9 +216,21 @@
 
       <div class="tab-content">
 
-        <mat-card class="form-card">
-          <h2>{{ editingSchemeId ? 'Edit Scheme' : 'Add New Scheme' }}</h2>
+        <mat-card class="form-card" *ngIf="!isSchemeFormOpen">
+          <button mat-stroked-button color="primary" class="add-new-btn" (click)="openNewSchemeForm()">
+            <mat-icon>add</mat-icon> Add New Scheme
+          </button>
+        </mat-card>
 
+        <mat-card class="form-card" *ngIf="isSchemeFormOpen">
+          <div class="form-card-header">
+          <h2>{{ editingSchemeId ? 'Edit Scheme' : 'Add New Scheme' }}</h2>
+            <button mat-icon-button (click)="editingSchemeId ? cancelSchemeEdit() : (isSchemeFormOpen = false)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <h3 class="form-section-label">Basic Info</h3>
           <div class="form-grid">
 
             <mat-form-field appearance="outline">
@@ -155,26 +246,50 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="schemeForm.status" name="scheme_status">
+                <mat-option *ngFor="let s of schemeStatusOptions" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+
+          <h3 class="form-section-label">Authority &amp; Location</h3>
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline">
               <mat-label>Department</mat-label>
-              <input matInput [(ngModel)]="schemeForm.department" name="scheme_department">
+              <input matInput
+                [(ngModel)]="schemeForm.department"
+                name="scheme_department"
+                [matAutocomplete]="schemeDeptAuto"
+                (ngModelChange)="filterDepartments($event)"
+                (focus)="filterDepartments(schemeForm.department)">
+              <mat-autocomplete #schemeDeptAuto="matAutocomplete">
+                <mat-option *ngFor="let d of filteredDepartments" [value]="d">{{ d }}</mat-option>
+              </mat-autocomplete>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Government Level</mat-label>
-              <input matInput [(ngModel)]="schemeForm.government_level" name="scheme_government_level" placeholder="Central / State">
+              <mat-select [(ngModel)]="schemeForm.government_level" name="scheme_government_level">
+                <mat-option value="">Not specified</mat-option>
+                <mat-option *ngFor="let g of governmentLevels" [value]="g">{{ g }}</mat-option>
+              </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>State</mat-label>
-              <input matInput [(ngModel)]="schemeForm.state" name="scheme_state">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select [(ngModel)]="schemeForm.status" name="scheme_status">
-                <mat-option *ngFor="let s of statusOptions" [value]="s">{{ s }}</mat-option>
+              <mat-select [(ngModel)]="schemeForm.state" name="scheme_state">
+                <mat-option value="">All India</mat-option>
+                <mat-option *ngFor="let s of eligibilityStates" [value]="s">{{ s }}</mat-option>
               </mat-select>
             </mat-form-field>
+
+          </div>
+
+          <h3 class="form-section-label">Timeline</h3>
+          <div class="form-grid">
 
             <mat-form-field appearance="outline">
               <mat-label>Start Date</mat-label>
@@ -186,7 +301,12 @@
               <input matInput type="date" [(ngModel)]="schemeForm.end_date" name="end_date">
             </mat-form-field>
 
-            <mat-form-field appearance="outline">
+          </div>
+
+          <h3 class="form-section-label">Links &amp; Details</h3>
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline" class="full-width">
               <mat-label>Official Website</mat-label>
               <input matInput [(ngModel)]="schemeForm.official_website" name="official_website">
             </mat-form-field>
@@ -217,18 +337,41 @@
             <button mat-raised-button color="primary" (click)="submitScheme()">
               {{ editingSchemeId ? 'Update Scheme' : 'Create Scheme' }}
             </button>
-            <button mat-stroked-button *ngIf="editingSchemeId" (click)="cancelSchemeEdit()">
+            <button mat-stroked-button (click)="editingSchemeId ? cancelSchemeEdit() : (isSchemeFormOpen = false)">
               Cancel
             </button>
           </div>
         </mat-card>
 
-        <h2 class="list-heading">Existing Schemes ({{ schemes.length }})</h2>
+        <div class="list-toolbar">
+          <h2 class="list-heading">Existing Schemes ({{ filteredSchemes.length }} of {{ schemes.length }})</h2>
+          <div class="filter-bar">
+            <mat-form-field appearance="outline" class="filter-search">
+              <mat-label>Search by name, department</mat-label>
+              <input matInput [(ngModel)]="schemeSearchText" name="scheme_search_text">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="filter-select">
+              <mat-label>Category</mat-label>
+              <mat-select [(ngModel)]="schemeFilterCategory" name="scheme_filter_category">
+                <mat-option value="">All Categories</mat-option>
+                <mat-option *ngFor="let cat of schemeCategories" [value]="cat">{{ cat }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="filter-select">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="schemeFilterStatus" name="scheme_filter_status">
+                <mat-option value="">All Statuses</mat-option>
+                <mat-option *ngFor="let s of schemeStatusOptions" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
 
         <div class="loading" *ngIf="loadingSchemes">Loading schemes...</div>
 
         <div class="item-grid" *ngIf="!loadingSchemes">
-          <mat-card class="item-card" *ngFor="let scheme of schemes" [class.archived]="scheme.status === 'Archived'">
+          <mat-card class="item-card" *ngFor="let scheme of filteredSchemes" [class.archived]="scheme.status === 'Archived'">
             <div class="item-header">
               <h3>{{ scheme.scheme_name }}</h3>
               <span class="status-badge" [ngClass]="scheme.status?.toLowerCase()">{{ scheme.status }}</span>
@@ -272,9 +415,7 @@
                   <mat-label>Gender</mat-label>
                   <mat-select [(ngModel)]="eligibilityForm.gender" name="gender_{{scheme.scheme_id}}">
                     <mat-option value="">Any</mat-option>
-                    <mat-option value="Male">Male</mat-option>
-                    <mat-option value="Female">Female</mat-option>
-                    <mat-option value="Other">Other</mat-option>
+                    <mat-option *ngFor="let g of eligibilityGenderOptions" [value]="g">{{g}}</mat-option>
                   </mat-select>
                 </mat-form-field>
 
@@ -285,17 +426,26 @@
 
                 <mat-form-field appearance="outline">
                   <mat-label>Occupation</mat-label>
-                  <input matInput [(ngModel)]="eligibilityForm.occupation" name="occupation_{{scheme.scheme_id}}">
+                  <mat-select [(ngModel)]="eligibilityForm.occupation" name="occupation_{{scheme.scheme_id}}">
+                    <mat-option value="">Any</mat-option>
+                    <mat-option *ngFor="let o of eligibilityOccupations" [value]="o">{{o}}</mat-option>
+                  </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                   <mat-label>Education</mat-label>
-                  <input matInput [(ngModel)]="eligibilityForm.education" name="education_{{scheme.scheme_id}}">
+                  <mat-select [(ngModel)]="eligibilityForm.education" name="education_{{scheme.scheme_id}}">
+                    <mat-option value="">Any</mat-option>
+                    <mat-option *ngFor="let e of eligibilityEducationLevels" [value]="e">{{e}}</mat-option>
+                  </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                   <mat-label>State</mat-label>
-                  <input matInput [(ngModel)]="eligibilityForm.state" name="elig_state_{{scheme.scheme_id}}">
+                  <mat-select [(ngModel)]="eligibilityForm.state" name="elig_state_{{scheme.scheme_id}}">
+                    <mat-option value="">Any</mat-option>
+                    <mat-option *ngFor="let s of eligibilityStates" [value]="s">{{s}}</mat-option>
+                  </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
@@ -307,10 +457,7 @@
                   <mat-label>Social Category</mat-label>
                   <mat-select [(ngModel)]="eligibilityForm.social_category" name="social_cat_{{scheme.scheme_id}}">
                     <mat-option value="">Any</mat-option>
-                    <mat-option value="General">General</mat-option>
-                    <mat-option value="OBC">OBC</mat-option>
-                    <mat-option value="SC">SC</mat-option>
-                    <mat-option value="ST">ST</mat-option>
+                    <mat-option *ngFor="let c of eligibilityCasteCategories" [value]="c">{{c}}</mat-option>
                   </mat-select>
                 </mat-form-field>
 
@@ -370,4 +517,4 @@
 
   </mat-tab-group>
 
-</div>
+</div>
