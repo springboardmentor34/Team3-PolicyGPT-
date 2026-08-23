@@ -153,6 +153,15 @@ export class CitizenDashboardComponent implements OnInit {
     color:'#2563EB',
     badge:'2 pending',
     badgeClass:'blue'
+},
+
+{
+  icon:'star',
+  value:'',
+  title:'Give Feedback',
+  color:'#F59E0B',
+  badge:'Share your experience',
+  badgeClass:'orange'
 }
 
 ];
@@ -253,6 +262,12 @@ openCard(item:any){
     this.goToApplications();
 
   }
+
+  else if(item.title === 'Give Feedback'){
+
+  this.router.navigate(['/feedback']);
+
+}
 
 }
 
