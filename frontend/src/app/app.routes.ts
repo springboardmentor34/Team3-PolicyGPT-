@@ -140,4 +140,12 @@ export const routes: Routes = [
       .then((m) => m.ApplicationsComponent),
   title: 'PolicyGPT | Applications',
 },
+{
+  path: 'feedback',
+  loadComponent: () =>
+    import('./pages/feedback/feedback')
+      .then((m) => m.FeedbackComponent),
+  title: 'PolicyGPT | Feedback',
+  canActivate: [authGuard],
+},
 ];
