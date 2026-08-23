@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import policy, scheme, notification, auth, search, comparison
 from app.routers import eligibility_rule, eligibility_check, admin, analytics
 from app.routers import saved_policy, feedback
+from app.routers import application
 
 # Without this, logger.info(...) calls anywhere in the app (e.g. the
 # password reset link in routers/auth.py) are silently dropped — Python's
@@ -46,6 +47,7 @@ app.include_router(comparison.router)
 app.include_router(analytics.router)
 app.include_router(saved_policy.router)
 app.include_router(feedback.router)
+app.include_router(application.router)
 
 @app.get("/")
 def root():

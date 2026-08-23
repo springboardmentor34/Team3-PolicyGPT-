@@ -5,8 +5,10 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { SchemeService } from '../../services/scheme.service';
+import { ApplicationService } from '../../services/application.service';
 
 @Component({
   selector: 'app-scheme-details',
@@ -16,7 +18,8 @@ import { SchemeService } from '../../services/scheme.service';
     RouterModule,
     MatButtonModule,
     MatCardModule,
-    MatIconModule
+    MatIconModule,
+    MatSnackBarModule
   ],
   templateUrl: './scheme-details.html',
   styleUrls: ['./scheme-details.scss']
@@ -33,9 +36,14 @@ export class SchemeDetailsComponent implements OnInit {
 
   documents: string[] = [];
 
+  applying = false;
+  alreadyApplied = false;
+
   constructor(
     private route: ActivatedRoute,
     private schemeService: SchemeService,
+    private applicationService: ApplicationService,
+    private snackBar: MatSnackBar,
     private location: Location
   ) {}
 
@@ -63,6 +71,8 @@ export class SchemeDetailsComponent implements OnInit {
         // ================= SCHEME INFORMATION =================
 
         this.scheme = {
+          scheme_id: data.scheme_id,
+
           title: data.scheme_name ?? 'Government Scheme',
 
           category: data.category ?? 'General',
@@ -83,6 +93,11 @@ export class SchemeDetailsComponent implements OnInit {
             data.application_process ??
             'Application guidance is not available.'
         };
+
+        // Check whether the citizen already applied to this scheme, so
+        // the button correctly shows "Applied" on every future visit —
+        // not just for the rest of the current browser session.
+        this.checkIfAlreadyApplied(this.scheme.scheme_id);
 
         // ================= BENEFITS =================
 
@@ -142,25 +157,53 @@ export class SchemeDetailsComponent implements OnInit {
   }
 
   // ================= APPLY NOW =================
+  // Previously this opened the scheme's official external website and
+  // didn't reliably reflect whether you'd already applied. Per updated
+  // requirements: no external redirect at all — Apply Now just records
+  // the application here and flips the button to a disabled "Applied"
+  // state, which is what then shows up in Application Status / the
+  // Citizen Dashboard's Applications count (Module 8).
+
+  checkIfAlreadyApplied(schemeId: number): void {
+    if (!schemeId) return;
+    this.applicationService.getMyApplications().subscribe({
+      next: (response: any) => {
+        const applications = response.data || [];
+        this.alreadyApplied = applications.some((a: any) => a.scheme_id === schemeId);
+      },
+      // Not logged in, or the call failed — leave the button as
+      // "Apply Now" rather than guessing; apply attempts will still be
+      // caught by the backend's own duplicate check either way.
+      error: () => {}
+    });
+  }
 
   applyNow(): void {
-
-    if (
-      this.scheme.website &&
-      this.scheme.website !== '#'
-    ) {
-
-      window.open(
-        this.scheme.website,
-        '_blank'
-      );
-
-    } else {
-
-      alert(
-        this.scheme.applicationGuidance ??
-        'Official application portal is not available yet.'
-      );
+    if (this.alreadyApplied || this.applying || !this.scheme.scheme_id) {
+      return;
     }
+
+    this.applying = true;
+    this.applicationService.applyToScheme(this.scheme.scheme_id).subscribe({
+      next: () => {
+        this.applying = false;
+        this.alreadyApplied = true;
+        this.snackBar.open('Application submitted — track its status under My Applications.', 'Close', { duration: 5000 });
+      },
+      error: (err) => {
+        this.applying = false;
+        if (err?.status === 400) {
+          // Already applied per the backend (e.g. applied from another
+          // tab/device) — treat it the same as a successful apply so the
+          // button state stays correct.
+          this.alreadyApplied = true;
+          this.snackBar.open('You have already applied to this scheme.', 'Close', { duration: 4000 });
+        } else if (err?.status === 401) {
+          this.snackBar.open('Please log in to apply for this scheme.', 'Close', { duration: 4000 });
+        } else {
+          this.snackBar.open('Could not submit your application. Please try again.', 'Close', { duration: 4000 });
+        }
+      }
+    });
   }
 }

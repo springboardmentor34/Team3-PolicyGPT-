@@ -123,16 +123,16 @@ export class PolicyApprovalsComponent implements OnInit {
    * Groups the flat pending-policies list by who submitted them, so an
    * Admin reviewing the queue can see at a glance "these 3 are from
    * Priya, these 2 are from Elahiya" instead of one undifferentiated
-   * list. Relies on submitted_by_name/email now included in the
+   * list. Relies on uploaded_by_name/email now included in the
    * /policies/pending response (see policy.py).
    */
   get groupedBySubmitter(): { name: string; email: string | null; policies: any[] }[] {
     const groups = new Map<string, { name: string; email: string | null; policies: any[] }>();
 
     for (const policy of this.pendingPolicies) {
-      const key = policy.submitted_by_name || 'Unknown';
+      const key = policy.uploaded_by_name || 'Unknown';
       if (!groups.has(key)) {
-        groups.set(key, { name: key, email: policy.submitted_by_email || null, policies: [] });
+        groups.set(key, { name: key, email: policy.uploaded_by_email || null, policies: [] });
       }
       groups.get(key)!.policies.push(policy);
     }

@@ -265,15 +265,16 @@
 
       <button
         mat-raised-button
-        color="primary"
+        [color]="alreadyApplied ? 'accent' : 'primary'"
         class="apply-btn"
+        [disabled]="alreadyApplied || applying"
         (click)="applyNow()">
 
         <mat-icon>
-          send
+          {{ alreadyApplied ? 'check_circle' : 'send' }}
         </mat-icon>
 
-        Apply Now
+        {{ alreadyApplied ? 'Applied' : (applying ? 'Submitting...' : 'Apply Now') }}
 
       </button>
 

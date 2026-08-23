@@ -25,11 +25,11 @@
       </button>
       <div class="profile">
         <div class="avatar">
-          G
+          {{ officerName.charAt(0) }}
         </div>
         <div class="profile-info">
-          <h4>Government Officer</h4>
-          <span>Administrator</span>
+          <h4>{{ officerName }}</h4>
+          <span>Government Official</span>
         </div>
       </div>
       <button
@@ -43,10 +43,10 @@
   <div class="dashboard-content">
     <div class="welcome-section">
       <h1>
-        Government Dashboard
+        Welcome, {{ officerName }}
       </h1>
       <p>
-        Monitor applications, manage schemes and view analytics from one place.
+        Track the policies and schemes you've submitted, and see how they're progressing through review.
       </p>
       <button mat-raised-button color="primary" routerLink="/manage-policies-schemes">
         <mat-icon>edit_note</mat-icon>
@@ -58,12 +58,12 @@
       <mat-card class="stat-card blue">
         <mat-icon>description</mat-icon>
         <h2>{{ totalPolicies }}</h2>
-        <p>Total Policies</p>
+        <p>My Policies</p>
       </mat-card>
       <mat-card class="stat-card green">
         <mat-icon>card_giftcard</mat-icon>
         <h2>{{ totalSchemes }}</h2>
-        <p>Total Schemes</p>
+        <p>My Schemes</p>
       </mat-card>
       <mat-card class="stat-card orange">
         <mat-icon>pending_actions</mat-icon>
@@ -73,7 +73,12 @@
       <mat-card class="stat-card purple">
         <mat-icon>check_circle</mat-icon>
         <h2>{{ approvedPolicies }}</h2>
-        <p>Approved Policies</p>
+        <p>Approved</p>
+      </mat-card>
+      <mat-card class="stat-card red">
+        <mat-icon>cancel</mat-icon>
+        <h2>{{ rejectedPolicies }}</h2>
+        <p>Rejected</p>
       </mat-card>
     </div>
     <!-- ================= MAIN GRID ================= -->
@@ -83,7 +88,7 @@
   <!-- Analytics -->
   <mat-card class="dashboard-card">
     <div class="card-header">
-      <h2>Policy &amp; Scheme Analytics</h2>
+      <h2>{{ scope === 'mine' ? 'My Policy & Scheme Analytics' : 'Policy & Scheme Analytics (All Officials)' }}</h2>
     </div>
     <div *ngIf="analyticsError" class="analytics-error">
       {{ analyticsError }}
@@ -125,7 +130,7 @@
   <!-- ================= USAGE STATISTICS (Milestone 3, task vi) ================= -->
   <mat-card class="dashboard-card">
     <div class="card-header">
-      <h2>Scheme Usage Statistics</h2>
+      <h2>{{ scope === 'mine' ? 'My Scheme Usage Statistics' : 'Scheme Usage Statistics (All Officials)' }}</h2>
     </div>
     <div *ngIf="analyticsError" class="analytics-error">
       {{ analyticsError }}
@@ -142,24 +147,21 @@
           <p *ngIf="schemeUsageTrend.length === 0" class="chart-empty">Not enough history yet.</p>
         </mat-card>
       </div>
-
       <div *ngIf="contentUsageError" class="analytics-error">
         {{ contentUsageError }}
       </div>
       <p *ngIf="loadingContentUsage" class="analytics-loading">Loading usage statistics...</p>
-
       <div class="usage-lists-grid" *ngIf="!loadingContentUsage && !contentUsageError">
         <div class="usage-list-card">
-          <h3>Most Viewed Policies</h3>
+          <h3>{{ scope === 'mine' ? 'Most Viewed — My Policies' : 'Most Viewed Policies' }}</h3>
           <div class="usage-list-row" *ngFor="let item of mostViewedPolicies">
             <span>{{ item.name }}</span>
             <span class="usage-count">{{ item.views }}</span>
           </div>
           <p *ngIf="mostViewedPolicies.length === 0" class="chart-empty-inline">No policy views recorded yet.</p>
         </div>
-
         <div class="usage-list-card">
-          <h3>Most Viewed Schemes</h3>
+          <h3>{{ scope === 'mine' ? 'Most Viewed — My Schemes' : 'Most Viewed Schemes' }}</h3>
           <div class="usage-list-row" *ngFor="let item of mostViewedSchemes">
             <span>{{ item.name }}</span>
             <span class="usage-count">{{ item.views }}</span>
@@ -173,11 +175,10 @@
   <mat-card class="dashboard-card">
     <div class="card-header">
       <h2>Recent Applications</h2>
-      <button mat-button color="primary">
-        View All
-      </button>
+      <span class="applications-count" *ngIf="!loadingApplications">{{ applications.length }} total</span>
     </div>
-    <table class="applications-table">
+    <div class="analytics-loading" *ngIf="loadingApplications">Loading applications...</div>
+    <table class="applications-table" *ngIf="!loadingApplications && applications.length > 0">
       <thead>
       <tr>
         <th>Applicant</th>
@@ -188,56 +189,38 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>Ravi Kumar</td>
-        <td>PM Kisan</td>
+      <tr *ngFor="let app of applications">
+        <td>{{ app.applicant }}</td>
+        <td>{{ app.scheme }}</td>
         <td>
-          <span class="status approved">
-            Approved
+          <span class="status" [ngClass]="statusClass(app.status)">
+            {{ app.status }}
           </span>
         </td>
-        <td>02 Aug 2026</td>
+        <td>{{ app.date }}</td>
         <td>
           <button
-          mat-stroked-button>
-            View
+            mat-stroked-button
+            [disabled]="applicationActionInProgressId === app.application_id"
+            [matMenuTriggerFor]="statusMenu">
+            Update Status
           </button>
-        </td>
-      </tr>
-      <tr>
-        <td>Priya</td>
-        <td>PMAY</td>
-        <td>
-          <span class="status pending">
-            Pending
-          </span>
-        </td>
-        <td>01 Aug 2026</td>
-        <td>
-          <button
-          mat-stroked-button>
-            Review
-          </button>
-        </td>
-      </tr>
-      <tr>
-        <td>Arjun</td>
-        <td>Scholarship</td>
-        <td>
-          <span class="status review">
-            Under Review
-          </span>
-        </td>
-        <td>31 Jul 2026</td>
-        <td>
-          <button
-          mat-stroked-button>
-            View
-          </button>
+          <mat-menu #statusMenu="matMenu">
+            <button
+              mat-menu-item
+              *ngFor="let s of applicationStatuses"
+              [disabled]="s === app.status"
+              (click)="updateApplicationStatus(app, s)">
+              {{ s }}
+            </button>
+          </mat-menu>
         </td>
       </tr>
       </tbody>
     </table>
+    <p *ngIf="!loadingApplications && applications.length === 0" class="breakdown-empty">
+      No applications submitted to your schemes yet.
+    </p>
   </mat-card>
 </div>
 <!-- ================= RIGHT PANEL ================= -->

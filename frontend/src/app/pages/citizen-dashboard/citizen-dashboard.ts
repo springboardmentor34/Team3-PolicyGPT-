@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { EligibilityResultService } from '../../services/eligibility-result.service';
 import { SearchHistoryService } from '../../services/search-history.service';
 import { SavedPolicyService } from '../../services/saved-policy.service';
+import { ApplicationService } from '../../services/application.service';
 
 @Component({
   selector: 'app-citizen-dashboard',
@@ -40,6 +41,7 @@ export class CitizenDashboardComponent implements OnInit {
   private eligibilityResultService = inject(EligibilityResultService);
   private searchHistoryService = inject(SearchHistoryService);
   private savedPolicyService = inject(SavedPolicyService);
+  private applicationService = inject(ApplicationService);
 
   userName = '';
 
@@ -62,6 +64,7 @@ export class CitizenDashboardComponent implements OnInit {
     this.loadEligibleSchemesCount();
     this.loadSearchHistory();
     this.loadSavedPoliciesCount();
+    this.loadApplicationsCount();
   }
 
   // Real "Saved Policies" count — was previously a hardcoded 7 that
@@ -73,6 +76,26 @@ export class CitizenDashboardComponent implements OnInit {
         if (savedCard) {
           savedCard.value = response.count || 0;
           savedCard.badge = response.count > 0 ? 'saved' : 'none yet';
+        }
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // Real "Applications" count — was previously a hardcoded 4 with a
+  // hardcoded "2 pending" badge that never reflected anything the
+  // citizen actually applied to (Application Status, Module 8).
+  loadApplicationsCount(): void {
+    this.applicationService.getMyApplications().subscribe({
+      next: (response: any) => {
+        const applicationsCard = this.stats.find(s => s.title === 'Applications');
+        if (applicationsCard) {
+          const apps = response.data || [];
+          const pendingCount = apps.filter((a: any) =>
+            a.status === 'Submitted' || a.status === 'Under Review'
+          ).length;
+          applicationsCard.value = apps.length;
+          applicationsCard.badge = pendingCount > 0 ? `${pendingCount} pending` : 'up to date';
         }
       },
       error: (err) => console.error(err)
@@ -95,15 +118,30 @@ export class CitizenDashboardComponent implements OnInit {
     });
   }
 
-  // Live "Eligible Schemes" count, computed from the citizen's own stored
-  // profile — was previously a hardcoded 18 (Milestone 3, Develop
-  // Analytics Dashboard).
+  // Live "Eligible Schemes" count AND the preview cards below, both
+  // computed from the citizen's own stored profile — the count used to
+  // be real but the 4 example scheme cards underneath it stayed a fixed
+  // hardcoded array (PM Kisan, Ayushman Bharat, etc.) that never actually
+  // reflected the citizen's own matches (Milestone 3, Develop Analytics
+  // Dashboard + Citizen Dashboard "Eligible Schemes").
   loadEligibleSchemesCount(): void {
     this.loadingEligibleCount = true;
     this.http.get<any>('http://127.0.0.1:8000/eligibility/my-matches').subscribe({
       next: (response) => {
         const count = response?.eligible_count ?? 0;
         this.stats[0].value = count;
+        this.schemes = (response?.eligible_schemes || [])
+          .slice(0, 4)
+          .map((s: any) => ({
+            scheme_id: s.scheme_id,
+            category: s.category,
+            title: s.title,
+            status: 'Eligible',
+            description: s.description,
+            deadline: s.deadline && s.deadline !== 'No deadline'
+              ? `Closes ${s.deadline}`
+              : 'Ongoing'
+          }));
         // So "View My Matches" from /scheme-matches works even if the
         // citizen hasn't run the step-by-step checker this session.
         this.eligibilityResultService.setResult(response);
@@ -166,36 +204,17 @@ export class CitizenDashboardComponent implements OnInit {
 
 ];
 
-  schemes = [
-    {
-      category: 'AGRICULTURE',
-      title: 'PM Kisan Samman Nidhi',
-      status: 'Eligible',
-      description: 'Income support of ₹6,000/year for small and marginal farmers.',
-      deadline: 'Closes 30 Sep'
-    },
-    {
-      category: 'HEALTH',
-      title: 'Ayushman Bharat - PMJAY',
-      status: 'Eligible',
-      description: 'Health cover up to ₹5 lakh per family per year.',
-      deadline: 'Ongoing'
-    },
-    {
-      category: 'EDUCATION',
-      title: 'National Scholarship Portal',
-      status: 'Under Review',
-      description: 'Merit and means scholarship for students.',
-      deadline: 'Closes 15 Oct'
-    },
-    {
-      category: 'HOUSING',
-      title: 'PM Awas Yojana',
-      status: 'Eligible',
-      description: 'Affordable housing support.',
-      deadline: 'Ongoing'
-    }
-  ];
+  // Populated by loadEligibleSchemesCount() with the citizen's own real
+  // matches — starts empty rather than hardcoded so nothing misleading
+  // shows before that call resolves.
+  schemes: {
+    scheme_id?: number;
+    category: string;
+    title: string;
+    status: string;
+    description: string;
+    deadline: string;
+  }[] = [];
 
   notifications = [
     {
@@ -235,6 +254,23 @@ goToNotifications(){
 goToApplications(){
 
   this.router.navigate(['/applications']);
+
+}
+
+// Quick Actions panel — previously 4 buttons with no (click) handlers
+// at all (Search Schemes, Track Applications, Saved Policies, Update
+// Profile). Track Applications / Saved Policies reuse the same
+// navigation as their matching stat cards above; these two are new.
+
+goToSearchSchemes(){
+
+  this.router.navigate(['/policy-search'], { queryParams: { type: 'scheme' } });
+
+}
+
+goToProfile(){
+
+  this.router.navigate(['/profile']);
 
 }
 openCard(item:any){

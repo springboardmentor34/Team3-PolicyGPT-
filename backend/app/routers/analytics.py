@@ -1,35 +1,46 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 from collections import OrderedDict
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-
 from app.utils.database import get_db
 from app.auth.dependencies import require_roles
 from app.models.user import User
 from app.models.policy import Policy
 from app.models.scheme import Scheme
 from app.utils.usage_stats import most_viewed_policies, most_viewed_schemes, most_searched_terms
-
 router = APIRouter(
     prefix="/analytics",
     tags=["Analytics Dashboard"]
 )
-
 # Accepts both the role value new registrations get ("official", from the
 # UserRole enum in auth_schema.py) and the legacy wording used in seed data
 # ("Government Official"), plus admin roles — require_roles() compares
 # case-insensitively already.
 _ANALYTICS_ROLES = ("admin", "administrator", "official", "government official", "government")
-
-
+def _scope_owner_id(current_user: User) -> Optional[int]:
+    """
+    Derives analytics scope from the caller's OWN role — never from a
+    client-supplied flag. An Official is always scoped to their own
+    submissions; an Admin always gets the unscoped, system-wide view.
+    This used to be a `mine_only: bool` query parameter the client set,
+    which meant an Official calling this endpoint directly (dev tools,
+    Postman, or just a future frontend bug) with the param omitted or
+    set to false would see every other official's submission counts,
+    approval history, and usage stats — contradicting the ownership
+    model this app enforces everywhere else (an official can only ever
+    see/manage their own policies and schemes). Deriving scope from the
+    JWT-verified role instead means there's no request shape that can
+    bypass it.
+    """
+    role = (current_user.role or "").strip().lower()
+    if role in ("admin", "administrator"):
+        return None
+    return current_user.user_id
 def _counts_by(query, column) -> Dict[str, int]:
     """Group-by count helper, e.g. policies by category or department."""
     rows = query.with_entities(column, func.count()).group_by(column).all()
     return {(value or "Uncategorized"): count for value, count in rows}
-
-
 def _approval_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     """
     'Approval rates over time' — every policy bucketed by the month it
@@ -38,7 +49,6 @@ def _approval_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     rather than a Postgres-specific date_trunc query, since the small
     dataset here makes that simpler to read and test than SQL-side
     date bucketing.
-
     owner_user_id scopes this to one official's own submission history —
     used by the Government Dashboard so an official only ever sees their
     own approval trend, never a system-wide one revealing other
@@ -48,12 +58,9 @@ def _approval_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     if owner_user_id is not None:
         query = query.filter(Policy.uploaded_by_user_id == owner_user_id)
     rows = query.all()
-
     buckets: "OrderedDict[str, dict]" = OrderedDict()
-
     for created_at, approval_status in sorted(rows, key=lambda r: r[0]):
         month_key = created_at.strftime("%Y-%m")
-
         if month_key not in buckets:
             buckets[month_key] = {
                 "month": month_key,
@@ -62,9 +69,7 @@ def _approval_trend(db: Session, owner_user_id: int = None) -> List[dict]:
                 "pending": 0,
                 "rejected": 0,
             }
-
         buckets[month_key]["total"] += 1
-
         status = (approval_status or "Pending").lower()
         if status == "approved":
             buckets[month_key]["approved"] += 1
@@ -72,10 +77,7 @@ def _approval_trend(db: Session, owner_user_id: int = None) -> List[dict]:
             buckets[month_key]["rejected"] += 1
         else:
             buckets[month_key]["pending"] += 1
-
     return list(buckets.values())
-
-
 def _scheme_usage_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     """
     Scheme Usage Statistics over time (Milestone 3, task vi) — how many
@@ -85,7 +87,6 @@ def _scheme_usage_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     volume and how much of what's been published is actually live for
     citizens to use — not per-scheme applicant counts, which aren't
     tracked anywhere yet.
-
     owner_user_id scopes this to one official's own schemes, same
     reasoning as _approval_trend above.
     """
@@ -93,12 +94,9 @@ def _scheme_usage_trend(db: Session, owner_user_id: int = None) -> List[dict]:
     if owner_user_id is not None:
         query = query.filter(Scheme.uploaded_by_user_id == owner_user_id)
     rows = query.all()
-
     buckets: "OrderedDict[str, dict]" = OrderedDict()
-
     for created_at, status in sorted(rows, key=lambda r: r[0]):
         month_key = created_at.strftime("%Y-%m")
-
         if month_key not in buckets:
             buckets[month_key] = {
                 "month": month_key,
@@ -108,53 +106,44 @@ def _scheme_usage_trend(db: Session, owner_user_id: int = None) -> List[dict]:
                 "pending": 0,
                 "archived": 0,
             }
-
         buckets[month_key]["total"] += 1
-
         status_key = (status or "Draft").lower()
         if status_key in ("active", "draft", "pending", "archived"):
             buckets[month_key][status_key] += 1
-
     return list(buckets.values())
-
-
 @router.get("/overview")
 def get_analytics_overview(
-    mine_only: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles(*_ANALYTICS_ROLES)),
 ):
     """
     Live Policy Statistics + Scheme Usage Analytics (Milestone 3,
     'Develop Analytics Dashboard').
-
-    mine_only=true (Government Dashboard, Officials): every number here
-    is scoped to policies/schemes this specific official created —
-    an official should never see how many policies another official has
-    submitted, approved, or rejected. Only their own activity.
-
-    mine_only omitted (Admin Dashboard): unscoped, system-wide — Admin
-    is the one role that genuinely needs the whole picture, matching the
-    ownership model we use everywhere else (Admin reviews/approves
-    everyone's work but doesn't get special edit access to it either).
+    Scope is derived from the caller's own role via _scope_owner_id(),
+    not a client-supplied flag: an Official (Government Dashboard) always
+    sees only policies/schemes THEY personally submitted — never another
+    official's activity. Admin (Admin Dashboard) always gets the
+    unscoped, system-wide picture, matching the ownership model used
+    everywhere else (Admin reviews/approves and can archive anyone's
+    work, but doesn't get to rewrite it or masquerade as its author).
     """
-    owner_user_id = current_user.user_id if mine_only else None
-
+    owner_user_id = _scope_owner_id(current_user)
+    mine_only = owner_user_id is not None
     live_policies = db.query(Policy).filter(Policy.status != "Archived")
     live_schemes = db.query(Scheme).filter(Scheme.status != "Archived")
     all_policies = db.query(Policy)
     all_schemes = db.query(Scheme)
-
     if mine_only:
         live_policies = live_policies.filter(Policy.uploaded_by_user_id == owner_user_id)
         live_schemes = live_schemes.filter(Scheme.uploaded_by_user_id == owner_user_id)
         all_policies = all_policies.filter(Policy.uploaded_by_user_id == owner_user_id)
         all_schemes = all_schemes.filter(Scheme.uploaded_by_user_id == owner_user_id)
-
     total_policies = live_policies.count()
     total_schemes = live_schemes.count()
-
     return {
+        # Lets the frontend label things correctly ("My Policies" vs
+        # "All Policies") without re-deriving the role itself.
+        "scope": "mine" if mine_only else "all",
         "total_policies": total_policies,
         "total_schemes": total_schemes,
         # Category/department breakdowns describe the same "live" (not
@@ -181,11 +170,8 @@ def get_analytics_overview(
         # publication volume + live-vs-not split over time.
         "scheme_usage_trend": _scheme_usage_trend(db, owner_user_id=owner_user_id),
     }
-
-
 @router.get("/content-usage")
 def get_content_usage(
-    mine_only: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles(*_ANALYTICS_ROLES)),
 ):
@@ -194,16 +180,17 @@ def get_content_usage(
     popularity half of it, shared with Officials, unlike /admin/usage-
     stats' account-activity data (active users, total users), which stays
     admin-only.
-
-    mine_only=true (Government Dashboard): Most Viewed Policies/Schemes
-    are scoped to this official's own content only. Most Searched Terms
-    is deliberately omitted here — search terms aren't attached to any
-    policy/scheme's creator, so there's no honest way to scope them to
-    one official; it only ever appears on the admin-only endpoint.
+    Scope is derived from the caller's own role, same as /overview above.
+    An Official's Most Viewed Policies/Schemes are scoped to their own
+    content only. Most Searched Terms is deliberately omitted for
+    Officials — search terms aren't attached to any policy/scheme's
+    creator, so there's no honest way to scope them to one official; it
+    only ever appears in the Admin (system-wide) response.
     """
-    owner_user_id = current_user.user_id if mine_only else None
-
+    owner_user_id = _scope_owner_id(current_user)
+    mine_only = owner_user_id is not None
     response = {
+        "scope": "mine" if mine_only else "all",
         "most_viewed_policies": most_viewed_policies(db, limit=5, owner_user_id=owner_user_id),
         "most_viewed_schemes": most_viewed_schemes(db, limit=5, owner_user_id=owner_user_id),
     }

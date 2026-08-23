@@ -20,6 +20,25 @@ router = APIRouter(
 )
 
 
+def _assert_scheme_owner(scheme: Scheme, current_user: User) -> None:
+    """
+    Ownership gap fix: create/update/delete on an eligibility rule used to
+    only check role (any official/admin), never who actually owns the
+    scheme the rule attaches to. Since the frontend never lets an official
+    see another official's scheme, this was unreachable through the UI —
+    but still directly exploitable by calling this API with someone
+    else's scheme_id. Same rule as scheme.py's _assert_owner: only the
+    Official who posted the scheme may manage its eligibility rules; no
+    admin exemption, since there's no scheme approval workflow to give
+    Admin a review role over scheme content at all.
+    """
+    if scheme.uploaded_by_user_id != current_user.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only manage eligibility rules for schemes you submitted yourself.",
+        )
+
+
 @router.get("/")
 def get_all_rules(scheme_id: Optional[int] = None, db: Session = Depends(get_db)):
     query = db.query(EligibilityRule)
@@ -51,6 +70,7 @@ def create_rule(
     scheme = db.query(Scheme).filter(Scheme.scheme_id == rule.scheme_id).first()
     if not scheme:
         raise HTTPException(status_code=404, detail=f"Scheme with id {rule.scheme_id} not found")
+    _assert_scheme_owner(scheme, current_user)
 
     new_rule = EligibilityRule(**rule.model_dump())
     db.add(new_rule)
@@ -69,6 +89,9 @@ def update_rule(
     rule = db.query(EligibilityRule).filter(EligibilityRule.rule_id == rule_id).first()
     if not rule:
         raise HTTPException(status_code=404, detail="Eligibility rule not found")
+    scheme = db.query(Scheme).filter(Scheme.scheme_id == rule.scheme_id).first()
+    if scheme:
+        _assert_scheme_owner(scheme, current_user)
 
     update_data = rule_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
@@ -88,6 +111,9 @@ def delete_rule(
     rule = db.query(EligibilityRule).filter(EligibilityRule.rule_id == rule_id).first()
     if not rule:
         raise HTTPException(status_code=404, detail="Eligibility rule not found")
+    scheme = db.query(Scheme).filter(Scheme.scheme_id == rule.scheme_id).first()
+    if scheme:
+        _assert_scheme_owner(scheme, current_user)
 
     db.delete(rule)
     db.commit()

@@ -110,6 +110,30 @@ background:#2563EB;
 
 }
 
+.red{
+
+background:#DC2626;
+
+}
+
+.loading, .error-state, .empty-state{
+
+padding:40px;
+
+text-align:center;
+
+color:#6B7280;
+
+font-size:15px;
+
+}
+
+.error-state{
+
+color:#DC2626;
+
+}
+
 .status{
 
 padding:8px 14px;
@@ -138,4 +162,97 @@ color:#6B7280;
 
 margin-bottom:20px;
 
+}
+
+/* ================= STATUS STEPPER ================= */
+
+.status-stepper{
+display:flex;
+align-items:flex-start;
+margin:4px 0 22px;
+}
+
+.step{
+display:flex;
+flex-direction:column;
+align-items:center;
+flex:0 0 auto;
+width:76px;
+}
+
+.step-dot{
+width:26px;
+height:26px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#F3F4F6;
+border:2px solid #E5E7EB;
+color:#D1D5DB;
+transition:.3s;
+flex-shrink:0;
+}
+
+.step-dot mat-icon{
+font-size:15px;
+width:15px;
+height:15px;
+line-height:15px;
+}
+
+.step-label{
+margin-top:6px;
+font-size:11px;
+font-weight:600;
+text-align:center;
+color:#9CA3AF;
+line-height:1.2;
+}
+
+.step.current .step-dot{
+background:white;
+border-color:#2563EB;
+box-shadow:0 0 0 4px rgba(37,99,235,.15);
+}
+
+.step.current .step-label{
+color:#2563EB;
+}
+
+.step.done .step-dot{
+background:#16A34A;
+border-color:#16A34A;
+color:white;
+}
+
+.step.done .step-label{
+color:#16A34A;
+}
+
+.step.rejected .step-dot{
+background:#DC2626;
+border-color:#DC2626;
+color:white;
+}
+
+.step.rejected .step-label{
+color:#DC2626;
+}
+
+.step-line{
+flex:1;
+height:3px;
+background:#E5E7EB;
+margin-top:12px;
+min-width:16px;
+transition:.3s;
+}
+
+.step-line.filled{
+background:#16A34A;
+}
+
+.step-line.filled-rejected{
+background:#DC2626;
 }

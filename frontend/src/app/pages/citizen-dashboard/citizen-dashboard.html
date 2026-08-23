@@ -170,13 +170,17 @@
 
     </div>
 
-    <button mat-button color="primary">
+    <button mat-button color="primary" (click)="goToEligibleSchemes()">
         View All
     </button>
 
 </div>
 
     <!-- ================= Scheme Grid ================= -->
+
+<p class="empty-state" *ngIf="!loadingEligibleCount && schemes.length === 0">
+  No scheme matches yet — complete your profile details to see schemes you may be eligible for.
+</p>
 
 <div class="scheme-grid">
 
@@ -234,7 +238,8 @@
 
       <button
         mat-button
-        color="primary">
+        color="primary"
+        [routerLink]="scheme.scheme_id ? ['/scheme-details', scheme.scheme_id] : null">
 
         View Details
 
@@ -365,7 +370,8 @@
 
   <button
     mat-stroked-button
-    class="quick-btn">
+    class="quick-btn"
+    (click)="goToSearchSchemes()">
 
     <mat-icon>
 
@@ -379,7 +385,8 @@
 
   <button
     mat-stroked-button
-    class="quick-btn">
+    class="quick-btn"
+    (click)="goToApplications()">
 
     <mat-icon>
 
@@ -393,7 +400,8 @@
 
   <button
     mat-stroked-button
-    class="quick-btn">
+    class="quick-btn"
+    (click)="goToSavedPolicies()">
 
     <mat-icon>
 
@@ -407,7 +415,8 @@
 
   <button
     mat-stroked-button
-    class="quick-btn">
+    class="quick-btn"
+    (click)="goToProfile()">
 
     <mat-icon>
 

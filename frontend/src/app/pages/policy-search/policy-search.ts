@@ -163,6 +163,11 @@ export class PolicySearchComponent implements OnInit {
         categoryFromUrl,
         typeFromUrl === 'scheme' ? 'scheme' : 'policy'
       );
+    } else if (typeFromUrl === 'scheme') {
+      // No category given — just "open straight into Scheme search",
+      // e.g. from the Citizen Dashboard's "Search Schemes" quick action
+      // (routerLink="/policy-search" queryParams="{ type: 'scheme' }").
+      this.toggleSearchMode('schemes');
     } else {
       this.loadPolicies();
     }

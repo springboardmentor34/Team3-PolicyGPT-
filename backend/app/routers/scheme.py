@@ -56,7 +56,7 @@ def _enrich_with_creator(schemes: list, db: Session, skip: bool = False) -> list
     } if creator_ids else {}
 
     for item in results:
-        item["created_by_name"] = creators.get(item.get("uploaded_by_user_id"), "Unknown")
+        item["uploaded_by_name"] = creators.get(item.get("uploaded_by_user_id"), "Unknown")
     return results
 
 
@@ -131,7 +131,7 @@ def get_scheme_by_id(
 
     return {
         "message": "Scheme found",
-        "data": SchemeOut.model_validate(scheme)
+        "data": _enrich_with_creator([scheme], db)[0]
     }
 
 

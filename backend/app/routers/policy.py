@@ -71,12 +71,12 @@ def _status_for_approval(approval_status: str) -> str:
 
 def _enrich_with_creator(policies: list, db: Session, skip: bool = False) -> list:
     """
-    Attaches created_by_name to each policy. Only bothers with the extra
+    Attaches uploaded_by_name to each policy. Only bothers with the extra
     lookup when it's actually useful — an Official viewing their own
     mine_only list already knows it's theirs, but Admin's system-wide
     view (post archive-exemption, Admin can now see and archive every
     official's policies) needs to show whose is whose, same reasoning as
-    the submitted_by_name added to /pending below.
+    the uploaded_by_name added to /pending below.
     """
     results = [PolicyOut.model_validate(p).model_dump() for p in policies]
     if skip:
@@ -89,7 +89,7 @@ def _enrich_with_creator(policies: list, db: Session, skip: bool = False) -> lis
     } if creator_ids else {}
 
     for item in results:
-        item["created_by_name"] = creators.get(item.get("uploaded_by_user_id"), "Unknown")
+        item["uploaded_by_name"] = creators.get(item.get("uploaded_by_user_id"), "Unknown")
     return results
 
 
@@ -168,7 +168,7 @@ def get_pending_policies(
     """
     Administrator-only: list policies awaiting approval, oldest first.
 
-    Each policy now includes who submitted it (submitted_by_name/email) —
+    Each policy now includes who submitted it (uploaded_by_name/email) —
     previously only uploaded_by_user_id (a bare number) was returned, so
     an Admin reviewing the queue had no way to tell which official
     submitted which policy without a separate lookup.
@@ -184,8 +184,8 @@ def get_pending_policies(
     for p in policies:
         item = PolicyOut.model_validate(p).model_dump()
         submitter = db.query(User).filter(User.user_id == p.uploaded_by_user_id).first()
-        item["submitted_by_name"] = submitter.full_name if submitter else "Unknown"
-        item["submitted_by_email"] = submitter.email if submitter else None
+        item["uploaded_by_name"] = submitter.full_name if submitter else "Unknown"
+        item["uploaded_by_email"] = submitter.email if submitter else None
         data.append(item)
 
     return {
@@ -222,7 +222,7 @@ def get_policies_approved_by_me(
     for p in policies:
         item = PolicyOut.model_validate(p).model_dump()
         submitter = db.query(User).filter(User.user_id == p.uploaded_by_user_id).first()
-        item["submitted_by_name"] = submitter.full_name if submitter else "Unknown"
+        item["uploaded_by_name"] = submitter.full_name if submitter else "Unknown"
         data.append(item)
 
     return {
@@ -252,7 +252,7 @@ def get_policy_by_id(
 
     return {
         "message": "Policy found",
-        "data": PolicyOut.model_validate(policy)
+        "data": _enrich_with_creator([policy], db)[0]
     }
 
 

@@ -197,3 +197,23 @@ CREATE TABLE saved_policies (
     CONSTRAINT uq_saved_policy_per_user
         UNIQUE (user_id, policy_id)
 );
+
+CREATE TABLE applications (
+    application_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    scheme_id BIGINT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'Submitted',
+    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_application_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id),
+
+    CONSTRAINT fk_application_scheme
+        FOREIGN KEY (scheme_id)
+        REFERENCES schemes(scheme_id),
+
+    CONSTRAINT uq_application_per_user_scheme
+        UNIQUE (user_id, scheme_id)
+);

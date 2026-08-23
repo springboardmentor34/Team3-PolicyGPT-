@@ -68,7 +68,7 @@
     <div class="analytics-section" [class.is-loading]="loadingAnalytics">
       <div class="analytics-header">
         <div>
-          <h2>Analytics</h2>
+          <h2>Analytics — All Officials Platform-Wide</h2>
           <p class="analytics-hint">Tip: click a category slice to jump to filtered search results.</p>
         </div>
         <div class="export-actions no-print" *ngIf="!loadingAnalytics && !analyticsError">
@@ -83,7 +83,6 @@
         </div>
       </div>
       <p *ngIf="loadingAnalytics" class="analytics-loading-note">Loading analytics...</p>
-
       <!-- Pie/doughnut charts: compact grid, few legend entries fit fine -->
       <div class="chart-grid">
         <mat-card class="chart-card">
@@ -98,7 +97,6 @@
           <p *ngIf="schemesByCategory.length === 0" class="chart-empty">No schemes yet.</p>
         </mat-card>
       </div>
-
       <!-- Department/State bar charts: wide grid, real labels need real room -->
       <div class="chart-grid-bars">
         <mat-card class="chart-card bar-card">
@@ -124,7 +122,6 @@
           </p>
         </mat-card>
       </div>
-
       <div class="chart-grid-wide">
         <mat-card class="chart-card wide">
           <canvas #approvalTrendChart width="900" height="280"></canvas>
@@ -134,14 +131,12 @@
         </mat-card>
       </div>
     </div>
-
     <!-- ================= USAGE STATISTICS (Milestone 3, Task 6) ================= -->
     <div class="usage-section" *ngIf="usageStats">
       <h2>Usage Statistics</h2>
       <p class="analytics-hint">
         Who's actually using the platform, not just what's in it. Only counts activity from logged-in users.
       </p>
-
       <div class="usage-stats-grid">
         <div class="usage-stat-tile">
           <span class="usage-value">{{ usageStats.total_users }}</span>
@@ -156,7 +151,6 @@
           <span class="usage-label">Eligibility Checks Run</span>
         </div>
       </div>
-
       <div class="usage-lists-grid">
         <div class="usage-list-card">
           <h3>Most Viewed Policies</h3>
@@ -166,7 +160,6 @@
           </div>
           <p *ngIf="usageStats.most_viewed_policies.length === 0" class="chart-empty-inline">No policy views recorded yet.</p>
         </div>
-
         <div class="usage-list-card">
           <h3>Most Viewed Schemes</h3>
           <div class="usage-list-row" *ngFor="let item of usageStats.most_viewed_schemes">
@@ -175,7 +168,6 @@
           </div>
           <p *ngIf="usageStats.most_viewed_schemes.length === 0" class="chart-empty-inline">No scheme views recorded yet.</p>
         </div>
-
         <div class="usage-list-card">
           <h3>Most Searched Terms</h3>
           <div class="usage-list-row" *ngFor="let item of usageStats.most_searched_terms">
@@ -186,7 +178,6 @@
         </div>
       </div>
     </div>
-
     <div class="quick-actions no-print">
       <h2>Quick Actions</h2>
       <div class="action-buttons">

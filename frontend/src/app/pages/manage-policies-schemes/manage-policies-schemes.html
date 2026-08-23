@@ -190,9 +190,9 @@
               </span>
             </div>
             <p class="item-meta">{{ policy.category }} &middot; {{ policy.state || 'All India' }}</p>
-            <p class="item-meta" *ngIf="policy.created_by_name">
+            <p class="item-meta" *ngIf="policy.uploaded_by_name">
               <mat-icon inline="true" style="font-size: 14px; vertical-align: middle;">person</mat-icon>
-              Created by {{ policy.created_by_name }}
+              Created by {{ policy.uploaded_by_name }}
             </p>
             <p class="item-desc">{{ policy.description }}</p>
             <div class="item-actions">
@@ -381,9 +381,9 @@
               <span class="status-badge" [ngClass]="scheme.status?.toLowerCase()">{{ scheme.status }}</span>
             </div>
             <p class="item-meta">{{ scheme.category }} &middot; {{ scheme.state || 'All India' }}</p>
-            <p class="item-meta" *ngIf="scheme.created_by_name">
+            <p class="item-meta" *ngIf="scheme.uploaded_by_name">
               <mat-icon inline="true" style="font-size: 14px; vertical-align: middle;">person</mat-icon>
-              Created by {{ scheme.created_by_name }}
+              Created by {{ scheme.uploaded_by_name }}
             </p>
             <p class="item-desc">{{ scheme.benefits }}</p>
             <div class="item-actions">
