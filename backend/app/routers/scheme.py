@@ -19,14 +19,45 @@ router = APIRouter(
 
 
 def _require_owner(scheme: Scheme, current_user: User) -> None:
-    """Same ownership rule as policies (see policy.py) — no role
-    exemption, including for Admins. Schemes have no approval workflow,
-    so this is the only access boundary content editing has."""
+    """Ownership check for editing CONTENT — same rule as policies (see
+    policy.py). No role exemption, including for Admins."""
     if scheme.uploaded_by_user_id != current_user.user_id:
         raise HTTPException(
             status_code=403,
-            detail="You can only edit or archive schemes you created yourself.",
+            detail="You can only edit schemes you created yourself.",
         )
+
+
+def _require_owner_or_admin(scheme: Scheme, current_user: User) -> None:
+    """Looser check for ARCHIVE/UNARCHIVE only — a moderation action, not
+    a content edit. Admin gets a system-wide exemption here; Officials
+    still don't."""
+    is_owner = scheme.uploaded_by_user_id == current_user.user_id
+    is_admin = (current_user.role or "").lower() in ("admin", "administrator")
+    if not is_owner and not is_admin:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only archive or restore schemes you created yourself.",
+        )
+
+
+def _enrich_with_creator(schemes: list, db: Session, skip: bool = False) -> list:
+    """Same reasoning as policy.py's _enrich_with_creator — only worth
+    the extra lookup on Admin's system-wide view, not an official's own
+    mine_only list."""
+    results = [SchemeOut.model_validate(s).model_dump() for s in schemes]
+    if skip:
+        return results
+
+    creator_ids = {s.uploaded_by_user_id for s in schemes if s.uploaded_by_user_id}
+    creators = {
+        u.user_id: u.full_name
+        for u in db.query(User).filter(User.user_id.in_(creator_ids)).all()
+    } if creator_ids else {}
+
+    for item in results:
+        item["created_by_name"] = creators.get(item.get("uploaded_by_user_id"), "Unknown")
+    return results
 
 
 @router.get("/")
@@ -76,7 +107,7 @@ def get_all_schemes(
     return {
         "message": "List of all schemes",
         "count": len(schemes),
-        "data": [SchemeOut.model_validate(s) for s in schemes]
+        "data": _enrich_with_creator(schemes, db, skip=mine_only),
     }
 
 
@@ -136,7 +167,7 @@ def archive_scheme(
     if not scheme:
         raise HTTPException(status_code=404, detail="Scheme not found")
 
-    _require_owner(scheme, current_user)
+    _require_owner_or_admin(scheme, current_user)
 
     scheme.status = "Archived"
     db.commit()
@@ -154,7 +185,7 @@ def unarchive_scheme(
     if not scheme:
         raise HTTPException(status_code=404, detail="Scheme not found")
 
-    _require_owner(scheme, current_user)
+    _require_owner_or_admin(scheme, current_user)
 
     scheme.status = "Active"
     db.commit()

@@ -58,6 +58,14 @@ export class PolicyApprovalsComponent implements OnInit {
   /** policy_id of the approve/reject request currently in flight, to disable buttons and avoid double-submits */
   actionInProgressId: number | null = null;
 
+  // ===== Policies I've approved — separate from the Pending queue above.
+  // Loaded independently so a mistaken approval can be undone without
+  // reloading the whole page. =====
+  approvedByMe: any[] = [];
+  loadingApproved = true;
+  approvedErrorMessage = '';
+  showApprovedSection = false;
+
   constructor(
     private readonly policyService: PolicyService,
     private readonly snackBar: MatSnackBar
@@ -65,6 +73,71 @@ export class PolicyApprovalsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPendingPolicies();
+    this.loadApprovedByMe();
+  }
+
+  loadApprovedByMe(): void {
+    this.loadingApproved = true;
+    this.approvedErrorMessage = '';
+    this.policyService.getPoliciesApprovedByMe().subscribe({
+      next: (res) => {
+        this.approvedByMe = res?.data || [];
+        this.loadingApproved = false;
+      },
+      error: (err) => {
+        this.loadingApproved = false;
+        this.approvedErrorMessage = err.status === 403
+          ? 'You do not have permission to view this.'
+          : 'Could not load your approval history.';
+      },
+    });
+  }
+
+  unapprove(policy: any): void {
+    if (this.actionInProgressId) return;
+    this.actionInProgressId = policy.policy_id;
+
+    this.policyService.unapprovePolicy(policy.policy_id).subscribe({
+      next: () => {
+        this.actionInProgressId = null;
+        this.snackBar.open(`"${policy.policy_name}" sent back to Pending.`, 'Close', { duration: 4000 });
+        this.approvedByMe = this.approvedByMe.filter((p) => p.policy_id !== policy.policy_id);
+        // It's back in the review queue now — refresh Pending so it
+        // shows up there without a manual page reload.
+        this.loadPendingPolicies();
+      },
+      error: (err) => {
+        this.actionInProgressId = null;
+        let message = 'Could not unapprove this policy. Please try again.';
+        if (err.status === 403) {
+          message = err.error?.detail || 'You can only unapprove policies you personally approved.';
+        } else if (err.status === 400 && err.error?.detail) {
+          message = err.error.detail;
+        }
+        this.snackBar.open(message, 'Close', { duration: 5000 });
+      },
+    });
+  }
+
+  /**
+   * Groups the flat pending-policies list by who submitted them, so an
+   * Admin reviewing the queue can see at a glance "these 3 are from
+   * Priya, these 2 are from Elahiya" instead of one undifferentiated
+   * list. Relies on submitted_by_name/email now included in the
+   * /policies/pending response (see policy.py).
+   */
+  get groupedBySubmitter(): { name: string; email: string | null; policies: any[] }[] {
+    const groups = new Map<string, { name: string; email: string | null; policies: any[] }>();
+
+    for (const policy of this.pendingPolicies) {
+      const key = policy.submitted_by_name || 'Unknown';
+      if (!groups.has(key)) {
+        groups.set(key, { name: key, email: policy.submitted_by_email || null, policies: [] });
+      }
+      groups.get(key)!.policies.push(policy);
+    }
+
+    return Array.from(groups.values()).sort((a, b) => a.name.localeCompare(b.name));
   }
 
   loadPendingPolicies(): void {

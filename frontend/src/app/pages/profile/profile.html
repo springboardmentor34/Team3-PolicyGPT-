@@ -189,7 +189,7 @@ matInput
   <label>Date of Birth</label>
 
   <span *ngIf="!isEditing">
-    {{user.dob}}
+    {{user.dob ? (user.dob | date:'dd MMM yyyy') : 'Not set'}}
   </span>
 
   <mat-form-field
@@ -199,7 +199,11 @@ matInput
 
     <input
       matInput
+      [matDatepicker]="dobPicker"
+      [max]="today"
       [(ngModel)]="user.dob">
+    <mat-datepicker-toggle matIconSuffix [for]="dobPicker"></mat-datepicker-toggle>
+    <mat-datepicker #dobPicker></mat-datepicker>
 
   </mat-form-field>
 

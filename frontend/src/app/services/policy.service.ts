@@ -50,8 +50,16 @@ export class PolicyService {
     return this.http.get(this.api + '/pending');
   }
 
+  getPoliciesApprovedByMe(): Observable<any> {
+    return this.http.get(this.api + '/approved-by-me');
+  }
+
   approvePolicy(id: string | number): Observable<any> {
     return this.http.patch(this.api + '/' + id + '/approve', {});
+  }
+
+  unapprovePolicy(id: string | number): Observable<any> {
+    return this.http.patch(this.api + '/' + id + '/unapprove', {});
   }
 
   rejectPolicy(id: string | number, reason: string): Observable<any> {

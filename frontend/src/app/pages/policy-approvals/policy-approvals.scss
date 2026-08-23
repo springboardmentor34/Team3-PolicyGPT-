@@ -159,3 +159,65 @@
     grid-template-columns: 1fr;
   }
 }
+
+.submitter-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.submitter-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  color: #173E73;
+  margin: 0 0 12px;
+
+  mat-icon {
+    color: #21549C;
+  }
+
+  .submitter-email {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: #5b6b82;
+  }
+
+  .submitter-count {
+    margin-left: auto;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #D97706;
+    background: #FEF3C7;
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+}
+
+.approved-by-me-toggle {
+  margin-bottom: 16px;
+
+  .approved-count {
+    font-weight: 600;
+    margin-left: 4px;
+  }
+}
+
+.approved-by-me-section {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e3e9f2;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  color: #173E73;
+  margin: 0 0 16px;
+
+  mat-icon {
+    color: #16A34A;
+  }
+}

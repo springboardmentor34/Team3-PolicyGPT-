@@ -5,6 +5,55 @@
     <span class="pending-count" *ngIf="!loading">{{ pendingPolicies.length }} pending</span>
   </div>
 
+  <div class="approved-by-me-toggle">
+    <button mat-stroked-button color="primary" (click)="showApprovedSection = !showApprovedSection">
+      <mat-icon>{{ showApprovedSection ? 'expand_less' : 'history' }}</mat-icon>
+      {{ showApprovedSection ? 'Hide' : 'View' }} policies you've approved
+      <span class="approved-count" *ngIf="!loadingApproved">({{ approvedByMe.length }})</span>
+    </button>
+  </div>
+
+  <div class="approved-by-me-section" *ngIf="showApprovedSection">
+    <h2 class="section-heading">
+      <mat-icon>check_circle</mat-icon>
+      Policies You've Approved
+    </h2>
+
+    <div class="loading" *ngIf="loadingApproved">Loading your approval history...</div>
+
+    <mat-card class="error-card" *ngIf="!loadingApproved && approvedErrorMessage">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ approvedErrorMessage }}</span>
+      <button mat-button color="primary" (click)="loadApprovedByMe()">Retry</button>
+    </mat-card>
+
+    <p class="empty-state" *ngIf="!loadingApproved && !approvedErrorMessage && approvedByMe.length === 0">
+      You haven't approved any policies yet.
+    </p>
+
+    <div class="item-grid" *ngIf="!loadingApproved && approvedByMe.length > 0">
+      <mat-card class="item-card" *ngFor="let policy of approvedByMe">
+        <div class="item-header">
+          <h3>{{ policy.policy_name }}</h3>
+          <span class="status-badge active">Approved</span>
+        </div>
+        <p class="item-meta">
+          Submitted by {{ policy.submitted_by_name }} &middot; {{ policy.category }} &middot; {{ policy.state || 'All India' }}
+        </p>
+        <div class="item-actions">
+          <button
+            mat-button
+            color="warn"
+            [disabled]="actionInProgressId === policy.policy_id"
+            (click)="unapprove(policy)">
+            <mat-icon>undo</mat-icon>
+            Unapprove (approved by mistake)
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
   <div class="loading" *ngIf="loading">Loading pending policies...</div>
 
   <mat-card class="error-card" *ngIf="!loading && errorMessage">
@@ -19,8 +68,18 @@
       No policies are currently awaiting approval.
     </p>
 
-    <div class="item-grid" *ngIf="pendingPolicies.length > 0">
-      <mat-card class="item-card" *ngFor="let policy of pendingPolicies">
+    <div class="submitter-groups" *ngIf="pendingPolicies.length > 0">
+      <div class="submitter-group" *ngFor="let group of groupedBySubmitter">
+
+        <h2 class="submitter-heading">
+          <mat-icon>person</mat-icon>
+          {{ group.name }}
+          <span class="submitter-email" *ngIf="group.email">({{ group.email }})</span>
+          <span class="submitter-count">{{ group.policies.length }} pending</span>
+        </h2>
+
+        <div class="item-grid">
+          <mat-card class="item-card" *ngFor="let policy of group.policies">
 
         <div class="item-header">
           <h3>{{ policy.policy_name }}</h3>
@@ -103,6 +162,9 @@
         </div>
 
       </mat-card>
+        </div>
+
+      </div>
     </div>
 
   </ng-container>

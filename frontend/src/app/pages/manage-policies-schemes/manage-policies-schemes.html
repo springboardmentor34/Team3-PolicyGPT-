@@ -190,9 +190,13 @@
               </span>
             </div>
             <p class="item-meta">{{ policy.category }} &middot; {{ policy.state || 'All India' }}</p>
+            <p class="item-meta" *ngIf="policy.created_by_name">
+              <mat-icon inline="true" style="font-size: 14px; vertical-align: middle;">person</mat-icon>
+              Created by {{ policy.created_by_name }}
+            </p>
             <p class="item-desc">{{ policy.description }}</p>
             <div class="item-actions">
-              <button mat-button color="primary" (click)="editPolicy(policy)">
+              <button mat-button color="primary" *ngIf="policy.uploaded_by_user_id === currentUserId" (click)="editPolicy(policy)">
                 <mat-icon>edit</mat-icon> Edit
               </button>
               <button mat-button color="warn" *ngIf="policy.status !== 'Archived'" (click)="archivePolicy(policy.policy_id)">
@@ -377,9 +381,13 @@
               <span class="status-badge" [ngClass]="scheme.status?.toLowerCase()">{{ scheme.status }}</span>
             </div>
             <p class="item-meta">{{ scheme.category }} &middot; {{ scheme.state || 'All India' }}</p>
+            <p class="item-meta" *ngIf="scheme.created_by_name">
+              <mat-icon inline="true" style="font-size: 14px; vertical-align: middle;">person</mat-icon>
+              Created by {{ scheme.created_by_name }}
+            </p>
             <p class="item-desc">{{ scheme.benefits }}</p>
             <div class="item-actions">
-              <button mat-button color="primary" (click)="editScheme(scheme)">
+              <button mat-button color="primary" *ngIf="scheme.uploaded_by_user_id === currentUserId" (click)="editScheme(scheme)">
                 <mat-icon>edit</mat-icon> Edit
               </button>
               <button mat-button color="warn" *ngIf="scheme.status !== 'Archived'" (click)="archiveScheme(scheme.scheme_id)">

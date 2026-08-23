@@ -197,8 +197,6 @@ export class ManagePoliciesSchemesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCurrentUser();
-    this.loadPolicies();
-    this.loadSchemes();
   }
 
   // ================= COLLAPSIBLE FORMS =================
@@ -294,18 +292,38 @@ export class ManagePoliciesSchemesComponent implements OnInit {
       next: (user: any) => {
         this.currentUserId = user.user_id;
         this.currentUserRole = user.role;
+        // Only load the lists once we actually know the role — Admin
+        // sees everything (system-wide oversight, archive rights on any
+        // item), an Official sees only their own. Loading before this
+        // resolves would default to the wrong scope.
+        this.loadPolicies();
+        this.loadSchemes();
       },
       error: () => {
         this.snackBar.open('Could not verify your login. Please log in again.', 'Close', { duration: 4000 });
+        // Fail safe: if we can't confirm identity, still load in the
+        // restrictive (mine_only) mode rather than defaulting to "see
+        // everything."
+        this.loadPolicies();
+        this.loadSchemes();
       }
     });
+  }
+
+  get isAdmin(): boolean {
+    const role = (this.currentUserRole || '').toLowerCase();
+    return role === 'admin' || role === 'administrator';
   }
 
   // ================= POLICIES =================
 
   loadPolicies(): void {
     this.loadingPolicies = true;
-    this.policyService.getAllPolicies({ include_archived: true, mine_only: true })
+    // Admin: system-wide view (no mine_only) — matches the archive/
+    // unarchive exemption on the backend (_require_owner_or_admin), so
+    // Admin can actually see the items they're now allowed to archive.
+    // Official: unchanged, mine_only stays true.
+    this.policyService.getAllPolicies({ include_archived: true, mine_only: !this.isAdmin })
       .subscribe({
         next: (response: any) => {
           this.policies = response.data || [];
@@ -404,7 +422,7 @@ export class ManagePoliciesSchemesComponent implements OnInit {
 
   loadSchemes(): void {
     this.loadingSchemes = true;
-    this.schemeService.getAllSchemes({ include_archived: true, mine_only: true }).subscribe({
+    this.schemeService.getAllSchemes({ include_archived: true, mine_only: !this.isAdmin }).subscribe({
       next: (response: any) => {
         this.schemes = response.data || [];
         this.loadingSchemes = false;

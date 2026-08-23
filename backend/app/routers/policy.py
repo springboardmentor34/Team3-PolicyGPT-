@@ -26,18 +26,33 @@ router = APIRouter(
 
 def _require_owner(policy: Policy, current_user: User) -> None:
     """
-    Ownership check for editing content — deliberately separate from role
-    checks. An Official or Admin can only edit/archive a policy they
-    personally created; role only gates *whether you can manage policies
-    at all*, not *whose*. Admins are NOT exempt here on purpose — Admin's
-    authority over content is the approve/reject workflow (which is about
-    reviewing someone else's submission, not editing it directly) and
-    User Management, not direct edit access to every official's work.
+    Ownership check for editing CONTENT — an Official or Admin can only
+    change what a policy actually says (name, description, category,
+    etc.) if they personally created it. No role exemption: Admin's
+    authority is approve/reject (reviewing someone else's submission) and
+    User Management, not rewriting another official's work.
     """
     if policy.uploaded_by_user_id != current_user.user_id:
         raise HTTPException(
             status_code=403,
-            detail="You can only edit or archive policies you created yourself.",
+            detail="You can only edit policies you created yourself.",
+        )
+
+
+def _require_owner_or_admin(policy: Policy, current_user: User) -> None:
+    """
+    Looser check for ARCHIVE/UNARCHIVE only — this is a moderation/
+    lifecycle action (pull something from public view), not a content
+    edit, so it's the one place Admin manages policies system-wide
+    without needing to have authored them. An Official still can't touch
+    another official's policy here; only Admin gets the exemption.
+    """
+    is_owner = policy.uploaded_by_user_id == current_user.user_id
+    is_admin = (current_user.role or "").lower() in ("admin", "administrator")
+    if not is_owner and not is_admin:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only archive or restore policies you created yourself.",
         )
 
 
@@ -52,6 +67,30 @@ def _status_for_approval(approval_status: str) -> str:
     if approval_status == "Rejected":
         return "Rejected"
     return "Pending"
+
+
+def _enrich_with_creator(policies: list, db: Session, skip: bool = False) -> list:
+    """
+    Attaches created_by_name to each policy. Only bothers with the extra
+    lookup when it's actually useful — an Official viewing their own
+    mine_only list already knows it's theirs, but Admin's system-wide
+    view (post archive-exemption, Admin can now see and archive every
+    official's policies) needs to show whose is whose, same reasoning as
+    the submitted_by_name added to /pending below.
+    """
+    results = [PolicyOut.model_validate(p).model_dump() for p in policies]
+    if skip:
+        return results
+
+    creator_ids = {p.uploaded_by_user_id for p in policies if p.uploaded_by_user_id}
+    creators = {
+        u.user_id: u.full_name
+        for u in db.query(User).filter(User.user_id.in_(creator_ids)).all()
+    } if creator_ids else {}
+
+    for item in results:
+        item["created_by_name"] = creators.get(item.get("uploaded_by_user_id"), "Unknown")
+    return results
 
 
 @router.get("/")
@@ -117,7 +156,7 @@ def get_all_policies(
     return {
         "message": "List of all policies",
         "count": len(policies),
-        "data": [PolicyOut.model_validate(p) for p in policies]
+        "data": _enrich_with_creator(policies, db, skip=mine_only),
     }
 
 
@@ -126,17 +165,70 @@ def get_pending_policies(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles("admin", "administrator")),
 ):
-    """Administrator-only: list policies awaiting approval, oldest first."""
+    """
+    Administrator-only: list policies awaiting approval, oldest first.
+
+    Each policy now includes who submitted it (submitted_by_name/email) —
+    previously only uploaded_by_user_id (a bare number) was returned, so
+    an Admin reviewing the queue had no way to tell which official
+    submitted which policy without a separate lookup.
+    """
     policies = (
         db.query(Policy)
         .filter(Policy.approval_status == "Pending")
         .order_by(Policy.created_at.asc())
         .all()
     )
+
+    data = []
+    for p in policies:
+        item = PolicyOut.model_validate(p).model_dump()
+        submitter = db.query(User).filter(User.user_id == p.uploaded_by_user_id).first()
+        item["submitted_by_name"] = submitter.full_name if submitter else "Unknown"
+        item["submitted_by_email"] = submitter.email if submitter else None
+        data.append(item)
+
     return {
         "message": "List of policies pending approval",
         "count": len(policies),
-        "data": [PolicyOut.model_validate(p) for p in policies]
+        "data": data
+    }
+
+
+@router.get("/approved-by-me")
+def get_policies_approved_by_me(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("admin", "administrator")),
+):
+    """
+    An admin's own approval history — with more than one Admin account,
+    each admin needs to see specifically what THEY approved (to unapprove
+    it if it was a mistake), not a mixed list where it's unclear who
+    approved what.
+
+    Registered here, before GET /{policy_id}, on purpose — FastAPI
+    matches routes in registration order, so a GET /policies/{policy_id}
+    defined earlier would otherwise swallow "approved-by-me" as if it
+    were a policy_id and this endpoint would never be reached.
+    """
+    policies = (
+        db.query(Policy)
+        .filter(Policy.approval_status == "Approved", Policy.approved_by == current_user.user_id)
+        .order_by(Policy.approved_at.desc())
+        .all()
+    )
+
+    data = []
+    for p in policies:
+        item = PolicyOut.model_validate(p).model_dump()
+        submitter = db.query(User).filter(User.user_id == p.uploaded_by_user_id).first()
+        item["submitted_by_name"] = submitter.full_name if submitter else "Unknown"
+        data.append(item)
+
+    return {
+        "message": "Policies you have approved",
+        "count": len(policies),
+        "data": data,
     }
 
 
@@ -215,7 +307,7 @@ def archive_policy(
     if not policy:
         raise HTTPException(status_code=404, detail="Policy not found")
 
-    _require_owner(policy, current_user)
+    _require_owner_or_admin(policy, current_user)
 
     policy.status = "Archived"
     db.commit()
@@ -233,7 +325,7 @@ def unarchive_policy(
     if not policy:
         raise HTTPException(status_code=404, detail="Policy not found")
 
-    _require_owner(policy, current_user)
+    _require_owner_or_admin(policy, current_user)
 
     policy.status = _status_for_approval(policy.approval_status)
     db.commit()
@@ -262,6 +354,48 @@ def approve_policy(
     policy.rejection_reason = None
     policy.rejected_by = None
     policy.rejected_at = None
+
+    db.commit()
+    db.refresh(policy)
+    return policy
+
+
+@router.patch("/{policy_id}/unapprove", response_model=PolicyOut)
+def unapprove_policy(
+    policy_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("admin", "administrator")),
+):
+    """
+    Lets an Admin undo their OWN approval — a quick-correction tool for
+    "I clicked Approve by mistake," not a general veto over another
+    admin's decision. Deliberately checks approved_by == current_user,
+    not just role: with more than one Admin account, Admin A shouldn't
+    be able to silently reverse Admin B's approval. Overturning someone
+    else's decision should go through Reject (with a reason, visible to
+    everyone), not a quiet self-service undo.
+
+    Sends the policy back to Pending — same as a fresh submission —
+    rather than to Rejected, since nothing about the policy itself was
+    found wrong; the admin just wants to re-review it.
+    """
+    policy = db.query(Policy).filter(Policy.policy_id == policy_id).first()
+    if not policy:
+        raise HTTPException(status_code=404, detail="Policy not found")
+
+    if policy.approval_status != "Approved":
+        raise HTTPException(status_code=400, detail="Only an approved policy can be unapproved")
+
+    if policy.approved_by != current_user.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only unapprove policies you personally approved.",
+        )
+
+    policy.approval_status = "Pending"
+    policy.status = _status_for_approval("Pending")
+    policy.approved_by = None
+    policy.approved_at = None
 
     db.commit()
     db.refresh(policy)

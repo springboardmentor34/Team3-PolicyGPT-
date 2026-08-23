@@ -12,6 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-profile',
@@ -26,7 +28,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss']
@@ -40,20 +44,6 @@ export class ProfileComponent implements OnInit {
 
   userName = '';
   userRole = '';
-
-  // These two lists must match eligibility-checker.ts and
-  // manage-policies-schemes.ts exactly — an official's rule requiring
-  // 'Farmer' should still match a citizen whose profile says 'Farmer',
-  // not a narrower or differently-worded list collected here.
-  occupations = [
-    'Student', 'Farmer', 'Salaried', 'Self-employed', 'Daily Wage Labourer',
-    'Homemaker', 'Retired / Pensioner', 'Unemployed', 'Other'
-  ];
-
-  educationLevels = [
-    'Below 10th', '10th Pass', '12th Pass', 'Undergraduate',
-    'Graduate', 'Postgraduate', 'Doctorate'
-  ];
 
   getRoleLabel(): string {
     const labels: { [key: string]: string } = {
@@ -71,7 +61,7 @@ export class ProfileComponent implements OnInit {
     fullName: '',
     email: '',
     mobile: '',
-    dob: '',
+    dob: null,
     gender: '',
     state: '',
     district: '',
@@ -104,7 +94,7 @@ export class ProfileComponent implements OnInit {
           fullName: data.full_name || '',
           email: data.email || '',
           mobile: data.mobile || '',
-          dob: data.date_of_birth || '',
+          dob: data.date_of_birth ? new Date(data.date_of_birth) : null,
           gender: data.gender || '',
           state: data.state || '',
           district: data.district || '',
@@ -130,6 +120,21 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  today = new Date();
+
+  // Converts the datepicker's Date object into a plain YYYY-MM-DD string
+  // using LOCAL date parts (not .toISOString(), which converts to UTC and
+  // can silently shift the date by a day — the exact bug we found and
+  // fixed in Policy Search's date filter earlier).
+  private formatDob(dob: any): string | null {
+    if (!dob) return null;
+    const d = new Date(dob);
+    if (isNaN(d.getTime())) return null;
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+
   editProfile() {
     this.originalUser = { ...this.user };
     this.isEditing = true;
@@ -141,7 +146,7 @@ export class ProfileComponent implements OnInit {
     const payload = {
       full_name: this.user.fullName,
       mobile: this.user.mobile,
-      date_of_birth: this.user.dob || null,
+      date_of_birth: this.formatDob(this.user.dob),
       gender: this.user.gender,
       state: this.user.state,
       district: this.user.district,
