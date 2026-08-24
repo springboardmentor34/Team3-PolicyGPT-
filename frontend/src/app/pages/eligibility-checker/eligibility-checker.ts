@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 
 import { EligibilityResultService } from '../../services/eligibility-result.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-eligibility-checker',
@@ -34,7 +35,8 @@ export class EligibilityCheckerComponent {
 
   constructor(
     private http: HttpClient,
-    private eligibilityResultService: EligibilityResultService
+    private eligibilityResultService: EligibilityResultService,
+    private toast: ToastService
   ) {}
 
 
@@ -217,7 +219,7 @@ export class EligibilityCheckerComponent {
 
         this.loading = false;
 
-        alert('Unable to check eligibility. Please make sure the backend server is running.');
+        this.toast.error('Unable to check eligibility. Please make sure the backend server is running.');
       }
 
     });

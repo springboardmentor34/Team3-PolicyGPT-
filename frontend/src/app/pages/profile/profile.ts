@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -37,6 +38,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 })
 export class ProfileComponent implements OnInit {
   private authService = inject(AuthService);
+  private toast = inject(ToastService);
   private router = inject(Router);
 
   loading = true;
@@ -162,12 +164,12 @@ export class ProfileComponent implements OnInit {
         this.userName = this.user.fullName;
         this.isEditing = false;
         this.saving = false;
-        alert('Profile updated successfully');
+        this.toast.success('Profile updated successfully');
       },
       error: (err) => {
         console.error('Failed to update profile', err);
         this.saving = false;
-        alert('Could not update profile. Please try again.');
+        this.toast.error('Could not update profile. Please try again.');
       },
     });
   }

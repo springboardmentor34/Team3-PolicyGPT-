@@ -11,6 +11,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 @Component({
   selector: "app-login",
   standalone: true,
@@ -31,6 +32,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   constructor(
   private authService: AuthService,
+  private toast: ToastService,
   private router: Router
 ) {}
 
@@ -54,7 +56,7 @@ export class LoginComponent {
 
       localStorage.setItem('token', response.access_token);
 
-      alert('Login Successful');
+      this.toast.success('Login Successful');
 
       const role = this.getRoleFromToken(response.access_token);
 
@@ -72,7 +74,7 @@ export class LoginComponent {
 
       console.error(error);
 
-      alert('Invalid Email or Password');
+      this.toast.error('Invalid Email or Password');
 
     }
 

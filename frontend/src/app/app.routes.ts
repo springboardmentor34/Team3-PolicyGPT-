@@ -148,4 +148,13 @@ export const routes: Routes = [
   title: 'PolicyGPT | Feedback',
   canActivate: [authGuard],
 },
+{
+  // Must stay LAST — Angular matches routes in order, and a wildcard
+  // any earlier position would swallow every route defined after it.
+  path: '**',
+  loadComponent: () =>
+    import('./pages/page-not-found/page-not-found')
+      .then((m) => m.PageNotFoundComponent),
+  title: 'PolicyGPT | Page Not Found',
+},
 ];

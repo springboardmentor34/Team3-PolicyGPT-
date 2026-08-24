@@ -15,6 +15,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
 import { PolicyService } from '../../services/policy.service';
+import { ToastService } from '../../services/toast.service';
 import { SchemeService } from '../../services/scheme.service';
 import { OnInit } from '@angular/core';
 
@@ -139,7 +140,8 @@ export class PolicySearchComponent implements OnInit {
   constructor(
     private policyService: PolicyService,
     private schemeService: SchemeService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -233,7 +235,7 @@ export class PolicySearchComponent implements OnInit {
 
         console.error(error);
 
-        alert('Unable to load policies');
+        this.toast.error('Unable to load policies');
 
       }
 
@@ -294,7 +296,7 @@ export class PolicySearchComponent implements OnInit {
 
         console.error(error);
 
-        alert('Unable to load schemes');
+        this.toast.error('Unable to load schemes');
 
       }
 

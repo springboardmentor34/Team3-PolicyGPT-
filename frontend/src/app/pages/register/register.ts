@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -34,6 +35,7 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
+    private toast: ToastService,
     private router: Router
   ) {}
 
@@ -86,7 +88,7 @@ export class RegisterComponent {
 
         console.log(response);
 
-        alert('Registration Successful');
+        this.toast.success('Registration Successful');
 
         this.router.navigate(['/login']);
 
@@ -96,7 +98,7 @@ export class RegisterComponent {
 
         console.error(error);
 
-        alert('Registration Failed');
+        this.toast.error('Registration Failed');
 
       }
 

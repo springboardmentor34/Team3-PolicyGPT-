@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -36,6 +37,7 @@ import { PolicyService } from '../../services/policy.service';
 export class CompareComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   logout(): void {
     this.authService.logout();
@@ -216,7 +218,7 @@ export class CompareComponent {
 
         console.error('Comparison API Error:', error);
 
-        alert(`Unable to compare these ${this.compareMode === 'policy' ? 'policies' : 'schemes'}. Please try again.`);
+        this.toast.error(`Unable to compare these ${this.compareMode === 'policy' ? 'policies' : 'schemes'}. Please try again.`);
       }
 
     });

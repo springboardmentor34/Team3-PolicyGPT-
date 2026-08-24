@@ -114,3 +114,25 @@ a:hover { color: var(--pg-accent); text-decoration: underline; }
   .pg-container { padding: 0 16px; }
   .pg-section-title { font-size: 1.3rem; }
 }
+
+/* ================= TOAST NOTIFICATIONS (ToastService) ================= */
+/* Replaces plain browser alert() popups app-wide with small, non-blocking
+   snackbar toasts. */
+
+.toast-success {
+  --mdc-snackbar-container-color: #16A34A;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-mdc-snack-bar-button-color: #ffffff;
+}
+
+.toast-error {
+  --mdc-snackbar-container-color: #DC2626;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-mdc-snack-bar-button-color: #ffffff;
+}
+
+.toast-info {
+  --mdc-snackbar-container-color: #0F4C97;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-mdc-snack-bar-button-color: #ffffff;
+}

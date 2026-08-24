@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { inject } from '@angular/core';
+import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
 import { AfterViewInit } from '@angular/core';
 import { Chart } from 'chart.js/auto';
@@ -28,6 +30,8 @@ import { FormsModule } from '@angular/forms';
 })
 
 export class ReportsComponent implements AfterViewInit {
+  private toast = inject(ToastService);
+
   @ViewChild('applicationChart')
 applicationChart!: ElementRef<HTMLCanvasElement>;
 
@@ -207,7 +211,7 @@ categoryChart!: ElementRef<HTMLCanvasElement>;
   exportReport(){
     
 
-    alert('Report exported successfully.');
+    this.toast.success('Report exported successfully.');
 
   }
   // ================= CHART INIT =================

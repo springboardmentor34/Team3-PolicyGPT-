@@ -400,16 +400,4 @@ export class GovernmentDashboardComponent implements OnInit {
       date: '10 Nov 2026'
     }
   ];
-  addScheme() {
-    alert('Add Scheme');
-  }
-  manageSchemes() {
-    alert('Manage Schemes');
-  }
-  manageUsers() {
-    alert('Manage Users');
-  }
-  viewReports() {
-    alert('Reports');
-  }
 }
