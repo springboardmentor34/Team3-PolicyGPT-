@@ -8,8 +8,12 @@ SECRET_KEY = "your_secret_key_here_change_this"
 # Algorithm used for JWT
 ALGORITHM = "HS256"
 
-# Token expiry time (in minutes)
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+# Token expiry time (in minutes). 30 minutes was too short for a real
+# working session (filling multi-section forms, reviewing several
+# policies) — sessions were expiring mid-task. 2 hours is generous
+# enough that a normal work or demo session won't hit it, while still
+# being a bounded, real expiry rather than "forever."
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 # Password hashing configuration
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -74,5 +78,3 @@ def decode_password_reset_token(token: str) -> str | None:
     if payload.get("purpose") != "password_reset":
         return None
     return payload.get("sub")
-
-

@@ -41,6 +41,10 @@ export class SchemeService {
     return this.http.patch<any>(`${this.api}/${id}/unarchive`, {});
   }
 
+  getUpcomingDeadlines(limit: number = 5): Observable<any> {
+    return this.http.get<any>(`${this.api}/upcoming-deadlines`, { params: { limit } });
+  }
+
   getLatestSchemes(limit: number): Observable<any[]> {
 
   return new Observable(observer => {

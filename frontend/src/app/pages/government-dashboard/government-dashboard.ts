@@ -15,6 +15,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Chart, ChartItem } from 'chart.js/auto';
 import { ApplicationService } from '../../services/application.service';
+import { SchemeService } from '../../services/scheme.service';
 @Component({
   selector: 'app-government-dashboard',
   standalone: true,
@@ -38,6 +39,7 @@ export class GovernmentDashboardComponent implements OnInit {
   private router = inject(Router);
   private analyticsService = inject(AnalyticsService);
   private applicationService = inject(ApplicationService);
+  private schemeService = inject(SchemeService);
   private snackBar = inject(MatSnackBar);
   logout(): void {
     this.authService.logout();
@@ -50,6 +52,7 @@ export class GovernmentDashboardComponent implements OnInit {
     this.loadAnalytics();
     this.loadContentUsage();
     this.loadApplications();
+    this.loadDeadlines();
   }
   loadCurrentUser(): void {
     this.authService.getMe().subscribe({
@@ -386,18 +389,26 @@ export class GovernmentDashboardComponent implements OnInit {
       color: 'blue'
     }
   ];
-  deadlines = [
-    {
-      scheme: 'PM Kisan Registration',
-      date: '30 Sep 2026'
-    },
-    {
-      scheme: 'National Scholarship Portal',
-      date: '15 Oct 2026'
-    },
-    {
-      scheme: 'PMAY Scheme',
-      date: '10 Nov 2026'
-    }
-  ];
+  deadlines: { scheme_id: number; scheme_name: string; end_date: string; category: string }[] = [];
+  loadingDeadlines = true;
+  deadlinesError = '';
+
+  loadDeadlines(): void {
+    this.loadingDeadlines = true;
+    this.deadlinesError = '';
+    this.schemeService.getUpcomingDeadlines(5).subscribe({
+      next: (res: any) => {
+        this.deadlines = res?.data || [];
+        this.loadingDeadlines = false;
+      },
+      error: () => {
+        this.loadingDeadlines = false;
+        this.deadlinesError = 'Could not load upcoming deadlines.';
+      }
+    });
+  }
+
+  viewScheme(schemeId: number): void {
+    this.router.navigate(['/scheme-details', schemeId]);
+  }
 }

@@ -313,45 +313,29 @@
   <h2>
     Upcoming Deadlines
   </h2>
-  <div class="deadline-item">
-    <div>
-      <h4>
-        PM Kisan Registration
-      </h4>
-      <span>
-        Last Date: 30 Sep 2026
-      </span>
-    </div>
-    <button
-    mat-stroked-button>
-      View
-    </button>
+
+  <p class="analytics-loading" *ngIf="loadingDeadlines">Loading upcoming deadlines...</p>
+
+  <div class="analytics-error" *ngIf="!loadingDeadlines && deadlinesError">
+    {{ deadlinesError }}
   </div>
-  <div class="deadline-item">
+
+  <p class="chart-empty-inline" *ngIf="!loadingDeadlines && !deadlinesError && deadlines.length === 0">
+    No upcoming deadlines right now.
+  </p>
+
+  <div class="deadline-item" *ngFor="let d of deadlines">
     <div>
       <h4>
-        National Scholarship Portal
+        {{ d.scheme_name }}
       </h4>
       <span>
-        Last Date: 15 Oct 2026
+        Last Date: {{ d.end_date | date:'dd MMM yyyy' }}
       </span>
     </div>
     <button
-    mat-stroked-button>
-      View
-    </button>
-  </div>
-  <div class="deadline-item">
-    <div>
-      <h4>
-        PMAY Scheme
-      </h4>
-      <span>
-        Last Date: 10 Nov 2026
-      </span>
-    </div>
-    <button
-    mat-stroked-button>
+    mat-stroked-button
+    (click)="viewScheme(d.scheme_id)">
       View
     </button>
   </div>

@@ -1,3 +1,6 @@
+from typing import List
+import datetime as _dt
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -5,8 +8,10 @@ from app.utils.database import get_db
 from app.models.application import Application
 from app.models.scheme import Scheme
 from app.models.user import User
+from app.models.eligibility_rule import EligibilityRule
 from app.auth.dependencies import get_current_user, require_roles
 from app.schemas.application_schema import ApplicationCreate, ApplicationStatusUpdate
+from app.routers.eligibility_check import EligibilityCheckRequest, _check_rule
 
 router = APIRouter(
     prefix="/applications",
@@ -14,6 +19,69 @@ router = APIRouter(
 )
 
 _ADMIN_ROLES = {"admin", "administrator"}
+
+
+def _build_eligibility_request(user: User) -> EligibilityCheckRequest:
+    """
+    Mirrors eligibility_check.py's my_eligible_schemes() profile
+    derivation exactly, so "are you eligible to apply" and "what are you
+    eligible for" use the identical logic — not a separate copy that
+    could quietly drift out of sync with it.
+    """
+    age = None
+    if user.date_of_birth:
+        today = _dt.date.today()
+        dob = user.date_of_birth
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+    return EligibilityCheckRequest(
+        age=age,
+        gender=user.gender,
+        income=float(user.income) if user.income is not None else None,
+        occupation=user.occupation,
+        education=user.education,
+        location=user.state,
+        district=user.district,
+        social_category=user.social_category,
+        disability_status=user.disability_status,
+    )
+
+
+def _assert_eligible(scheme: Scheme, current_user: User, db: Session) -> None:
+    """
+    The one gap in an otherwise complete Applications feature: without
+    this, ANY logged-in citizen could apply to ANY scheme regardless of
+    its eligibility_rules — defeating the entire point of the
+    Eligibility Checker, which exists specifically to tell a citizen
+    which schemes they actually qualify for before they apply.
+
+    Reuses _check_rule() from eligibility_check.py — the exact same
+    rule-matching logic GET /eligibility/my-matches already uses — so
+    "can I apply" and "am I eligible" can never silently disagree.
+    """
+    rules = db.query(EligibilityRule).filter(EligibilityRule.scheme_id == scheme.scheme_id).all()
+    if not rules:
+        # No rules configured = open to everyone, same convention
+        # eligibility_check.py already uses for unrestricted schemes.
+        return
+
+    req = _build_eligibility_request(current_user)
+
+    best_reasons: List[str] = []
+    for rule in rules:
+        is_match, reasons = _check_rule(rule, req)
+        if is_match:
+            return
+        if not best_reasons or len(reasons) < len(best_reasons):
+            best_reasons = reasons
+
+    raise HTTPException(
+        status_code=403,
+        detail={
+            "message": "You are not eligible to apply for this scheme.",
+            "reasons": best_reasons,
+        },
+    )
 
 
 def _serialize(row: Application, scheme: Scheme, applicant: User = None) -> dict:
@@ -108,6 +176,8 @@ def apply_to_scheme(
     scheme = db.query(Scheme).filter(Scheme.scheme_id == payload.scheme_id).first()
     if not scheme:
         raise HTTPException(status_code=404, detail=f"Scheme with id {payload.scheme_id} not found")
+
+    _assert_eligible(scheme, current_user, db)
 
     existing = (
         db.query(Application)

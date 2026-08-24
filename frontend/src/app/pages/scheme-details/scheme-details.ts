@@ -200,6 +200,17 @@ export class SchemeDetailsComponent implements OnInit {
           this.snackBar.open('You have already applied to this scheme.', 'Close', { duration: 4000 });
         } else if (err?.status === 401) {
           this.snackBar.open('Please log in to apply for this scheme.', 'Close', { duration: 4000 });
+        } else if (err?.status === 403) {
+          // Eligibility gate — the citizen doesn't meet this scheme's
+          // eligibility_rules. Surface the specific reason rather than a
+          // generic failure message, so they understand why (and don't
+          // just retry the same click expecting a different result).
+          const detail = err?.error?.detail;
+          const reasons: string[] = Array.isArray(detail?.reasons) ? detail.reasons : [];
+          const message = reasons.length > 0
+            ? `You're not eligible for this scheme: ${reasons[0]}`
+            : 'You are not eligible to apply for this scheme.';
+          this.snackBar.open(message, 'Close', { duration: 6000 });
         } else {
           this.snackBar.open('Could not submit your application. Please try again.', 'Close', { duration: 4000 });
         }

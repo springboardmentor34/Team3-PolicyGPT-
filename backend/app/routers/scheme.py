@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -108,6 +109,56 @@ def get_all_schemes(
         "message": "List of all schemes",
         "count": len(schemes),
         "data": _enrich_with_creator(schemes, db, skip=mine_only),
+    }
+
+
+def _is_admin(user: User) -> bool:
+    return (user.role or "").lower() in ("admin", "administrator")
+
+
+@router.get("/upcoming-deadlines")
+def get_upcoming_deadlines(
+    limit: int = 5,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("official", "admin", "administrator", "government official")),
+):
+    """
+    Real data for the Government Dashboard's "Upcoming Deadlines" card,
+    replacing what was previously a hardcoded array. Scope is derived
+    from the caller's own role, not a client-supplied flag — same fix we
+    applied to analytics.py after finding that a client could just claim
+    mine_only=false and see everyone's data. An Official only sees
+    deadlines for schemes THEY created; Admin sees every scheme's.
+
+    Registered before GET /{scheme_id} on purpose — FastAPI matches path
+    params in declaration order, so putting this after would make
+    "/upcoming-deadlines" get swallowed as if it were a scheme_id.
+    """
+    today = date.today()
+    query = (
+        db.query(Scheme)
+        .filter(Scheme.end_date.isnot(None))
+        .filter(Scheme.end_date >= today)
+        .filter(Scheme.status != "Archived")
+    )
+
+    if not _is_admin(current_user):
+        query = query.filter(Scheme.uploaded_by_user_id == current_user.user_id)
+
+    schemes = query.order_by(Scheme.end_date.asc()).limit(limit).all()
+
+    return {
+        "message": "Upcoming scheme deadlines",
+        "count": len(schemes),
+        "data": [
+            {
+                "scheme_id": s.scheme_id,
+                "scheme_name": s.scheme_name,
+                "end_date": s.end_date,
+                "category": s.category,
+            }
+            for s in schemes
+        ],
     }
 
 
