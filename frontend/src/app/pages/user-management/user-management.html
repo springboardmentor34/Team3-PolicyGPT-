@@ -1,0 +1,84 @@
+<div class="user-management-page">
+  <header class="top-navbar">
+    <div class="logo-section">
+      <div class="logo-box"><mat-icon>shield</mat-icon></div>
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>ADMIN CONTROL PANEL</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button mat-stroked-button routerLink="/admin-dashboard">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Dashboard
+      </button>
+      <button mat-raised-button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </header>
+  <div class="page-content">
+    <h1>User Management</h1>
+    <p class="subtitle">Review every registered account, change roles, or deactivate access.</p>
+    <div class="filters-bar">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search name or email</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="e.g. Priya or priya@example.com">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="role-filter-field">
+        <mat-label>Filter by role</mat-label>
+        <mat-select [(ngModel)]="roleFilter" (selectionChange)="onRoleFilterChange()">
+          <mat-option value="">All roles</mat-option>
+          <mat-option *ngFor="let r of assignableRoles" [value]="r">{{ r }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div *ngIf="loading" class="loading-state">Loading users...</div>
+    <div *ngIf="error" class="error-state">{{ error }}</div>
+    <table *ngIf="!loading && !error" class="users-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>State</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users" [class.inactive-row]="!user.is_active">
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <mat-form-field appearance="outline" class="inline-role-select">
+              <mat-select
+                [ngModel]="user.role"
+                (ngModelChange)="changeRole(user, $event)"
+                [disabled]="pendingUserId === user.user_id">
+                <mat-option *ngFor="let r of assignableRoles" [value]="r">{{ r }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+          <td>{{ user.state || '—' }}</td>
+          <td>
+            <span class="status-badge" [class.active]="user.is_active" [class.inactive]="!user.is_active">
+              {{ user.is_active ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td>
+            <button
+              mat-stroked-button
+              [color]="user.is_active ? 'warn' : 'primary'"
+              [disabled]="pendingUserId === user.user_id || user.user_id === currentUserId"
+              (click)="toggleActive(user)">
+              {{ user.is_active ? 'Deactivate' : 'Activate' }}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="users.length === 0">
+          <td colspan="6" class="empty-row">No users match this filter.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

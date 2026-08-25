@@ -1,0 +1,457 @@
+/* ================= PAGE ================= */
+
+.matches-page{
+min-height:100vh;
+background:#F4F7FC;
+font-family:'Inter',sans-serif;
+}
+
+/* ================= PROFILE SUMMARY & ELIGIBILITY SUMMARY ================= */
+
+.profile-summary-box{
+display:flex;
+align-items:flex-start;
+gap:12px;
+background:#EEF4FF;
+border:1px solid #C7DBFF;
+border-radius:12px;
+padding:14px 18px;
+margin:16px 20px;
+max-width:900px;
+color:#1B3A6B;
+
+mat-icon{ margin-top:2px; }
+p{ margin:0; line-height:1.5; }
+}
+
+.eligibility-summary-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:12px;
+margin:0 20px 16px;
+max-width:900px;
+}
+
+.summary-tile{
+background:#fff;
+border-radius:12px;
+padding:14px;
+text-align:center;
+box-shadow:0 1px 4px rgba(0,0,0,.06);
+
+.summary-value{ display:block; font-size:24px; font-weight:700; color:#0F4C97; }
+.summary-label{ font-size:12px; color:#64748B; }
+
+&.eligible .summary-value{ color:#16A34A; }
+&.not-eligible .summary-value{ color:#DC2626; }
+
+&.categories{
+text-align:left;
+grid-column:1 / -1;
+}
+}
+
+.category-chips{
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+margin-top:6px;
+}
+
+.chip{
+background:#E0ECFF;
+color:#0F4C97;
+font-size:12px;
+padding:4px 10px;
+border-radius:999px;
+}
+
+/* ================= APPLICATION GUIDANCE ================= */
+
+.guidance-box{
+background:#F8FAFC;
+border-radius:10px;
+padding:10px 14px;
+margin:8px 0;
+}
+
+.guidance-title{
+display:flex;
+align-items:center;
+gap:6px;
+font-size:13px;
+font-weight:600;
+color:#334155;
+margin-bottom:6px;
+
+mat-icon{ font-size:18px; height:18px; width:18px; }
+}
+
+.guidance-steps{
+margin:0;
+padding-left:18px;
+font-size:13px;
+color:#475569;
+
+li{ margin-bottom:4px; }
+}
+
+/* ================= NAVBAR ================= */
+
+.top-navbar{
+height:75px;
+background:#0F4C97;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 30px;
+color:white;
+}
+
+.logo-section{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.logo-box{
+width:45px;
+height:45px;
+background:#16A34A;
+border-radius:10px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.logo-box mat-icon{
+color:white;
+font-size:24px;
+}
+
+.logo-text h2{
+margin:0;
+font-size:24px;
+font-weight:700;
+}
+
+.logo-text span{
+font-size:10px;
+letter-spacing:1px;
+color:#D1D5DB;
+}
+
+.search-section{
+flex:1;
+display:flex;
+justify-content:center;
+margin:0 40px;
+}
+
+.search-field{
+width:520px;
+}
+
+::ng-deep .search-field .mat-mdc-text-field-wrapper{
+height:44px;
+border-radius:10px;
+}
+
+::ng-deep .search-field .mat-mdc-form-field-subscript-wrapper{
+display:none;
+}
+
+/* ================= RIGHT ================= */
+
+.nav-right{
+display:flex;
+align-items:center;
+gap:18px;
+}
+
+.icon-btn{
+position:relative;
+color:white !important;
+}
+
+.badge{
+position:absolute;
+top:3px;
+right:3px;
+width:18px;
+height:18px;
+border-radius:50%;
+background:#EF4444;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:11px;
+}
+
+.profile{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.avatar{
+width:42px;
+height:42px;
+border-radius:50%;
+background:#2563EB;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+font-weight:700;
+}
+
+.profile-info h4{
+margin:0;
+font-size:15px;
+color:white;
+}
+
+.profile-info span{
+font-size:12px;
+color:#D1FAE5;
+}
+
+.logout-btn{
+background:#2563EB !important;
+color:white !important;
+}
+
+/* ================= CONTENT ================= */
+
+.matches-content{
+max-width:1250px;
+margin:auto;
+padding:30px;
+}
+
+.top-section{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+margin-bottom:25px;
+}
+
+.top-section h1{
+margin:15px 0 8px;
+font-size:34px;
+font-weight:700;
+color:#111827;
+}
+
+.top-section p{
+color:#6B7280;
+font-size:15px;
+max-width:650px;
+}
+
+.match-box{
+width:160px;
+height:120px;
+background:white;
+border-radius:16px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+.match-box h2{
+margin:0;
+font-size:42px;
+color:#16A34A;
+}
+
+.match-box span{
+font-size:14px;
+color:#6B7280;
+}
+
+.filter-search{
+width:100%;
+margin-bottom:30px;
+}
+
+::ng-deep .filter-search .mat-mdc-form-field-subscript-wrapper{
+display:none;
+}
+/* ================= SCHEME GRID ================= */
+
+.scheme-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:25px;
+}
+
+/* ================= CARD ================= */
+
+.scheme-card{
+padding:25px;
+border-radius:18px !important;
+box-shadow:0 8px 20px rgba(0,0,0,.08) !important;
+transition:.3s;
+border:1px solid #E5E7EB;
+}
+
+.scheme-card:hover{
+transform:translateY(-6px);
+box-shadow:0 15px 35px rgba(37,99,235,.18) !important;
+}
+
+/* ================= CARD HEADER ================= */
+
+.card-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.category{
+display:flex;
+align-items:center;
+gap:8px;
+background:#DBEAFE;
+padding:7px 14px;
+border-radius:20px;
+font-size:14px;
+font-weight:600;
+color:#2563EB;
+}
+
+.category mat-icon{
+font-size:20px;
+width:20px;
+height:20px;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+display:flex;
+align-items:center;
+gap:6px;
+background:#DCFCE7;
+color:#15803D;
+padding:7px 14px;
+border-radius:20px;
+font-size:13px;
+font-weight:600;
+}
+
+.status mat-icon{
+font-size:18px;
+width:18px;
+height:18px;
+}
+
+/* ================= TITLE ================= */
+
+.scheme-card h2{
+margin:0;
+font-size:22px;
+font-weight:700;
+color:#111827;
+line-height:1.4;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.description{
+margin:15px 0;
+font-size:15px;
+line-height:1.8;
+color:#6B7280;
+}
+
+/* ================= BENEFIT ================= */
+
+.benefit{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:14px;
+font-weight:600;
+color:#16A34A;
+}
+
+.benefit mat-icon{
+color:#16A34A;
+}
+
+/* ================= DEADLINE ================= */
+
+.deadline{
+display:flex;
+align-items:center;
+gap:8px;
+color:#6B7280;
+font-size:14px;
+margin-bottom:20px;
+}
+
+.deadline mat-icon{
+font-size:18px;
+width:18px;
+height:18px;
+}
+
+/* ================= FOOTER ================= */
+
+.card-footer{
+display:flex;
+justify-content:flex-end;
+}
+
+.card-footer button{
+border-radius:10px !important;
+padding:10px 22px !important;
+font-weight:600;
+}
+
+.card-footer mat-icon{
+margin-left:6px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:992px){
+
+.scheme-grid{
+grid-template-columns:1fr;
+}
+
+.top-section{
+flex-direction:column;
+gap:20px;
+}
+
+.match-box{
+width:100%;
+height:90px;
+}
+
+.search-section{
+display:none;
+}
+
+.top-navbar{
+padding:0 15px;
+}
+
+.matches-content{
+padding:20px;
+}
+
+.profile-info{
+display:none;
+}
+
+}

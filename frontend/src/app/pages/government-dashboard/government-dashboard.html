@@ -1,0 +1,348 @@
+<div class="government-dashboard">
+  <!-- ================= NAVBAR ================= -->
+  <header class="top-navbar">
+    <div class="logo-section">
+      <div class="logo-box">
+        <mat-icon>account_balance</mat-icon>
+      </div>
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>Government Portal</span>
+      </div>
+    </div>
+    <div class="search-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          placeholder="Search schemes, applications...">
+      </mat-form-field>
+    </div>
+    <div class="nav-right">
+      <button mat-icon-button class="icon-btn">
+        <mat-icon>notifications</mat-icon>
+        <span class="badge">5</span>
+      </button>
+      <div class="profile">
+        <div class="avatar">
+          {{ officerName.charAt(0) }}
+        </div>
+        <div class="profile-info">
+          <h4>{{ officerName }}</h4>
+          <span>Government Official</span>
+        </div>
+      </div>
+      <button
+        mat-raised-button
+        class="logout-btn" (click)="logout()">
+        Logout
+      </button>
+    </div>
+  </header>
+  <!-- ================= CONTENT ================= -->
+  <div class="dashboard-content">
+    <div class="welcome-section">
+      <h1>
+        Welcome, {{ officerName }}
+      </h1>
+      <p>
+        Track the policies and schemes you've submitted, and see how they're progressing through review.
+      </p>
+      <button mat-raised-button color="primary" routerLink="/manage-policies-schemes">
+        <mat-icon>edit_note</mat-icon>
+        Manage Policies &amp; Schemes
+      </button>
+    </div>
+    <!-- ================= SUMMARY CARDS ================= -->
+    <div class="stats-grid">
+      <mat-card class="stat-card blue">
+        <mat-icon>description</mat-icon>
+        <h2>{{ totalPolicies }}</h2>
+        <p>My Policies</p>
+      </mat-card>
+      <mat-card class="stat-card green">
+        <mat-icon>card_giftcard</mat-icon>
+        <h2>{{ totalSchemes }}</h2>
+        <p>My Schemes</p>
+      </mat-card>
+      <mat-card class="stat-card orange">
+        <mat-icon>pending_actions</mat-icon>
+        <h2>{{ pendingPolicies }}</h2>
+        <p>Pending Approval</p>
+      </mat-card>
+      <mat-card class="stat-card purple">
+        <mat-icon>check_circle</mat-icon>
+        <h2>{{ approvedPolicies }}</h2>
+        <p>Approved</p>
+      </mat-card>
+      <mat-card class="stat-card red">
+        <mat-icon>cancel</mat-icon>
+        <h2>{{ rejectedPolicies }}</h2>
+        <p>Rejected</p>
+      </mat-card>
+    </div>
+    <!-- ================= MAIN GRID ================= -->
+    <div class="dashboard-grid">
+      <!-- ================= LEFT PANEL ================= -->
+<div class="left-panel">
+  <!-- Analytics -->
+  <mat-card class="dashboard-card">
+    <div class="card-header">
+      <h2>{{ scope === 'mine' ? 'My Policy & Scheme Analytics' : 'Policy & Scheme Analytics (All Officials)' }}</h2>
+    </div>
+    <div *ngIf="analyticsError" class="analytics-error">
+      {{ analyticsError }}
+    </div>
+    <div class="analytics-breakdowns" [class.is-loading]="loadingAnalytics">
+      <p *ngIf="loadingAnalytics" class="analytics-loading">Loading analytics...</p>
+      <div class="chart-grid">
+        <mat-card class="chart-card">
+          <canvas #policyCategoryChart width="280" height="260"></canvas>
+          <p *ngIf="policiesByCategory.length === 0" class="chart-empty">No policies yet.</p>
+        </mat-card>
+        <mat-card class="chart-card">
+          <canvas #schemeCategoryChart width="280" height="260"></canvas>
+          <p *ngIf="schemesByCategory.length === 0" class="chart-empty">No schemes yet.</p>
+        </mat-card>
+        <mat-card class="chart-card">
+          <canvas #policyDepartmentChart width="280" height="260"></canvas>
+          <p *ngIf="policiesByDepartment.length === 0" class="chart-empty">No policies yet.</p>
+        </mat-card>
+        <mat-card class="chart-card">
+          <canvas #policyStatusChart width="280" height="260"></canvas>
+          <p *ngIf="policiesByStatus.length === 0" class="chart-empty">No policies yet.</p>
+        </mat-card>
+        <mat-card class="chart-card">
+          <canvas #policyStateChart width="280" height="260"></canvas>
+          <p *ngIf="policiesByState.length === 0" class="chart-empty">No policies yet.</p>
+        </mat-card>
+        <mat-card class="chart-card">
+          <canvas #schemeStateChart width="280" height="260"></canvas>
+          <p *ngIf="schemesByState.length === 0" class="chart-empty">No schemes yet.</p>
+        </mat-card>
+        <mat-card class="chart-card chart-card-wide">
+          <canvas #approvalTrendChart width="580" height="260"></canvas>
+          <p *ngIf="approvalTrend.length === 0" class="chart-empty">Not enough history yet.</p>
+        </mat-card>
+      </div>
+    </div>
+  </mat-card>
+  <!-- ================= USAGE STATISTICS (Milestone 3, task vi) ================= -->
+  <mat-card class="dashboard-card">
+    <div class="card-header">
+      <h2>{{ scope === 'mine' ? 'My Scheme Usage Statistics' : 'Scheme Usage Statistics (All Officials)' }}</h2>
+    </div>
+    <div *ngIf="analyticsError" class="analytics-error">
+      {{ analyticsError }}
+    </div>
+    <div class="analytics-breakdowns" [class.is-loading]="loadingAnalytics">
+      <p *ngIf="loadingAnalytics" class="analytics-loading">Loading usage statistics...</p>
+      <div class="chart-grid">
+        <mat-card class="chart-card">
+          <canvas #schemeStatusChart width="280" height="260"></canvas>
+          <p *ngIf="schemesByStatus.length === 0" class="chart-empty">No schemes yet.</p>
+        </mat-card>
+        <mat-card class="chart-card chart-card-wide">
+          <canvas #schemeUsageTrendChart width="580" height="260"></canvas>
+          <p *ngIf="schemeUsageTrend.length === 0" class="chart-empty">Not enough history yet.</p>
+        </mat-card>
+      </div>
+      <div *ngIf="contentUsageError" class="analytics-error">
+        {{ contentUsageError }}
+      </div>
+      <p *ngIf="loadingContentUsage" class="analytics-loading">Loading usage statistics...</p>
+      <div class="usage-lists-grid" *ngIf="!loadingContentUsage && !contentUsageError">
+        <div class="usage-list-card">
+          <h3>{{ scope === 'mine' ? 'Most Viewed — My Policies' : 'Most Viewed Policies' }}</h3>
+          <div class="usage-list-row" *ngFor="let item of mostViewedPolicies">
+            <span>{{ item.name }}</span>
+            <span class="usage-count">{{ item.views }}</span>
+          </div>
+          <p *ngIf="mostViewedPolicies.length === 0" class="chart-empty-inline">No policy views recorded yet.</p>
+        </div>
+        <div class="usage-list-card">
+          <h3>{{ scope === 'mine' ? 'Most Viewed — My Schemes' : 'Most Viewed Schemes' }}</h3>
+          <div class="usage-list-row" *ngFor="let item of mostViewedSchemes">
+            <span>{{ item.name }}</span>
+            <span class="usage-count">{{ item.views }}</span>
+          </div>
+          <p *ngIf="mostViewedSchemes.length === 0" class="chart-empty-inline">No scheme views recorded yet.</p>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+  <!-- Recent Applications -->
+  <mat-card class="dashboard-card">
+    <div class="card-header">
+      <h2>Recent Applications</h2>
+      <span class="applications-count" *ngIf="!loadingApplications">{{ applications.length }} total</span>
+    </div>
+    <div class="analytics-loading" *ngIf="loadingApplications">Loading applications...</div>
+    <table class="applications-table" *ngIf="!loadingApplications && applications.length > 0">
+      <thead>
+      <tr>
+        <th>Applicant</th>
+        <th>Scheme</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let app of applications">
+        <td>{{ app.applicant }}</td>
+        <td>{{ app.scheme }}</td>
+        <td>
+          <span class="status" [ngClass]="statusClass(app.status)">
+            {{ app.status }}
+          </span>
+        </td>
+        <td>{{ app.date }}</td>
+        <td>
+          <button
+            mat-stroked-button
+            [disabled]="applicationActionInProgressId === app.application_id"
+            [matMenuTriggerFor]="statusMenu">
+            Update Status
+          </button>
+          <mat-menu #statusMenu="matMenu">
+            <button
+              mat-menu-item
+              *ngFor="let s of applicationStatuses"
+              [disabled]="s === app.status"
+              (click)="updateApplicationStatus(app, s)">
+              {{ s }}
+            </button>
+          </mat-menu>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <p *ngIf="!loadingApplications && applications.length === 0" class="breakdown-empty">
+      No applications submitted to your schemes yet.
+    </p>
+  </mat-card>
+</div>
+<!-- ================= RIGHT PANEL ================= -->
+<div class="right-panel">
+  <!-- Quick Actions -->
+  <mat-card class="dashboard-card">
+    <h2>
+      Quick Actions
+    </h2>
+    <div class="action-grid">
+      <button
+      mat-raised-button
+      color="primary">
+        <mat-icon>
+          add_circle
+        </mat-icon>
+        Add Scheme
+      </button>
+      <button
+      mat-raised-button
+      color="accent">
+        <mat-icon>
+          edit_note
+        </mat-icon>
+        Manage Schemes
+      </button>
+      <button
+      mat-raised-button>
+        <mat-icon>
+          groups
+        </mat-icon>
+        Manage Users
+      </button>
+      <button
+      mat-raised-button>
+        <mat-icon>
+          analytics
+        </mat-icon>
+        Reports
+      </button>
+    </div>
+  </mat-card>
+  <!-- ================= LATEST NOTIFICATIONS ================= -->
+<mat-card class="dashboard-card">
+  <h2>
+    Latest Notifications
+  </h2>
+  <div class="notification-item">
+    <mat-icon class="green">
+      check_circle
+    </mat-icon>
+    <div>
+      <h4>
+        PM Kisan applications approved
+      </h4>
+      <p>
+        125 applications approved today.
+      </p>
+    </div>
+  </div>
+  <div class="notification-item">
+    <mat-icon class="orange">
+      warning
+    </mat-icon>
+    <div>
+      <h4>
+        Pending document verification
+      </h4>
+      <p>
+        63 applications require document verification.
+      </p>
+    </div>
+  </div>
+  <div class="notification-item">
+    <mat-icon class="blue">
+      campaign
+    </mat-icon>
+    <div>
+      <h4>
+        New scheme published
+      </h4>
+      <p>
+        Skill India Digital scheme is now live.
+      </p>
+    </div>
+  </div>
+</mat-card>
+<!-- ================= UPCOMING DEADLINES ================= -->
+<mat-card class="dashboard-card">
+  <h2>
+    Upcoming Deadlines
+  </h2>
+
+  <p class="analytics-loading" *ngIf="loadingDeadlines">Loading upcoming deadlines...</p>
+
+  <div class="analytics-error" *ngIf="!loadingDeadlines && deadlinesError">
+    {{ deadlinesError }}
+  </div>
+
+  <p class="chart-empty-inline" *ngIf="!loadingDeadlines && !deadlinesError && deadlines.length === 0">
+    No upcoming deadlines right now.
+  </p>
+
+  <div class="deadline-item" *ngFor="let d of deadlines">
+    <div>
+      <h4>
+        {{ d.scheme_name }}
+      </h4>
+      <span>
+        Last Date: {{ d.end_date | date:'dd MMM yyyy' }}
+      </span>
+    </div>
+    <button
+    mat-stroked-button
+    (click)="viewScheme(d.scheme_id)">
+      View
+    </button>
+  </div>
+</mat-card>
+</div>
+<!-- ================= END RIGHT PANEL ================= -->
+</div>
+<!-- ================= END GRID ================= -->
+</div>
+</div>

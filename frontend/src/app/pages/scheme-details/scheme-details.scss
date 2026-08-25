@@ -1,0 +1,721 @@
+/* =========================================================
+   SCHEME DETAILS PAGE
+   ========================================================= */
+
+.details-page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #172033;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.top-navbar {
+  height: 76px;
+  padding: 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: linear-gradient(135deg, #124f94, #0d4380);
+  color: #fff;
+
+  box-shadow: 0 3px 14px rgba(15, 76, 151, 0.18);
+
+  box-sizing: border-box;
+}
+
+
+/* ---------- Logo ---------- */
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.logo-box {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #16a34a;
+  border-radius: 11px;
+
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+}
+
+.logo-box mat-icon {
+  color: #fff !important;
+  font-size: 25px;
+  width: 25px;
+  height: 25px;
+}
+
+.logo-text h2 {
+  margin: 0;
+
+  color: #fff !important;
+
+  font-size: 25px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.logo-text span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #dbeafe !important;
+
+  font-size: 10px;
+  letter-spacing: 1.1px;
+}
+
+
+/* ---------- Back button ---------- */
+
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-right button {
+  height: 42px;
+
+  padding: 0 18px;
+
+  color: #fff !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  transition: 0.2s ease;
+}
+
+.nav-right button mat-icon {
+  margin-right: 6px;
+  color: #fff !important;
+}
+
+.nav-right button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.details-content {
+  width: min(1180px, calc(100% - 48px));
+
+  margin: 0 auto;
+
+  padding: 34px 0 70px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HERO CARD
+   ========================================================= */
+
+.hero-card {
+  position: relative;
+
+  padding: 34px 38px !important;
+
+  margin: 0 0 26px;
+
+  background: #fff;
+
+  border: 1px solid #e5ebf3;
+
+  border-radius: 18px !important;
+
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.07) !important;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* Blue accent line */
+
+.hero-card::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #1557a6,
+    #2563eb
+  );
+}
+
+
+/* =========================================================
+   HERO CONTENT
+   ========================================================= */
+
+.hero-top {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 30px;
+}
+
+
+/* Category badge */
+
+.category {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 14px;
+
+  margin-bottom: 13px;
+
+  background: #eff6ff;
+  color: #1d4ed8;
+
+  border: 1px solid #dbeafe;
+  border-radius: 20px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-transform: capitalize;
+}
+
+
+/* Scheme title */
+
+.hero-card h1 {
+  margin: 0 0 10px;
+
+  color: #123f73 !important;
+
+  font-size: 34px;
+  line-height: 1.25;
+
+  font-weight: 700;
+
+  letter-spacing: -0.4px;
+}
+
+
+/* Ministry */
+
+.hero-card .hero-top p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 17px;
+
+  background: #dcfce7;
+  color: #15803d;
+
+  border: 1px solid #bbf7d0;
+
+  border-radius: 30px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status mat-icon {
+  width: 19px;
+  height: 19px;
+
+  font-size: 19px;
+
+  color: #15803d !important;
+}
+
+
+/* =========================================================
+   DETAILS GRID
+   ========================================================= */
+
+.details-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 22px;
+
+  align-items: stretch;
+}
+
+
+/* =========================================================
+   INFORMATION CARDS
+   ========================================================= */
+
+.info-card {
+  min-width: 0;
+
+  padding: 26px 28px !important;
+
+  background: #fff;
+
+  border: 1px solid #e6ebf2;
+
+  border-radius: 17px !important;
+
+  box-shadow: 0 7px 23px rgba(15, 23, 42, 0.055) !important;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-3px);
+
+  border-color: #d7e3f3;
+
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09) !important;
+}
+
+
+/* =========================================================
+   CARD HEADINGS
+   ========================================================= */
+
+.info-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 0 0 23px;
+
+  color: #16263d;
+
+  font-size: 21px;
+  line-height: 1.3;
+
+  font-weight: 700;
+}
+
+
+/*
+   The headings currently contain emojis.
+   Keep them visually consistent with the rest of the UI.
+*/
+
+.info-card h2::first-letter {
+  font-size: 20px;
+}
+
+
+/* =========================================================
+   LIST ITEMS
+   ========================================================= */
+
+.list-item {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 13px;
+
+  padding: 13px 0;
+
+  color: #334155;
+
+  border-bottom: 1px solid #edf1f5;
+
+  line-height: 1.6;
+
+  box-sizing: border-box;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item mat-icon {
+  flex-shrink: 0;
+
+  width: 22px;
+  height: 22px;
+
+  margin-top: 2px;
+
+  color: #16a34a !important;
+
+  font-size: 22px;
+}
+
+.list-item span {
+  color: #3f4d60;
+
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+
+/* Empty information message */
+
+.list-item span:only-child {
+  color: #64748b;
+}
+
+
+/* =========================================================
+   IMPORTANT INFORMATION
+   ========================================================= */
+
+.info-row {
+  display: grid;
+
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.5fr);
+
+  gap: 20px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #e8edf3;
+
+  line-height: 1.55;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.info-row:first-of-type {
+  padding-top: 0;
+}
+
+
+/* Label */
+
+.info-row span:first-child {
+  color: #64748b;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* Value */
+
+.info-row b {
+  color: #172033;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-align: right;
+
+  overflow-wrap: anywhere;
+}
+
+
+/*
+   Official website row has a normal span
+   as its value rather than <b>.
+*/
+
+.info-row span:last-child:not(:first-child) {
+  color: #475569;
+
+  font-size: 14px;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   APPLICATION GUIDANCE
+   ========================================================= */
+
+/*
+   Make the final guidance card span the complete width.
+   This gives the page a much cleaner visual ending.
+*/
+
+.details-grid .info-card:last-child {
+  grid-column: 1 / -1;
+}
+
+.details-grid .info-card:last-child .list-item {
+  border-bottom: none;
+
+  padding: 4px 0 0;
+}
+
+.details-grid .info-card:last-child .list-item mat-icon {
+  width: 24px;
+  height: 24px;
+
+  font-size: 24px;
+}
+
+
+/* =========================================================
+   APPLY BUTTON
+   ========================================================= */
+
+.apply-section {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 34px;
+}
+
+.apply-btn {
+  min-width: 210px;
+
+  height: 52px !important;
+
+  padding: 0 32px !important;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border-radius: 11px !important;
+
+  background: #3154c6 !important;
+
+  color: #fff !important;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  box-shadow: 0 5px 12px rgba(49, 84, 198, 0.28) !important;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.apply-btn mat-icon {
+  margin: 0 !important;
+
+  color: #fff !important;
+}
+
+.apply-btn:hover {
+  background: #2847ae !important;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 18px rgba(49, 84, 198, 0.32) !important;
+}
+
+.apply-btn:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-grid .info-card:last-child {
+    grid-column: auto;
+  }
+
+  .hero-top {
+    flex-direction: column;
+
+    gap: 20px;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .top-navbar {
+    height: 70px;
+
+    padding: 0 20px;
+  }
+
+  .details-content {
+    width: calc(100% - 30px);
+
+    padding-top: 22px;
+    padding-bottom: 50px;
+  }
+
+  .hero-card {
+    padding: 28px 23px !important;
+  }
+
+  .hero-card h1 {
+    font-size: 28px;
+  }
+
+  .info-card {
+    padding: 23px !important;
+  }
+
+  .info-card h2 {
+    font-size: 20px;
+  }
+
+  .info-row {
+    grid-template-columns: 1fr;
+
+    gap: 5px;
+  }
+
+  .info-row b,
+  .info-row span:last-child:not(:first-child) {
+    text-align: left;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .top-navbar {
+    padding: 0 14px;
+  }
+
+  .logo-section {
+    gap: 9px;
+  }
+
+  .logo-box {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-box mat-icon {
+    font-size: 22px;
+  }
+
+  .logo-text h2 {
+    font-size: 20px;
+  }
+
+  .logo-text span {
+    display: none;
+  }
+
+  .nav-right button {
+    min-width: auto;
+
+    padding: 0 12px;
+  }
+
+  .nav-right button mat-icon {
+    margin-right: 0;
+  }
+
+  .nav-right button {
+    font-size: 0;
+  }
+
+  .nav-right button mat-icon {
+    font-size: 20px;
+  }
+
+  .hero-card {
+    padding: 24px 19px !important;
+  }
+
+  .hero-card h1 {
+    font-size: 25px;
+  }
+
+  .category {
+    font-size: 12px;
+  }
+
+  .status {
+    padding: 8px 14px;
+
+    font-size: 13px;
+  }
+
+  .info-card {
+    padding: 20px !important;
+  }
+
+  .info-card h2 {
+    font-size: 19px;
+  }
+
+  .list-item span {
+    font-size: 14px;
+  }
+
+  .apply-btn {
+    width: 100%;
+
+    min-width: 0;
+  }
+}

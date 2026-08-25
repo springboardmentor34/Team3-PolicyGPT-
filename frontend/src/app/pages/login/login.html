@@ -1,0 +1,196 @@
+<div class="login-page">
+
+  <!-- ================= LEFT PANEL ================= -->
+
+  <div class="login-left">
+
+    <div class="brand">
+
+      <div class="brand-logo">
+  <mat-icon>account_balance</mat-icon>
+</div>
+
+      <div>
+        <h2>PolicyGPT</h2>
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+      </div>
+
+    </div>
+
+    <div class="left-content">
+
+      <h1>
+        Discover every government
+        scheme you're eligible
+        for — in one place.
+      </h1>
+
+      <p>
+        Sign in to check eligibility, track applications,
+        and get personalized policy recommendations from
+        India's public welfare programmes.
+      </p>
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          <mat-icon>verified</mat-icon>
+        </div>
+
+        <span>
+          Verified government data, updated daily
+        </span>
+
+      </div>
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          <mat-icon>lock</mat-icon>
+        </div>
+
+        <span>
+          Bank-grade security & data protection
+        </span>
+
+      </div>
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          <mat-icon>notifications</mat-icon>
+        </div>
+
+        <span>
+          Real-time application status updates
+        </span>
+
+      </div>
+
+    </div>
+
+    
+
+  </div>
+
+  <!-- ================= RIGHT PANEL ================= -->
+
+  <div class="login-right">
+
+    <div class="login-box">
+
+      <h1>Welcome back</h1>
+
+      <p class="subtitle">
+        Log in to continue to your citizen dashboard.
+      </p>
+
+      <!-- Email -->
+      <label class="input-heading">Email address</label>
+      <mat-form-field appearance="outline" class="full-width">
+
+  <mat-icon matPrefix>mail</mat-icon>
+
+  <input
+    matInput
+    type="email"
+    placeholder="example@gmail.com"
+    [(ngModel)]="email">
+
+</mat-form-field>
+
+      <!-- Password -->
+      <label class="input-heading">Password</label>
+      <mat-form-field appearance="outline" class="full-width">
+
+  <mat-icon matPrefix>lock</mat-icon>
+
+  <input
+    matInput
+    [type]="hidePassword ? 'password' : 'text'"
+    placeholder="Enter your password"
+    [(ngModel)]="password">
+
+  <button
+    mat-icon-button
+    matSuffix
+    type="button"
+    (click)="hidePassword = !hidePassword">
+
+    <mat-icon>
+      {{ hidePassword ? 'visibility_off' : 'visibility' }}
+    </mat-icon>
+
+  </button>
+
+</mat-form-field>
+
+      <!-- Remember -->
+
+      <div class="login-options">
+
+        <mat-checkbox>
+          Remember me
+        </mat-checkbox>
+
+        <a routerLink="/forgot-password">
+          Forgot password?
+        </a>
+
+      </div>
+
+      <!-- Login Button -->
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="login-btn"
+        (click)="login()">
+
+        <mat-icon>login</mat-icon>
+
+        Log In
+
+      </button>
+
+      <!-- Divider -->
+
+      <div class="divider">
+
+        <span>or continue with</span>
+
+      </div>
+
+      <!-- DigiLocker -->
+
+      <button
+        mat-stroked-button
+        class="digilocker-btn">
+
+        <img
+          src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+          width="20">
+
+        Continue with DigiLocker
+
+      </button>
+
+      <!-- Register -->
+
+      <div class="register">
+
+        New to PolicyGPT?
+
+        <a routerLink="/register">
+
+          Create an account
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

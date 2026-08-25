@@ -1,0 +1,36 @@
+.pg-search-bar {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--pg-border);
+  border-radius: 50px;
+  padding: 6px 8px 6px 20px;
+  box-shadow: var(--pg-shadow);
+  gap: 6px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+
+  &__icon { color: var(--pg-primary); }
+
+  &__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 10px 4px;
+    font-family: var(--pg-font-body);
+    background: transparent;
+  }
+
+  &__btn {
+    background: var(--pg-primary) !important;
+    color: #fff !important;
+    border-radius: 50px !important;
+    padding: 0 24px !important;
+
+    @media (max-width: 480px) {
+      padding: 0 14px !important;
+    }
+  }
+}

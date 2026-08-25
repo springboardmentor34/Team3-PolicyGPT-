@@ -1,0 +1,285 @@
+<div class="details-page">
+
+  <!-- ================= NAVBAR ================= -->
+
+  <header class="top-navbar">
+
+    <div class="logo-section">
+
+      <div class="logo-box">
+        <mat-icon>shield</mat-icon>
+      </div>
+
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+      </div>
+
+    </div>
+
+    <div class="nav-right">
+
+      <button
+        mat-stroked-button
+        (click)="goBack()">
+
+        <mat-icon>arrow_back</mat-icon>
+
+        Back
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================= CONTENT ================= -->
+
+  <div class="details-content">
+
+    <!-- ================= HERO CARD ================= -->
+
+    <mat-card class="hero-card">
+
+      <div class="hero-top">
+
+        <div>
+
+          <span class="category">
+            {{ scheme.category }}
+          </span>
+
+          <h1>
+            {{ scheme.title }}
+          </h1>
+
+          <p>
+            {{ scheme.ministry }}
+          </p>
+
+        </div>
+
+        <div class="status">
+
+          <mat-icon>
+            check_circle
+          </mat-icon>
+
+          {{ scheme.status }}
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- ================= GRID ================= -->
+
+    <div class="details-grid">
+
+
+      <!-- ================= BENEFITS ================= -->
+
+      <mat-card class="info-card">
+
+        <h2>
+           Benefits
+        </h2>
+
+        <div
+          class="list-item"
+          *ngFor="let item of benefits">
+
+          <mat-icon>
+            task_alt
+          </mat-icon>
+
+          <span>
+            {{ item }}
+          </span>
+
+        </div>
+
+        <div
+          *ngIf="benefits.length === 0"
+          class="list-item">
+
+          <span>
+            Benefit information is not available.
+          </span>
+
+        </div>
+
+      </mat-card>
+
+
+      <!-- ================= ELIGIBILITY ================= -->
+
+      <mat-card class="info-card">
+
+        <h2>
+           Eligibility Criteria
+        </h2>
+
+        <div
+          class="list-item"
+          *ngFor="let item of eligibility">
+
+          <mat-icon>
+            verified
+          </mat-icon>
+
+          <span>
+            {{ item }}
+          </span>
+
+        </div>
+
+        <div
+          *ngIf="eligibility.length === 0"
+          class="list-item">
+
+          <span>
+            Eligibility information is not available.
+          </span>
+
+        </div>
+
+      </mat-card>
+
+
+      <!-- ================= DOCUMENTS ================= -->
+
+      <mat-card class="info-card">
+
+        <h2>
+           Required Documents
+        </h2>
+
+        <div
+          class="list-item"
+          *ngFor="let item of documents">
+
+          <mat-icon>
+            description
+          </mat-icon>
+
+          <span>
+            {{ item }}
+          </span>
+
+        </div>
+
+      </mat-card>
+
+
+      <!-- ================= IMPORTANT INFORMATION ================= -->
+
+      <mat-card class="info-card">
+
+        <h2>
+           Important Information
+        </h2>
+
+        <div class="info-row">
+
+          <span>
+            Application Deadline
+          </span>
+
+          <b>
+            {{ scheme.deadline }}
+          </b>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Application Mode
+          </span>
+
+          <b>
+            {{ scheme.mode }}
+          </b>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Processing Time
+          </span>
+
+          <b>
+            {{ scheme.processing }}
+          </b>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Official Website
+          </span>
+
+          <span>
+            {{ scheme.website !== '#' ? 'Available' : 'Not Available' }}
+          </span>
+
+        </div>
+
+      </mat-card>
+
+
+      <!-- ================= APPLICATION GUIDANCE ================= -->
+
+      <mat-card class="info-card">
+
+        <h2>
+           Application Guidance
+        </h2>
+
+        <div class="list-item">
+
+          <mat-icon>
+            info
+          </mat-icon>
+
+          <span>
+            {{ scheme.applicationGuidance }}
+          </span>
+
+        </div>
+
+      </mat-card>
+
+    </div>
+
+
+    <!-- ================= APPLY BUTTON ================= -->
+
+    <div class="apply-section">
+
+      <button
+        mat-raised-button
+        [color]="alreadyApplied ? 'accent' : 'primary'"
+        class="apply-btn"
+        [disabled]="alreadyApplied || applying"
+        (click)="applyNow()">
+
+        <mat-icon>
+          {{ alreadyApplied ? 'check_circle' : 'send' }}
+        </mat-icon>
+
+        {{ alreadyApplied ? 'Applied' : (applying ? 'Submitting...' : 'Apply Now') }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

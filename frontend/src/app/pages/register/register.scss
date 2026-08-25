@@ -1,0 +1,777 @@
+/* =========================================================
+   PolicyGPT Register Page
+========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:'Inter',sans-serif;
+    background:#F4F7FB;
+}
+
+.register-page{
+    display:flex;
+    width:100%;
+    height:calc(100vh - 64px);
+    background:#F4F7FB;
+}
+
+/* =========================================================
+   LEFT PANEL
+========================================================= */
+
+.register-left{
+
+    width:40%;
+    background:linear-gradient(180deg,#173E73 0%,#21549C 100%);
+    color:#fff;
+
+    padding:40px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.brand{
+
+    display:flex;
+    align-items:center;
+    gap:18px;
+
+    margin-bottom:25px;
+}
+
+.brand-logo{
+
+    width:64px;
+    height:64px;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.12);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.brand-logo mat-icon{
+
+    color:#fff;
+
+    font-size:40px;
+    width:40px;
+    height:40px;
+}
+
+.brand-text h2{
+
+    font-family:'Poppins',sans-serif;
+    font-size:25px;
+    font-weight:700;
+
+    color:#fff;
+}
+
+.brand-text span{
+
+    display:block;
+
+    margin-top:5px;
+
+    color:#D6E4FF;
+
+    font-size:12px;
+
+    letter-spacing:.20px;
+}
+
+/* =========================================================
+   LEFT CONTENT
+========================================================= */
+
+.left-content{
+
+    margin-top:15px;
+}
+
+.left-content h1{
+
+    color:#fff;
+
+    font-family:'Poppins',sans-serif;
+
+    font-size:30px;
+
+    line-height:1.25;
+
+    font-weight:700;
+
+    margin-bottom:18px;
+}
+
+.left-content p{
+
+    color:#D6E4FF;
+
+    font-size:16px;
+
+    line-height:1.7;
+
+    margin-bottom:32px;
+}
+
+/* =========================================================
+   FEATURES
+========================================================= */
+
+.feature{
+
+    display:flex;
+    align-items:center;
+
+    gap:15px;
+
+    padding:14px 16px;
+
+    margin-bottom:16px;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.08);
+
+    border:1px solid rgba(255,255,255,.12);
+}
+
+.feature-icon{
+
+    width:44px;
+    height:44px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.10);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    flex-shrink:0;
+}
+
+.feature-icon mat-icon{
+
+    color:#86EFAC;
+
+    font-size:22px;
+}
+
+.feature span{
+
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:500;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.copyright{
+
+    margin-top:25px;
+
+    color:rgba(255,255,255,.60);
+
+    font-size:12px;
+
+    line-height:1.5;
+}
+
+/* =========================================================
+   RIGHT PANEL
+========================================================= */
+
+/* ================= RIGHT PANEL ================= */
+
+.register-right{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#F4F7FB;
+    padding:40px 70px;
+    overflow-y:auto;
+    padding:20px 50px;
+}
+
+.register-box{
+    width:720px;
+    max-width:720px;
+    margin:auto;
+}
+
+/* Heading */
+
+.register-box h1{
+    text-align:center;
+    font-family:'Poppins',sans-serif;
+    font-size:34px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:4px;
+}
+
+.subtitle{
+    text-align:center;
+    font-size:17px;
+    color:#64748B;
+    margin-bottom:35px;
+    margin:6px 0 20px;
+}
+
+/* ================= ROLE ================= */
+.role-selection{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    margin:25px 0;
+}
+
+.role-card{
+    flex:1;
+    height:140px;
+    width:100%;
+}
+.role-card.active{
+    background:#E9F8FF;
+    border:2px solid #2563EB;
+}
+
+
+
+.role-card h3{
+    font-size:24px;
+    margin-top:18px;
+    font-weight:700;
+}
+
+.role-card p{
+    margin-top:10px;
+    color:#64748B;
+    font-size:17px;
+}
+
+/* ================= FORM ================= */
+
+.form-row{
+    display:flex;
+    gap:22px;
+    margin-bottom:22px;
+}
+
+.form-group{
+    flex:1;
+}
+
+.full{
+    width:100%;
+    margin-bottom:22px;
+}
+
+.input-heading{
+    display:block;
+    margin-bottom:8px;
+    font-size:18px;
+    font-weight:600;
+    color:#111827;
+}
+
+/* Material */
+
+::ng-deep .mat-mdc-form-field{
+    width:100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper{
+    height:58px!important;
+    border-radius:12px!important;
+}
+
+::ng-deep .mat-mdc-form-field-infix{
+    min-height:58px!important;
+}
+
+::ng-deep input{
+    font-size:17px!important;
+}
+
+::ng-deep .mat-mdc-select{
+    font-size:17px!important;
+}
+
+/* Terms */
+
+.terms{
+    margin:22px 0 28px;
+    font-size:16px;
+}
+
+.register-btn{
+    width:100%;
+    height:56px!important;
+    border-radius:12px!important;
+    font-size:20px!important;
+    font-weight:600!important;
+}
+
+.login-link{
+    text-align:center;
+    margin-top:25px;
+    font-size:16px;
+}
+/* =========================================================
+   TITLE
+========================================================= */
+
+.register-box h1{
+
+    text-align:center;
+
+    font-family:'Poppins',sans-serif;
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:#111827;
+
+    margin-bottom:8px;
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:#64748B;
+
+    font-size:16px;
+
+    margin-bottom:32px;
+}
+
+/* =========================================================
+   ROLE CARDS
+========================================================= */
+
+.role-selection{
+
+    display:flex;
+
+    gap:16px;
+
+    margin-bottom:28px;
+}
+
+.role-card{
+
+    flex:1;
+
+    border:1px solid #CBD5E1;
+
+    border-radius:14px;
+
+    background:#FFFFFF;
+
+    padding:18px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    transition:.3s ease;
+}
+
+.role-card:hover{
+
+    transform:translateY(-2px);
+
+    border-color:#2563EB;
+}
+
+.role-card.active{
+
+    border:2px solid #2563EB;
+
+    background:#EFF6FF;
+}
+
+.role-card mat-icon{
+
+    font-size:34px;
+
+    width:34px;
+
+    height:34px;
+
+    color:#2563EB;
+
+    margin-bottom:10px;
+}
+
+.role-card h3{
+
+    margin:0;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#111827;
+}
+
+.role-card p{
+
+    margin-top:6px;
+
+    font-size:10px;
+
+    color:#64748B;
+}
+
+/* =========================================================
+   LABELS
+========================================================= */
+
+.input-heading{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#111827;
+}
+
+.full-width{
+
+    width:100%;
+
+    margin-bottom:18px;
+}
+
+/* =========================================================
+   MATERIAL INPUT
+========================================================= */
+
+::ng-deep .mat-mdc-form-field{
+
+    width:100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper{
+
+    height:54px !important;
+
+    border-radius:12px !important;
+
+    background:#fff;
+}
+
+::ng-deep .mdc-notched-outline>*{
+
+    border-color:#CBD5E1 !important;
+}
+
+::ng-deep .mat-mdc-form-field-icon-prefix{
+
+    color:#94A3B8;
+}
+
+::ng-deep .mat-mdc-form-field-icon-suffix{
+
+    color:#94A3B8;
+}
+
+::ng-deep input::placeholder{
+
+    color:#94A3B8 !important;
+
+    font-size:15px;
+}
+
+::ng-deep .mat-mdc-select-placeholder{
+
+    color:#94A3B8 !important;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper{
+
+    display:none;
+}
+
+/* =========================================================
+   TERMS
+========================================================= */
+
+.terms{
+    margin:20px 0 26px;
+    font-size:14px;
+    color:#64748B;
+}
+
+.terms a{
+    color:#2563EB;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.terms a:hover{
+    text-decoration:underline;
+}
+
+/* =========================================================
+   CREATE ACCOUNT BUTTON
+========================================================= */
+
+.register-btn{
+
+    width:100%;
+
+    height:54px !important;
+
+    border-radius:12px !important;
+
+    background:#1E4D8F !important;
+
+    color:white !important;
+
+    font-family:'Poppins',sans-serif;
+
+    font-size:18px !important;
+
+    font-weight:600 !important;
+
+    display:flex !important;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    box-shadow:none !important;
+
+    transition:.25s;
+}
+
+.register-btn:hover{
+
+    background:#173E73 !important;
+}
+
+.register-btn mat-icon{
+
+    font-size:22px;
+
+    width:22px;
+
+    height:22px;
+}
+
+/* =========================================================
+   LOGIN LINK
+========================================================= */
+
+.login-link{
+
+    text-align:center;
+
+    margin-top:24px;
+
+    color:#64748B;
+
+    font-size:14px;
+}
+
+.login-link a{
+
+    color:#2563EB;
+
+    font-weight:600;
+
+    text-decoration:none;
+
+    margin-left:4px;
+}
+
+.login-link a:hover{
+
+    text-decoration:underline;
+}
+
+/* =========================================================
+   CHECKBOX
+========================================================= */
+
+::ng-deep .mat-mdc-checkbox{
+
+    font-size:14px;
+}
+
+::ng-deep .mdc-checkbox__background{
+
+    border-radius:4px;
+}
+
+/* =========================================================
+   MATERIAL FIXES
+========================================================= */
+
+::ng-deep .mat-mdc-form-field-infix{
+
+    min-height:52px !important;
+}
+
+::ng-deep .mat-mdc-form-field-flex{
+
+    align-items:center !important;
+}
+
+::ng-deep .mat-mdc-select-arrow{
+
+    color:#94A3B8;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1200px){
+
+.register-left{
+    width:42%;
+}
+
+.register-right{
+    width:58%;
+}
+
+.left-content h1{
+    font-size:34px;
+}
+
+}
+
+@media(max-width:992px){
+
+.register-page{
+
+    flex-direction:column;
+
+    overflow:auto;
+
+    height:auto;
+}
+
+.register-left{
+
+    width:100%;
+
+    padding:32px;
+}
+
+.register-right{
+
+    width:100%;
+
+    padding:40px 24px;
+}
+
+}
+
+@media(max-width:768px){
+
+.register-left{
+
+    display:none;
+}
+
+.register-right{
+
+    width:100%;
+
+    padding:24px 16px;
+}
+
+.register-box{
+
+    max-width:100%;
+}
+
+.register-box h1{
+
+    font-size:28px;
+}
+
+.subtitle{
+
+    font-size:14px;
+}
+
+.role-selection{
+
+    flex-direction:column;
+}
+
+.role-card{
+
+    width:100%;
+}
+
+}
+
+.row{
+    display:flex;
+    gap:24px;
+    margin-bottom:22px;
+}
+
+.field{
+    flex:1;
+}
+
+.field.full{
+    width:100%;
+    margin-bottom:22px;
+}
+
+.field mat-form-field{
+    width:100%;
+}
+
+.input-heading{
+    display:block;
+    margin-bottom:8px;
+    font-size:16px;
+    font-weight:600;
+    color:#111827;
+}

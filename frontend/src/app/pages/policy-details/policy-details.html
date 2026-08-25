@@ -1,0 +1,99 @@
+<div class="policy-details-page">
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="top-navbar">
+
+  <div class="logo-section">
+    <div class="logo-box"><mat-icon>shield</mat-icon></div>
+    <div class="logo-text">
+      <h2>PolicyGPT</h2>
+      <span>GOVT. SCHEME INTELLIGENCE</span>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <button mat-stroked-button color="primary" [disabled]="savingInProgress" (click)="toggleSave()">
+      <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+      {{ isSaved ? 'Saved' : 'Save' }}
+    </button>
+    <button mat-stroked-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+  </div>
+
+</header>
+
+<!-- ================= LOADING / NOT FOUND ================= -->
+
+<div class="details-content" *ngIf="!policy || !policy.policy_id">
+  <mat-card class="hero-card">
+    <p>Loading policy details...</p>
+  </mat-card>
+</div>
+
+<!-- ================= CONTENT ================= -->
+
+<div class="details-content" *ngIf="policy && policy.policy_id">
+
+  <!-- ================= HERO CARD ================= -->
+
+  <mat-card class="hero-card">
+    <div class="hero-top">
+      <div>
+        <span class="category">{{ policy.category || 'General' }}</span>
+        <h1>{{ policy.policy_name }}</h1>
+        <p>{{ policy.ministry }} <span *ngIf="policy.department"> &middot; {{ policy.department }}</span></p>
+      </div>
+      <div class="status">
+        <mat-icon>check_circle</mat-icon>
+        {{ policy.status || 'Active' }}
+      </div>
+    </div>
+    <p>{{ policy.description }}</p>
+  </mat-card>
+
+  <!-- ================= GRID ================= -->
+
+  <div class="details-grid">
+
+    <!-- OVERVIEW -->
+    <mat-card class="info-card">
+      <h2>ℹ Overview</h2>
+      <div class="info-row"><span>Description</span><b>{{ policy.description || 'Not available' }}</b></div>
+    </mat-card>
+
+    <!-- KEY INFORMATION -->
+    <mat-card class="info-card">
+      <h2> Key Information</h2>
+      <div class="info-row"><span>Category</span><b>{{ policy.category || 'N/A' }}</b></div>
+      <div class="info-row"><span>Ministry</span><b>{{ policy.ministry || 'N/A' }}</b></div>
+      <div class="info-row"><span>Department</span><b>{{ policy.department || 'N/A' }}</b></div>
+      <div class="info-row"><span>Government Level</span><b>{{ policy.government_level || 'N/A' }}</b></div>
+      <div class="info-row"><span>State</span><b>{{ policy.state || 'All States' }}</b></div>
+    </mat-card>
+
+    <!-- DATES -->
+    <mat-card class="info-card">
+      <h2> Dates</h2>
+      <div class="info-row"><span>Publication Date</span><b>{{ policy.publication_date || 'N/A' }}</b></div>
+      <div class="info-row"><span>Effective Date</span><b>{{ policy.effective_date || 'N/A' }}</b></div>
+      <div class="info-row"><span>Status</span><b>{{ policy.status || 'N/A' }}</b></div>
+      <div class="info-row"><span>Approval Status</span><b>{{ policy.approval_status || 'N/A' }}</b></div>
+    </mat-card>
+
+    <!-- DOCUMENT -->
+    <mat-card class="info-card" *ngIf="policy.document_url">
+      <h2> Official Document</h2>
+      <div class="list-item">
+        <mat-icon>description</mat-icon>
+        <a [href]="policy.document_url" target="_blank">View document</a>
+      </div>
+    </mat-card>
+
+  </div>
+
+</div>
+
+</div>

@@ -1,0 +1,80 @@
+<div class="applications-page">
+
+<div class="page-header">
+
+<h1>My Applications</h1>
+
+<p>Track the status of all submitted government scheme applications.</p>
+
+</div>
+
+<div class="loading" *ngIf="loading">Loading your applications...</div>
+
+<p class="error-state" *ngIf="!loading && errorMessage">{{ errorMessage }}</p>
+
+<p class="empty-state" *ngIf="!loading && !errorMessage && applications.length === 0">
+You have not applied to any schemes yet. Browse schemes and apply to see their status here.
+</p>
+
+<div class="application-grid" *ngIf="!loading && !errorMessage">
+
+<mat-card
+class="application-card"
+*ngFor="let app of applications">
+
+<div class="top">
+
+<div class="icon" [ngClass]="app.color">
+
+<mat-icon>{{app.icon}}</mat-icon>
+
+</div>
+
+<span class="status" [ngClass]="app.color">
+
+{{app.status}}
+
+</span>
+
+</div>
+
+<h2>
+
+{{app.scheme}}
+
+</h2>
+
+<p>
+
+Applied on {{app.date}}
+
+</p>
+
+<!-- Connected-dot progress: Submitted -> Under Review -> Approved,
+     with Rejected able to end the journey at any point. -->
+<div class="status-stepper">
+  <ng-container *ngFor="let step of app.steps; let last = last">
+    <div class="step" [ngClass]="step.state">
+      <div class="step-dot">
+        <mat-icon *ngIf="step.state === 'done'">check</mat-icon>
+        <mat-icon *ngIf="step.state === 'rejected'">close</mat-icon>
+      </div>
+      <span class="step-label">{{ step.label }}</span>
+    </div>
+    <div class="step-line" *ngIf="!last" [ngClass]="step.lineClass"></div>
+  </ng-container>
+</div>
+
+<button
+  mat-raised-button
+  color="primary"
+  (click)="viewDetails(app.scheme_id)">
+
+  View Details
+
+</button>
+</mat-card>
+
+</div>
+
+</div>

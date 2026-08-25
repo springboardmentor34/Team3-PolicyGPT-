@@ -1,9 +1,89 @@
-from pydantic import BaseModel
+from datetime import date, datetime
+from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class Policy(BaseModel):
+class ApprovalStatus(str, Enum):
+    """Moderation state for a policy. Separate from the lifecycle `status`
+    field (Draft/Active/Archived) — this tracks the approval decision."""
+    PENDING = "Pending"
+    APPROVED = "Approved"
+    REJECTED = "Rejected"
+
+
+class PolicyCategory(str, Enum):
+    EDUCATION = "Education"
+    HEALTHCARE = "Healthcare"
+    AGRICULTURE = "Agriculture"
+    EMPLOYMENT = "Employment"
+    FINANCE = "Finance"
+    WOMEN_CHILD_WELFARE = "Women & Child Welfare"
+    HOUSING = "Housing"
+    ENVIRONMENT = "Environment"
+    DIGITAL_GOVERNANCE = "Digital Governance"
+    INFRASTRUCTURE = "Infrastructure"
+
+
+class PolicyCreate(BaseModel):
     policy_name: str
-    category: str
-    department: str
-    state: str
-    status: str
+    description: Optional[str] = None
+    category: Optional[PolicyCategory] = None
+    ministry: Optional[str] = None
+    department: Optional[str] = None
+    government_level: Optional[str] = None
+    state: Optional[str] = None
+    # `status` isn't accepted at creation time either — every new policy
+    # starts life as Pending (see create_policy), matching approval_status.
+    publication_date: Optional[date] = None
+    effective_date: Optional[date] = None
+    document_url: Optional[str] = None
+    uploaded_by_user_id: int
+
+    model_config = ConfigDict(use_enum_values=True)
+
+
+class PolicyUpdate(BaseModel):
+    policy_name: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[PolicyCategory] = None
+    ministry: Optional[str] = None
+    department: Optional[str] = None
+    government_level: Optional[str] = None
+    state: Optional[str] = None
+    # `status` is intentionally NOT editable here — it's derived from
+    # approval_status (see policy.py's _sync_status_from_approval) so an
+    # Official can't self-approve by just typing "Active" into the edit
+    # form, or resurrect a Rejected policy without going back through
+    # approval. Archived/restored is handled by the dedicated
+    # archive/unarchive endpoints instead.
+    publication_date: Optional[date] = None
+    effective_date: Optional[date] = None
+    document_url: Optional[str] = None
+
+    model_config = ConfigDict(use_enum_values=True)
+
+
+class PolicyOut(PolicyCreate):
+    policy_id: int
+    created_at: datetime
+    updated_at: datetime
+    # Readable in responses (and used for filtering/badges), but not
+    # accepted as input on PolicyCreate/PolicyUpdate — see the note there.
+    status: Optional[str] = None
+
+    # ---- Policy Approval Workflow (Task 4) -----------------------------
+    approval_status: ApprovalStatus
+    approved_by: Optional[int] = None
+    approved_at: Optional[datetime] = None
+    rejection_reason: Optional[str] = None
+    rejected_by: Optional[int] = None
+    rejected_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+
+class PolicyRejectRequest(BaseModel):
+    """Body for PATCH /policies/{id}/reject — a reason is mandatory."""
+    reason: str = Field(..., min_length=1, max_length=1000)

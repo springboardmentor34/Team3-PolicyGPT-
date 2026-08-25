@@ -1,0 +1,268 @@
+<div class="eligibility-page">
+
+<!-- ================= CONTENT ================= -->
+
+<div class="checker-content">
+
+<div class="page-header">
+<h1>Eligibility Checker</h1>
+<p>Answer a few quick questions and we'll match you with government schemes you qualify for.</p>
+</div>
+
+<!-- ================= STEPPER ================= -->
+
+<div class="stepper">
+
+<div class="step" [class.completed]="currentStep>1" [class.active]="currentStep==1">
+<div class="step-circle">
+<mat-icon *ngIf="currentStep>1">check</mat-icon>
+<span *ngIf="currentStep<=1">1</span>
+</div>
+<span>Personal Details</span>
+</div>
+
+<div class="step" [class.completed]="currentStep>2" [class.active]="currentStep==2">
+<div class="step-circle">
+<mat-icon *ngIf="currentStep>2">check</mat-icon>
+<span *ngIf="currentStep<=2">2</span>
+</div>
+<span>Work &amp; Education</span>
+</div>
+
+<div class="step" [class.completed]="currentStep>3" [class.active]="currentStep==3">
+<div class="step-circle">
+<mat-icon *ngIf="currentStep>3">check</mat-icon>
+<span *ngIf="currentStep<=3">3</span>
+</div>
+<span>Income &amp; Category</span>
+</div>
+
+<div class="step" [class.completed]="currentStep>4" [class.active]="currentStep==4">
+<div class="step-circle"><span>4</span></div>
+<span>Results</span>
+</div>
+
+</div>
+
+<!-- ================================================= -->
+<!-- STEP 1 : PERSONAL DETAILS (Age, Gender, Location) -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==1">
+
+<mat-card class="form-card">
+
+<div class="card-header">
+<h2>Personal Details</h2>
+<p>Tell us a little about yourself.</p>
+</div>
+
+<div class="form-grid">
+
+<!-- Date of Birth -->
+<div>
+<label>Date of Birth</label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>cake</mat-icon>
+<input matInput type="date" [(ngModel)]="dob" [max]="today">
+</mat-form-field>
+<span class="field-hint" *ngIf="dob">Age: {{ calculateAge() }} years</span>
+</div>
+
+<!-- Gender -->
+<div>
+<label>Gender</label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>wc</mat-icon>
+<mat-select [(ngModel)]="gender">
+<mat-option *ngFor="let g of genderOptions" [value]="g">{{ g }}</mat-option>
+</mat-select>
+</mat-form-field>
+</div>
+
+<!-- State -->
+<div>
+<label>State / Union Territory</label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>location_on</mat-icon>
+<mat-select [(ngModel)]="state">
+<mat-option *ngFor="let s of states" [value]="s">{{ s }}</mat-option>
+</mat-select>
+</mat-form-field>
+</div>
+
+<!-- District -->
+<div>
+<label>District <span class="optional-tag">(optional)</span></label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>map</mat-icon>
+<input matInput placeholder="e.g. Bengaluru Urban" [(ngModel)]="district">
+</mat-form-field>
+<span class="field-hint">Only fill this in if a scheme is limited to your specific district.</span>
+</div>
+
+</div>
+
+<div class="button-row">
+<span></span>
+<button mat-raised-button color="primary" class="continue-btn" (click)="nextStep()">
+Continue
+<mat-icon>arrow_forward</mat-icon>
+</button>
+</div>
+
+</mat-card>
+
+</div>
+
+<!-- ================================================= -->
+<!-- STEP 2 : WORK & EDUCATION -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==2">
+
+<mat-card class="form-card">
+
+<div class="card-header">
+<h2>Work &amp; Education</h2>
+<p>This helps us match schemes meant for your occupation and education level.</p>
+</div>
+
+<!-- Occupation -->
+<label>Occupation</label>
+
+<div class="occupation-grid">
+<div
+class="occupation-card"
+*ngFor="let item of occupations"
+[class.active]="selectedOccupation==item.name"
+(click)="selectOccupation(item.name)">
+<div class="occupation-icon"><mat-icon>{{ item.icon }}</mat-icon></div>
+<div>
+<h4>{{ item.name }}</h4>
+<p>{{ item.description }}</p>
+</div>
+</div>
+</div>
+
+<mat-form-field appearance="outline" class="full-width" *ngIf="selectedOccupation === 'Other'">
+<mat-icon matPrefix>edit</mat-icon>
+<input matInput placeholder="Please specify your occupation" [(ngModel)]="customOccupation">
+</mat-form-field>
+
+<!-- Education -->
+<label>Highest Education Level</label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>school</mat-icon>
+<mat-select [(ngModel)]="selectedEducation">
+<mat-option *ngFor="let level of educationLevels" [value]="level">{{ level }}</mat-option>
+</mat-select>
+</mat-form-field>
+
+<div class="button-row">
+<button mat-stroked-button class="back-btn" (click)="previousStep()">
+<mat-icon>arrow_back</mat-icon>
+Back
+</button>
+<div class="step-count">Step 2 of 4</div>
+<button mat-raised-button color="primary" class="continue-btn" (click)="nextStep()">
+Continue
+<mat-icon>arrow_forward</mat-icon>
+</button>
+</div>
+
+</mat-card>
+
+</div>
+
+<!-- ================================================= -->
+<!-- STEP 3 : INCOME & CATEGORY -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==3">
+
+<mat-card class="form-card">
+
+<div class="card-header">
+<h2>Income &amp; Category</h2>
+<p>The last few details that many schemes use to check eligibility.</p>
+</div>
+
+<!-- Annual Income -->
+<label>Annual Family Income (₹)</label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>currency_rupee</mat-icon>
+<input matInput type="number" placeholder="Enter annual income" [(ngModel)]="annualIncome">
+</mat-form-field>
+
+<!-- Social Category -->
+<label>Social Category</label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>groups</mat-icon>
+<mat-select [(ngModel)]="selectedCaste">
+<mat-option *ngFor="let caste of casteCategories" [value]="caste">{{ caste }}</mat-option>
+</mat-select>
+</mat-form-field>
+
+<!-- Disability Status -->
+<label>Do you identify as a person with disability?</label>
+<mat-form-field appearance="outline" class="full-width">
+<mat-icon matPrefix>accessible</mat-icon>
+<mat-select [(ngModel)]="disability">
+<mat-option value="No">No</mat-option>
+<mat-option value="Yes">Yes</mat-option>
+</mat-select>
+</mat-form-field>
+
+<div class="button-row">
+<button mat-stroked-button class="back-btn" (click)="previousStep()">
+<mat-icon>arrow_back</mat-icon>
+Back
+</button>
+<div class="step-count">Step 3 of 4</div>
+<button mat-raised-button color="primary" class="continue-btn" [disabled]="loading" (click)="nextStep()">
+<span *ngIf="!loading">Check Eligibility</span>
+<span *ngIf="loading">Checking...</span>
+<mat-icon *ngIf="!loading">arrow_forward</mat-icon>
+</button>
+</div>
+
+</mat-card>
+
+</div>
+
+<!-- ================================================= -->
+<!-- STEP 4 : RESULTS -->
+<!-- ================================================= -->
+
+<div *ngIf="currentStep==4">
+
+<mat-card class="result-card">
+
+<div class="success-icon"><mat-icon>check_circle</mat-icon></div>
+
+<h1>{{ eligibleCount }}</h1>
+
+<h2>You're eligible for {{ eligibleCount }} scheme{{ eligibleCount === 1 ? '' : 's' }}</h2>
+
+<p *ngIf="profileSummary">{{ profileSummary }}</p>
+
+<div class="button-row">
+<button mat-stroked-button class="back-btn" (click)="previousStep()">
+<mat-icon>arrow_back</mat-icon>
+Back
+</button>
+
+<button mat-raised-button color="primary" class="continue-btn" routerLink="/scheme-matches">
+View My Matches
+<mat-icon>arrow_forward</mat-icon>
+</button>
+</div>
+
+</mat-card>
+
+</div>
+
+</div>
+
+</div>

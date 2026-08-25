@@ -1,0 +1,53 @@
+<footer class="pg-footer">
+  <div class="pg-container pg-footer__grid">
+    <div class="pg-footer__col pg-footer__brand">
+      <div class="pg-brand">
+        <mat-icon>account_balance</mat-icon>
+        <span>Policy<strong>GPT</strong></span>
+      </div>
+      <p class="pg-text-muted">
+        A unified intelligence platform helping citizens, officials, and researchers discover,
+        compare, and understand government policies and public welfare schemes.
+      </p>
+      <div class="pg-footer__socials">
+        <a href="#" aria-label="Facebook"><mat-icon>public</mat-icon></a>
+        <a href="#" aria-label="Twitter"><mat-icon>alternate_email</mat-icon></a>
+        <a href="#" aria-label="LinkedIn"><mat-icon>business_center</mat-icon></a>
+      </div>
+    </div>
+
+    <div class="pg-footer__col">
+      <h4>Quick Links</h4>
+      <ul>
+        @for (link of quickLinks; track link.path) {
+          <li><a [routerLink]="link.path">{{ link.label }}</a></li>
+        }
+      </ul>
+    </div>
+
+    <div class="pg-footer__col">
+      <h4>Resources</h4>
+      <ul>
+        @for (link of resourceLinks; track link.path) {
+          <li><a [routerLink]="link.path">{{ link.label }}</a></li>
+        }
+      </ul>
+    </div>
+
+    <div class="pg-footer__col">
+      <h4>Contact</h4>
+      <ul class="pg-footer__contact">
+        <li><mat-icon>location_on</mat-icon> New Delhi, India</li>
+        <li><mat-icon>email</mat-icon> support&#64;policygpt.gov.in</li>
+        <li><mat-icon>call</mat-icon> 1800-000-000 (Toll Free)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pg-footer__bottom">
+    <div class="pg-container pg-flex-between">
+      <span>&copy; {{ currentYear }} PolicyGPT. All rights reserved.</span>
+      <span class="pg-text-muted">Final Year Project | Government Policy Intelligence Platform</span>
+    </div>
+  </div>
+</footer>

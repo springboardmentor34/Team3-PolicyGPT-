@@ -1,0 +1,657 @@
+/* =========================================================
+   POLICY DETAILS PAGE
+   ========================================================= */
+
+.policy-details-page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #172033;
+}
+
+
+/* =========================================================
+   TOP NAVBAR
+   ========================================================= */
+
+.top-navbar {
+  height: 76px;
+  padding: 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: linear-gradient(135deg, #124f94, #0d4380);
+  color: white;
+
+  box-shadow: 0 3px 14px rgba(15, 76, 151, 0.18);
+}
+
+
+/* ---------- Logo ---------- */
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.logo-box {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #16a34a;
+  border-radius: 11px;
+
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+}
+
+.logo-box mat-icon {
+  color: white;
+  font-size: 25px;
+  width: 25px;
+  height: 25px;
+}
+
+.logo-text h2 {
+  margin: 0;
+
+  font-size: 25px;
+  line-height: 1.1;
+  font-weight: 700;
+
+  color: white;
+}
+
+.logo-text span {
+  display: block;
+  margin-top: 4px;
+
+  font-size: 10px;
+  letter-spacing: 1.1px;
+
+  color: #dbeafe;
+}
+
+
+/* ---------- Back button ---------- */
+
+.nav-right button {
+  height: 42px;
+
+  padding: 0 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+
+  color: white;
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-right button mat-icon {
+  margin-right: 6px;
+}
+
+.nav-right button:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.details-content {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+
+  padding: 34px 0 60px;
+}
+
+
+/* =========================================================
+   HERO CARD
+   ========================================================= */
+
+.hero-card {
+  position: relative;
+
+  padding: 34px 38px 30px !important;
+
+  border-radius: 18px !important;
+
+  background: white;
+
+  border: 1px solid #e7edf5;
+
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.07) !important;
+
+  margin-bottom: 24px;
+
+  overflow: hidden;
+}
+
+
+/* Small blue line on top */
+
+.hero-card::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #1557a6,
+    #2563eb
+  );
+}
+
+
+/* =========================================================
+   HERO TOP
+   ========================================================= */
+
+.hero-top {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 30px;
+}
+
+
+/* Category */
+
+.category {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 13px;
+
+  margin-bottom: 12px;
+
+  border-radius: 20px;
+
+  background: #eff6ff;
+  color: #1d4ed8;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-transform: capitalize;
+}
+
+
+/* Policy title */
+
+.hero-card h1 {
+  margin: 0 0 10px;
+
+  color: #123f73;
+
+  font-size: 34px;
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  letter-spacing: -0.4px;
+}
+
+
+/* Ministry */
+
+.hero-card .hero-top p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+
+/* Description under hero */
+
+.hero-card > p:last-child {
+  margin: 25px 0 0;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #edf1f6;
+
+  color: #475569;
+
+  font-size: 15px;
+  line-height: 1.75;
+
+  max-width: 900px;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 17px;
+
+  border-radius: 30px;
+
+  background: #dcfce7;
+  color: #15803d;
+
+  border: 1px solid #bbf7d0;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status mat-icon {
+  width: 19px;
+  height: 19px;
+
+  font-size: 19px;
+}
+
+
+/* =========================================================
+   DETAILS GRID
+   ========================================================= */
+
+.details-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 22px;
+
+  align-items: stretch;
+}
+
+
+/* =========================================================
+   INFORMATION CARDS
+   ========================================================= */
+
+.info-card {
+  padding: 26px 28px !important;
+
+  border-radius: 16px !important;
+
+  background: white;
+
+  border: 1px solid #e7edf5;
+
+  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.055) !important;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  box-sizing: border-box;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08) !important;
+}
+
+
+/* =========================================================
+   CARD HEADINGS
+   ========================================================= */
+
+.info-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin: 0 0 22px;
+
+  color: #123f73;
+
+  font-size: 20px;
+  line-height: 1.3;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   INFORMATION ROW
+   ========================================================= */
+
+.info-row {
+  display: grid;
+
+  grid-template-columns: 155px 1fr;
+
+  gap: 20px;
+
+  padding: 13px 0;
+
+  border-bottom: 1px solid #edf1f5;
+
+  font-size: 14px;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.info-row:first-of-type {
+  padding-top: 0;
+}
+
+
+/* Label */
+
+.info-row span {
+  color: #64748b;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  line-height: 1.5;
+}
+
+
+/* Value */
+
+.info-row b {
+  color: #1e293b;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  line-height: 1.55;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   OVERVIEW CARD
+   ========================================================= */
+
+.info-card:first-child {
+  grid-column: 1 / -1;
+}
+
+.info-card:first-child .info-row {
+  display: block;
+
+  padding: 0;
+
+  border: none;
+}
+
+.info-card:first-child .info-row span {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #64748b;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.info-card:first-child .info-row b {
+  display: block;
+
+  color: #475569;
+
+  font-size: 15px;
+  font-weight: 400;
+
+  line-height: 1.75;
+}
+
+
+/* =========================================================
+   DOCUMENT CARD
+   ========================================================= */
+
+.info-card:has(.list-item) {
+  grid-column: 1 / -1;
+}
+
+
+/* Document item */
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 14px 16px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e7edf5;
+
+  border-radius: 12px;
+
+  transition: 0.2s ease;
+}
+
+.list-item:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+
+/* Document icon */
+
+.list-item mat-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px;
+
+  box-sizing: border-box;
+
+  border-radius: 10px;
+
+  background: #dbeafe;
+
+  color: #2563eb;
+
+  font-size: 22px;
+}
+
+
+/* Document link */
+
+.list-item a {
+  color: #1d4ed8;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.list-item a:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================================
+   LOADING STATE
+   ========================================================= */
+
+.details-content > .hero-card p {
+  color: #64748b;
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   ANGULAR MATERIAL CARD RESET
+   ========================================================= */
+
+mat-card {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-card:first-child,
+  .info-card:has(.list-item) {
+    grid-column: auto;
+  }
+
+  .hero-top {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+}
+
+
+@media (max-width: 768px) {
+
+  .top-navbar {
+    height: 70px;
+    padding: 0 20px;
+  }
+
+  .logo-box {
+    width: 42px;
+    height: 42px;
+  }
+
+  .logo-text h2 {
+    font-size: 22px;
+  }
+
+  .logo-text span {
+    font-size: 8px;
+  }
+
+  .nav-right button {
+    padding: 0 12px;
+  }
+
+  .details-content {
+    width: calc(100% - 30px);
+
+    padding-top: 22px;
+  }
+
+  .hero-card {
+    padding: 27px 22px 24px !important;
+  }
+
+  .hero-card h1 {
+    font-size: 28px;
+  }
+
+  .hero-card > p:last-child {
+    font-size: 14px;
+  }
+
+  .info-card {
+    padding: 22px !important;
+  }
+
+  .info-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+
+    padding: 12px 0;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .top-navbar {
+    padding: 0 14px;
+  }
+
+  .logo-section {
+    gap: 9px;
+  }
+
+  .logo-box {
+    width: 38px;
+    height: 38px;
+  }
+
+  .logo-box mat-icon {
+    font-size: 21px;
+  }
+
+  .logo-text h2 {
+    font-size: 19px;
+  }
+
+  .logo-text span {
+    display: none;
+  }
+
+  .nav-right button {
+    min-width: auto;
+  }
+
+  .nav-right button mat-icon {
+    margin-right: 0;
+  }
+
+  .nav-right button {
+    font-size: 0;
+  }
+
+  .nav-right button mat-icon {
+    font-size: 20px;
+  }
+
+  .hero-card h1 {
+    font-size: 25px;
+  }
+
+  .status {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+}

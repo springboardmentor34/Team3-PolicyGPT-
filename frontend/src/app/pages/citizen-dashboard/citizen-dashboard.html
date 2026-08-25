@@ -1,0 +1,466 @@
+<div class="dashboard-page">
+
+  <!-- ================= PAGE CONTENT STARTS HERE ================= -->
+
+  <div class="dashboard-content">
+    <!-- ================= WELCOME BANNER ================= -->
+
+<div class="welcome-banner">
+
+  <!-- Left -->
+
+  <div class="banner-left">
+
+    <span class="portal-badge">
+
+      ⭐ NATIONAL CITIZEN PORTAL
+
+    </span>
+
+    <h2>
+
+      Welcome back, {{userName}} 👋
+
+    </h2>
+
+    <p>
+
+      You have 3 new scheme matches based on your profile updates.
+
+      <br>
+
+      Check your eligibility for the latest government policies
+
+      <br>
+
+      and public welfare schemes in under two minutes.
+
+    </p>
+
+    <button
+      mat-raised-button
+      class="eligibility-btn">
+
+      <mat-icon>task_alt</mat-icon>
+
+      Check Eligibility
+
+    </button>
+
+  </div>
+
+  <!-- Right -->
+
+  <div class="banner-right">
+
+    <div class="citizen-card">
+
+      <div class="info-row">
+
+        <span class="label">
+
+          Citizen ID
+
+        </span>
+
+        <span class="value">
+
+          IN-7742-9931
+
+        </span>
+
+      </div>
+
+      <div class="info-row">
+
+        <span class="label">
+
+          State
+
+        </span>
+
+        <span class="value">
+
+          Tamil Nadu
+
+        </span>
+
+      </div>
+
+      <div class="info-row">
+
+        <span class="label">
+
+          Profile Status
+
+        </span>
+
+        <span class="verified">
+
+          ✔ Verified
+
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- =====================================================
+     STATISTICS
+====================================================== -->
+
+<div class="stats-grid">
+
+  <mat-card
+    class="stat-card"
+    *ngFor="let item of stats"
+    (click)="openCard(item)">
+    <div
+        class="stat-icon"
+        [style.background]="item.color">
+
+        <mat-icon>
+
+            {{item.icon}}
+
+        </mat-icon>
+
+    </div>
+
+    <div
+        class="stat-badge"
+        [ngClass]="item.badgeClass">
+
+        {{item.badge}}
+
+    </div>
+
+    <div class="stat-content">
+
+        <h2>{{item.value}}</h2>
+
+        <span>{{item.title}}</span>
+
+    </div>
+
+</mat-card>
+</div>
+<!-- =====================================================
+     MAIN CONTENT
+====================================================== -->
+
+<div class="dashboard-grid">
+
+  <!-- ================= LEFT ================= -->
+
+  <div class="left-column">
+
+    <div class="section-header">
+
+    <div>
+
+        <h2>Recommended Schemes</h2>
+
+        <p class="section-subtitle">
+            Matched to your profile and location
+        </p>
+
+    </div>
+
+    <button mat-button color="primary" (click)="goToEligibleSchemes()">
+        View All
+    </button>
+
+</div>
+
+    <!-- ================= Scheme Grid ================= -->
+
+<p class="empty-state" *ngIf="!loadingEligibleCount && schemes.length === 0">
+  No scheme matches yet — complete your profile details to see schemes you may be eligible for.
+</p>
+
+<div class="scheme-grid">
+
+  <mat-card
+    class="scheme-card"
+    *ngFor="let scheme of schemes">
+>
+
+    <!-- Top -->
+
+    <div class="scheme-top">
+
+      <span class="category">
+        {{scheme.category}}
+      </span>
+
+      <span
+        class="status"
+        [ngClass]="{
+          'eligible': scheme.status=='Eligible',
+          'review': scheme.status=='Under Review'
+        }">
+
+        {{scheme.status}}
+
+      </span>
+
+    </div>
+
+    <!-- Title -->
+
+    <h3>
+
+      {{scheme.title}}
+
+    </h3>
+
+    <!-- Description -->
+
+    <p>
+
+      {{scheme.description}}
+
+    </p>
+
+    <!-- Footer -->
+
+    <div class="scheme-footer">
+
+      <span class="deadline">
+
+        {{scheme.deadline}}
+
+      </span>
+
+      <button
+        mat-button
+        color="primary"
+        [routerLink]="scheme.scheme_id ? ['/scheme-details', scheme.scheme_id] : null">
+
+        View Details
+
+        <mat-icon>
+
+          chevron_right
+
+        </mat-icon>
+
+      </button>
+
+    </div>
+
+  </mat-card>
+
+</div>
+
+  </div>
+
+  <!-- ================= RIGHT SIDE START ================= -->
+
+  <div class="right-column">
+    <!-- =====================================================
+     NOTIFICATIONS
+====================================================== -->
+
+<mat-card class="side-card">
+
+  <div class="section-header">
+
+    <h3>Notifications</h3>
+
+    <div class="header-right">
+
+      
+
+      <button
+        mat-button
+        color="primary">
+
+        View All
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    class="notification-item"
+    *ngFor="let notify of notifications">
+
+    <div class="notification-dot"></div>
+
+    <div class="notification-content">
+
+      <h4>{{notify.title}}</h4>
+
+      <span>{{notify.time}}</span>
+
+    </div>
+
+  </div>
+
+</mat-card>
+<!-- =====================================================
+     SEARCH HISTORY
+====================================================== -->
+
+<mat-card class="side-card">
+
+  <div class="section-header">
+
+    <h3>Recent Searches</h3>
+
+    <button
+      mat-button
+      color="primary">
+
+      Clear
+
+    </button>
+
+  </div>
+
+  <div class="loading-text" *ngIf="loadingHistory">
+
+    Loading...
+
+  </div>
+
+  <div
+    class="history-item"
+    *ngFor="let item of history">
+
+    <mat-icon>
+
+      history
+
+    </mat-icon>
+
+    <span>
+
+      {{item}}
+
+    </span>
+
+  </div>
+
+  <p class="empty-state" *ngIf="!loadingHistory && history.length === 0">
+
+    No searches yet — try searching for a policy or scheme.
+
+  </p>
+
+</mat-card>
+<!-- =====================================================
+     QUICK ACTIONS
+====================================================== -->
+
+<mat-card class="side-card">
+
+  <div class="section-header">
+
+    <h3>Quick Actions</h3>
+
+  </div>
+
+  <button
+    mat-stroked-button
+    class="quick-btn"
+    (click)="goToSearchSchemes()">
+
+    <mat-icon>
+
+      search
+
+    </mat-icon>
+
+    Search Schemes
+
+  </button>
+
+  <button
+    mat-stroked-button
+    class="quick-btn"
+    (click)="goToApplications()">
+
+    <mat-icon>
+
+      assignment
+
+    </mat-icon>
+
+    Track Applications
+
+  </button>
+
+  <button
+    mat-stroked-button
+    class="quick-btn"
+    (click)="goToSavedPolicies()">
+
+    <mat-icon>
+
+      bookmark
+
+    </mat-icon>
+
+    Saved Policies
+
+  </button>
+
+  <button
+    mat-stroked-button
+    class="quick-btn"
+    (click)="goToProfile()">
+
+    <mat-icon>
+
+      account_circle
+
+    </mat-icon>
+
+    Update Profile
+
+  </button>
+
+</mat-card>
+
+</div> <!-- right-column -->
+
+</div> <!-- dashboard-grid -->
+<!-- =====================================================
+     FOOTER
+====================================================== -->
+
+<footer class="dashboard-footer">
+
+  <div class="footer-left">
+
+    © 2026 PolicyGPT • Government Policy & Public Scheme Intelligence Platform
+
+  </div>
+
+  <div class="footer-right">
+
+    <a href="#">Privacy Policy</a>
+
+    <span>•</span>
+
+    <a href="#">Terms of Use</a>
+
+    <span>•</span>
+
+    <a href="#">Help Center</a>
+
+  </div>
+
+</footer>
+
+</div> <!-- dashboard-content -->
+
+</div> <!-- dashboard-page -->

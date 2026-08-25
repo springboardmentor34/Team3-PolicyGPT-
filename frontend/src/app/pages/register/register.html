@@ -1,0 +1,348 @@
+<div class="register-page">
+
+  <!-- ================= LEFT PANEL ================= -->
+
+  <div class="register-left">
+
+    <!-- Logo -->
+
+    <div class="brand">
+
+      <div class="brand-logo">
+        <mat-icon>account_balance</mat-icon>
+      </div>
+
+      <div class="brand-text">
+        <h2>PolicyGPT</h2>
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+      </div>
+
+    </div>
+
+    <!-- Left Content -->
+
+    <div class="left-content">
+
+      <h1>
+        Create your account and
+        never miss a scheme you
+        qualify for.
+      </h1>
+
+      <p>
+        It takes less than two minutes to set up your profile.
+        We'll match you with eligible government policies
+        automatically.
+      </p>
+
+      <!-- Feature 1 -->
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          <mat-icon>verified</mat-icon>
+        </div>
+
+        <span>
+          Free, secure and takes 2 minutes
+        </span>
+
+      </div>
+
+      <!-- Feature 2 -->
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          <mat-icon>shield</mat-icon>
+        </div>
+
+        <span>
+          Used by 248,000+ verified citizens
+        </span>
+
+      </div>
+
+      <!-- Feature 3 -->
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          <mat-icon>schedule</mat-icon>
+        </div>
+
+        <span>
+          Get instant eligibility results
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+
+    <div class="copyright">
+      © 2026 PolicyGPT • Government Policy & Public Scheme Intelligence Platform
+    </div>
+
+  </div>
+
+  <!-- ================= RIGHT PANEL ================= -->
+
+  <div class="register-right">
+
+    <div class="register-box">
+
+      <h1>Create your account</h1>
+
+      <p class="subtitle">
+        Join PolicyGPT to check your eligibility instantly
+      </p>
+
+      <!-- Role Selection -->
+
+      <div class="role-selection">
+
+        <div
+          class="role-card"
+          [class.active]="selectedRole==='citizen'"
+          (click)="selectRole('citizen')">
+
+          <mat-icon>person</mat-icon>
+
+          <h3>I'm a Citizen</h3>
+
+          <p>Search schemes & Apply</p>
+
+        </div>
+
+        <div
+          class="role-card"
+          [class.active]="selectedRole==='official'"
+          (click)="selectRole('official')">
+
+          <mat-icon>account_balance</mat-icon>
+
+          <h3>Government Official</h3>
+
+          <p>Manage policies</p>
+
+        </div>
+
+        <div
+          class="role-card"
+          [class.active]="selectedRole==='researcher'"
+          (click)="selectRole('researcher')">
+
+          <mat-icon>science</mat-icon>
+
+          <h3>Researcher</h3>
+
+          <p>Analyze policies & data</p>
+
+        </div>
+
+        <div
+          class="role-card"
+          [class.active]="selectedRole==='organization'"
+          (click)="selectRole('organization')">
+
+          <mat-icon>domain</mat-icon>
+
+          <h3>Organization</h3>
+
+          <p>Access schemes & reports</p>
+
+        </div>
+
+      </div>
+
+      <!-- ================= ROW 1 ================= -->
+
+<div class="row">
+
+  <!-- Full Name -->
+
+  <div class="field">
+
+    <label class="input-heading">Full Name</label>
+
+    <mat-form-field appearance="outline">
+
+      <mat-icon matPrefix>person</mat-icon>
+
+      <input
+        matInput
+        placeholder="Name"
+        [(ngModel)]="fullName">
+
+    </mat-form-field>
+
+  </div>
+
+  <!-- Mobile -->
+
+  <div class="field">
+
+    <label class="input-heading">Mobile Number</label>
+
+    <mat-form-field appearance="outline">
+
+      <mat-icon matPrefix>call</mat-icon>
+
+      <input
+        matInput
+        placeholder="+91 9876543210"
+        [(ngModel)]="mobile">
+
+    </mat-form-field>
+
+  </div>
+
+</div>
+
+<!-- ================= EMAIL ================= -->
+
+<div class="field full">
+
+  <label class="input-heading">
+    Email Address
+  </label>
+
+  <mat-form-field appearance="outline">
+
+    <mat-icon matPrefix>mail</mat-icon>
+
+    <input
+      matInput
+      type="email"
+      placeholder="you@example.com"
+      [(ngModel)]="email">
+
+  </mat-form-field>
+
+</div>
+
+<!-- ================= ROW 2 ================= -->
+
+<div class="row">
+
+  <!-- Password -->
+
+  <div class="field">
+
+    <label class="input-heading">
+      Password
+    </label>
+
+    <mat-form-field appearance="outline">
+
+      <mat-icon matPrefix>lock</mat-icon>
+
+      <input
+        matInput
+        [type]="hidePassword ? 'password' : 'text'"
+        placeholder="Create a password"
+        [(ngModel)]="password">
+
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="hidePassword=!hidePassword">
+
+        <mat-icon>
+          {{hidePassword ? 'visibility_off' : 'visibility'}}
+        </mat-icon>
+
+      </button>
+
+    </mat-form-field>
+
+  </div>
+
+  <!-- State -->
+
+  <div class="field">
+
+    <label class="input-heading">
+      State
+    </label>
+
+    <mat-form-field appearance="outline">
+
+      <mat-icon matPrefix>location_on</mat-icon>
+
+      <mat-select [(ngModel)]="state">
+
+        <mat-option
+          *ngFor="let s of states"
+          [value]="s">
+
+          {{s}}
+
+        </mat-option>
+
+      </mat-select>
+
+    </mat-form-field>
+
+  </div>
+
+</div>
+
+      <!-- ================= TERMS ================= -->
+
+      <div class="terms">
+
+        <mat-checkbox [(ngModel)]="agree">
+
+          I agree to the
+
+          <a href="javascript:void(0)">
+            Terms of Use
+          </a>
+
+          and
+
+          <a href="javascript:void(0)">
+            Privacy Policy
+          </a>
+
+        </mat-checkbox>
+
+      </div>
+
+      <!-- ================= BUTTON ================= -->
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="register-btn"
+        (click)="createAccount()">
+
+        <mat-icon>person_add</mat-icon>
+
+        Create Account
+
+      </button>
+
+      <!-- ================= LOGIN ================= -->
+
+      <div class="login-link">
+
+        Already have an account?
+
+        <a routerLink="/login">
+
+          Log in
+
+        </a>
+
+      </div>
+
+    </div> <!-- register-box -->
+
+  </div> <!-- register-right -->
+
+</div> <!-- register-page -->

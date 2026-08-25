@@ -1,0 +1,155 @@
+/* ==========================================================================
+   PolicyGPT Global Theme — Government Portal (Blue & White, Minimal, Modern)
+   ========================================================================== */
+
+:root {
+  --pg-primary: #0b4f8a;        // deep government blue
+  --pg-primary-dark: #073b68;
+  --pg-primary-light: #e8f1fb;
+  --pg-accent: #1976d2;
+  --pg-success: #1e8e3e;
+  --pg-warning: #b8860b;
+  --pg-danger: #c62828;
+  --pg-white: #ffffff;
+  --pg-bg: #f4f7fb;
+  --pg-text: #1a2733;
+  --pg-text-muted: #5f7182;
+  --pg-border: #d9e3ef;
+  --pg-radius: 10px;
+  --pg-shadow: 0 2px 10px rgba(11, 79, 138, 0.08);
+  --pg-shadow-hover: 0 6px 20px rgba(11, 79, 138, 0.14);
+  --pg-font-heading: 'Poppins', sans-serif;
+  --pg-font-body: 'Roboto', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--pg-bg);
+  color: var(--pg-text);
+  font-family: var(--pg-font-body);
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--pg-font-heading);
+  color: var(--pg-primary-dark);
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+a { color: var(--pg-primary); text-decoration: none; }
+a:hover { color: var(--pg-accent); text-decoration: underline; }
+
+/* Layout helpers */
+.pg-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.pg-page {
+  min-height: calc(100vh - 64px);
+  padding: 32px 0 64px 0;
+}
+
+.pg-section-title {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-left: 14px;
+  border-left: 5px solid var(--pg-primary);
+}
+
+/* Cards */
+.pg-card {
+  background: var(--pg-white);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius);
+  box-shadow: var(--pg-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.pg-card:hover {
+  box-shadow: var(--pg-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Buttons - Angular Material overrides */
+.mat-mdc-raised-button.pg-btn-primary {
+  --mdc-protected-button-container-color: var(--pg-primary);
+  --mdc-protected-button-label-text-color: #ffffff;
+}
+
+/* Status chips */
+.pg-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.pg-status--active { background: #e6f4ea; color: var(--pg-success); }
+.pg-status--upcoming { background: #fff5e0; color: var(--pg-warning); }
+.pg-status--closed { background: #fdecea; color: var(--pg-danger); }
+
+/* Utility */
+.pg-text-muted { color: var(--pg-text-muted); }
+.pg-w-100 { width: 100%; }
+.pg-flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--pg-border); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--pg-primary); }
+
+/* Responsive helpers */
+@media (max-width: 768px) {
+  .pg-container { padding: 0 16px; }
+  .pg-section-title { font-size: 1.3rem; }
+}
+
+/* ================= TOAST NOTIFICATIONS (ToastService) ================= */
+/* Replaces plain browser alert() popups app-wide with small, non-blocking
+   snackbar toasts.
+
+   NOTE: Angular Material 20's MDC-based snackbar sets its own background
+   via the --mdc-snackbar-container-color variable internally, but that
+   variable didn't reliably cascade down to the actual visible surface
+   in testing (showed up transparent instead of colored). Targeting the
+   real rendered elements directly with !important is more reliable
+   than depending on Material's internal variable indirection. */
+
+.toast-success,
+.toast-error,
+.toast-info {
+  .mdc-snackbar__surface {
+    color: #ffffff !important;
+  }
+
+  .mdc-snackbar__label {
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-snack-bar-action {
+    color: #ffffff !important;
+  }
+}
+
+.toast-success .mdc-snackbar__surface {
+  background-color: #16A34A !important;
+}
+
+.toast-error .mdc-snackbar__surface {
+  background-color: #DC2626 !important;
+}
+
+.toast-info .mdc-snackbar__surface {
+  background-color: #0F4C97 !important;
+}

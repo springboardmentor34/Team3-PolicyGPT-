@@ -1,0 +1,6 @@
+<div class="pg-spinner" [class.pg-spinner--overlay]="overlay">
+  <mat-spinner [diameter]="diameter" color="primary"></mat-spinner>
+  @if (message) {
+    <p class="pg-spinner__msg">{{ message }}</p>
+  }
+</div>

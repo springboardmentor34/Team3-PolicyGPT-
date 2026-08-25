@@ -1,0 +1,65 @@
+<mat-toolbar class="pg-navbar">
+  <div class="pg-navbar__inner pg-container">
+    <a routerLink="/home" class="pg-brand" (click)="closeMobileMenu()">
+      <mat-icon class="pg-brand__icon">account_balance</mat-icon>
+      <span class="pg-brand__text">
+        Policy<span class="pg-brand__accent">GPT</span>
+      </span>
+    </a>
+
+    <nav class="pg-nav-links">
+      @for (link of navLinks; track link.path) {
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          class="pg-nav-link"
+        >{{ link.label }}</a>
+      }
+    </nav>
+
+    <div class="pg-navbar__actions">
+      <button mat-icon-button (click)="goToDashboard()" matTooltip="Dashboard" aria-label="Dashboard">
+        <mat-icon>dashboard</mat-icon>
+      </button>
+
+      @if (isLoggedIn) {
+        <button mat-icon-button routerLink="/notifications" matTooltip="Notifications" aria-label="Notifications">
+          <mat-icon [matBadge]="unreadNotifications" matBadgeColor="warn" matBadgeSize="small">notifications</mat-icon>
+        </button>
+
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Account menu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <a mat-menu-item routerLink="/profile"><mat-icon>person</mat-icon> Profile</a>
+          <a mat-menu-item (click)="goToDashboard()"><mat-icon>dashboard</mat-icon> Dashboard</a>
+          <a mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Logout</a>
+        </mat-menu>
+      } @else {
+        <button mat-stroked-button routerLink="/login" class="pg-btn-outline">Login</button>
+        <button mat-raised-button routerLink="/register" class="pg-btn-primary">Register</button>
+      }
+
+      <button mat-icon-button class="pg-menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+        <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  @if (mobileMenuOpen) {
+    <div class="pg-mobile-menu">
+      @for (link of navLinks; track link.path) {
+        <a [routerLink]="link.path" (click)="closeMobileMenu()" routerLinkActive="active">{{ link.label }}</a>
+      }
+      <a (click)="goToDashboard()">Dashboard</a>
+      @if (isLoggedIn) {
+        <a routerLink="/notifications" (click)="closeMobileMenu()">Notifications</a>
+        <a routerLink="/profile" (click)="closeMobileMenu()">Profile</a>
+        <a (click)="logout()">Logout</a>
+      } @else {
+        <a routerLink="/login" (click)="closeMobileMenu()">Login</a>
+        <a routerLink="/register" (click)="closeMobileMenu()">Register</a>
+      }
+    </div>
+  }
+</mat-toolbar>

@@ -1,0 +1,137 @@
+<div class="notifications-page">
+
+<!-- ================= CONTENT ================= -->
+
+<div class="notifications-content">
+
+<div class="page-header">
+
+<div>
+
+<h1>
+
+Notifications
+
+</h1>
+
+<p>
+
+Stay updated on your applications, new scheme matches and important deadlines.
+
+</p>
+
+</div>
+
+<button
+mat-stroked-button
+(click)="markAllRead()">
+
+<mat-icon>
+
+done_all
+
+</mat-icon>
+
+Mark all as read
+
+</button>
+
+</div>
+
+<div class="toolbar">
+
+<div class="filters">
+
+  <button
+    mat-stroked-button
+    *ngFor="let filter of filters"
+    (click)="setFilter(filter)"
+    [color]="selectedFilter === filter ? 'primary' : ''"
+    [class.active-filter]="selectedFilter === filter">
+
+    {{filter}}
+
+  </button>
+
+</div>
+<mat-form-field appearance="outline" class="period-filter">
+
+<mat-select [(ngModel)]="selectedPeriod" placeholder="Select Period">
+
+<mat-option
+*ngFor="let item of periods"
+[value]="item">
+
+{{item}}
+
+</mat-option>
+
+</mat-select>
+
+</mat-form-field>
+
+</div>
+<!-- ================= NOTIFICATION LIST ================= -->
+<!-- ================= NOTIFICATION LIST ================= -->
+
+<mat-card
+class="notification-card"
+*ngFor="let item of filteredNotifications"
+[class.unread]="!item.isRead">
+  <div class="notification-left">
+
+    <div class="notification-icon" [ngClass]="item.color">
+
+      <mat-icon>{{item.icon}}</mat-icon>
+
+    </div>
+
+    <div class="notification-info">
+
+      <h3>{{item.title}}</h3>
+
+      <p>{{item.message}}</p>
+
+      <a href="javascript:void(0)">
+        {{item.action}}
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="notification-time">
+
+  <span
+    *ngIf="!item.isRead"
+    class="unread-badge">
+
+    Unread
+
+  </span>
+
+  <br>
+
+  {{item.time}}
+
+</div>
+</mat-card>
+
+<!-- ================= EMPTY STATE ================= -->
+
+<mat-card
+class="empty-card"
+*ngIf="filteredNotifications.length==0">
+  <div class="empty-icon">
+    <mat-icon>notifications_none</mat-icon>
+  </div>
+
+  <h2>You're all caught up</h2>
+
+  <p>
+    No more notifications in this view.
+    New updates on your applications and
+    scheme matches will appear here.
+  </p>
+
+</mat-card>

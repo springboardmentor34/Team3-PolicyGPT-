@@ -1,0 +1,228 @@
+<div class="matches-page">
+
+<!-- ================= CONTENT ================= -->
+
+<div class="matches-content">
+
+<div class="top-section">
+
+<div>
+
+<button
+mat-stroked-button
+(click)="goBack()">
+
+<mat-icon>
+
+arrow_back
+
+</mat-icon>
+
+
+Back
+
+</button>
+
+<h1>
+
+My Matched Schemes
+
+</h1>
+
+<p>
+
+Based on your profile and eligibility, these government schemes are recommended for you.
+
+</p>
+
+</div>
+
+<div class="match-box">
+
+<h2>
+
+{{totalMatches}}
+
+</h2>
+
+<span>
+
+Matches Found
+
+</span>
+
+</div>
+
+</div>
+
+<!-- ================= (ii) USER PROFILE ANALYSIS ================= -->
+
+<div class="profile-summary-box" *ngIf="profileSummary">
+
+<mat-icon>person</mat-icon>
+
+<p>{{ profileSummary }}</p>
+
+</div>
+
+<!-- ================= (iv) ELIGIBILITY SUMMARY ================= -->
+
+<div class="eligibility-summary-grid" *ngIf="eligibilitySummary">
+
+<div class="summary-tile">
+<span class="summary-value">{{ eligibilitySummary.total_schemes_evaluated }}</span>
+<span class="summary-label">Schemes Evaluated</span>
+</div>
+
+<div class="summary-tile eligible">
+<span class="summary-value">{{ eligibilitySummary.eligible_count }}</span>
+<span class="summary-label">You're Eligible For</span>
+</div>
+
+<div class="summary-tile not-eligible">
+<span class="summary-value">{{ eligibilitySummary.not_eligible_count }}</span>
+<span class="summary-label">Not Matched</span>
+</div>
+
+<div class="summary-tile categories" *ngIf="eligibilitySummary.matched_categories?.length">
+<span class="summary-label">Matched Categories</span>
+<div class="category-chips">
+  <span class="chip" *ngFor="let cat of eligibilitySummary.matched_categories">{{ cat }}</span>
+</div>
+</div>
+
+</div>
+
+<mat-form-field appearance="outline" class="filter-search">
+
+<mat-icon matPrefix>
+
+search
+
+</mat-icon>
+
+<input
+matInput
+[(ngModel)]="search"
+placeholder="Search matched schemes...">
+
+</mat-form-field>
+
+<div class="scheme-grid">
+
+<mat-card
+class="scheme-card"
+*ngFor="let scheme of schemes">
+
+<div class="card-header">
+
+<div class="category">
+
+<mat-icon>
+
+{{scheme.icon}}
+
+</mat-icon>
+
+<span>
+
+{{scheme.category}}
+
+</span>
+
+</div>
+
+<div class="status">
+
+<mat-icon>
+
+check_circle
+
+</mat-icon>
+
+Eligible
+
+</div>
+
+</div>
+
+<h2>
+
+{{scheme.title}}
+
+</h2>
+
+<p class="description">
+
+{{scheme.description}}
+
+</p>
+
+<div class="benefit">
+
+<mat-icon>
+
+payments
+
+</mat-icon>
+
+{{scheme.benefit}}
+
+</div>
+
+<div class="deadline">
+
+<mat-icon>
+
+calendar_today
+
+</mat-icon>
+
+Deadline :
+
+{{scheme.deadline}}
+
+</div>
+
+<!-- ================= (vi) APPLICATION GUIDANCE ================= -->
+
+<div class="guidance-box" *ngIf="scheme.application_guidance?.length">
+
+<span class="guidance-title">
+<mat-icon>checklist</mat-icon>
+How to apply
+</span>
+
+<ol class="guidance-steps">
+<li *ngFor="let step of scheme.application_guidance">{{ step }}</li>
+</ol>
+
+</div>
+
+<div class="card-footer">
+
+<button
+mat-raised-button
+color="primary"
+[routerLink]="['/scheme-details', scheme.scheme_id]">
+
+View Details
+
+<mat-icon>
+
+arrow_forward
+
+</mat-icon>
+
+
+</button>
+
+</div>
+
+</mat-card>
+
+</div>
+
+</div>
+
+</div>

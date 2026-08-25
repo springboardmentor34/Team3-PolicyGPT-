@@ -1,0 +1,38 @@
+<mat-card class="pg-card pg-scheme-card" [routerLink]="['/scheme-details', scheme.id]">
+  <div class="pg-scheme-card__header">
+    <span class="pg-status pg-status--active">Available</span>
+    <button mat-icon-button (click)="onSave($event)" aria-label="Save scheme">
+      <mat-icon>{{ scheme.isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+    </button>
+  </div>
+
+  <mat-card-content>
+    <h3 class="pg-scheme-card__title">{{ scheme.scheme_name }}</h3>
+    <p class="pg-scheme-card__desc">{{ scheme.benefits }}</p>
+
+    <div class="pg-scheme-card__stats">
+      <div>
+        <span class="pg-scheme-card__stat-value">{{ scheme.state }}</span>
+        <span class="pg-scheme-card__stat-value">{{ scheme.department }}</span>
+      </div>
+      <div>
+        <span class="pg-scheme-card__stat-value">{{ scheme.department }}</span>
+        <span class="pg-scheme-card__stat-label">Ministry</span>
+      </div>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions class="pg-scheme-card__actions">
+    <span class="pg-text-muted">{{ scheme.category }}</span>
+    <button
+  mat-button
+  color="primary"
+  [routerLink]="['/scheme-details', scheme.id]"
+  (click)="$event.stopPropagation()">
+
+  View Details
+  <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+
+</button>
+  </mat-card-actions>
+</mat-card>

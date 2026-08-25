@@ -1,0 +1,639 @@
+<div class="profile-page">
+
+  <!-- ================= PAGE HEADER ================= -->
+
+  <div class="page-header">
+
+    <h1>My Profile</h1>
+
+    <p>
+      View and manage your personal information and account settings.
+    </p>
+
+  </div>
+
+  <!-- ================= PROFILE LAYOUT ================= -->
+
+  <div class="profile-layout">
+
+    <!-- ================= LEFT PROFILE CARD ================= -->
+
+    <mat-card class="profile-card">
+
+      <div class="profile-avatar">
+
+        <mat-icon>
+
+          account_circle
+
+        </mat-icon>
+
+      </div>
+
+      <h2>
+
+        {{userName}}
+
+      </h2>
+
+      <span class="verified">
+
+        <mat-icon>
+
+          verified
+
+        </mat-icon>
+
+        {{ getRoleLabel() }}
+
+      </span>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="edit-btn">
+
+        <mat-icon>
+
+          edit
+
+        </mat-icon>
+
+        Edit Profile
+
+      </button>
+
+    </mat-card>
+
+    <!-- ================= RIGHT DETAILS ================= -->
+
+    <mat-card class="details-card">
+
+      <div class="card-header">
+
+  <div class="card-title">
+
+    <mat-icon>person</mat-icon>
+
+    <h2>Personal Information</h2>
+
+  </div>
+
+  <div>
+
+<button
+*ngIf="!isEditing"
+mat-stroked-button
+color="primary"
+class="edit-info-btn"
+(click)="editProfile()">
+
+<mat-icon>edit</mat-icon>
+
+Edit Info
+
+</button>
+
+<button
+*ngIf="isEditing"
+mat-raised-button
+color="primary"
+(click)="saveProfile()">
+
+Save
+
+</button>
+
+<button
+*ngIf="isEditing"
+mat-stroked-button
+(click)="cancelEdit()">
+
+Cancel
+
+</button>
+
+</div>
+
+</div>
+
+      <div class="details-grid">
+
+        <div class="detail-box">
+
+<label>Full Name</label>
+
+<span *ngIf="!isEditing">
+
+{{user.fullName}}
+
+</span>
+
+<mat-form-field
+appearance="outline"
+class="full-width"
+*ngIf="isEditing">
+
+<input
+matInput
+[(ngModel)]="user.fullName">
+
+</mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Email Address</label>
+
+  <span *ngIf="!isEditing">
+    {{user.email}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <input
+      matInput
+      [(ngModel)]="user.email">
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Mobile Number</label>
+
+  <span *ngIf="!isEditing">
+    {{user.mobile}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <input
+      matInput
+      [(ngModel)]="user.mobile">
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Date of Birth</label>
+
+  <span *ngIf="!isEditing">
+    {{user.dob ? (user.dob | date:'dd MMM yyyy') : 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <input
+      matInput
+      [matDatepicker]="dobPicker"
+      [max]="today"
+      [(ngModel)]="user.dob">
+    <mat-datepicker-toggle matIconSuffix [for]="dobPicker"></mat-datepicker-toggle>
+    <mat-datepicker #dobPicker></mat-datepicker>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Gender</label>
+
+  <span *ngIf="!isEditing">
+    {{user.gender}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.gender">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Male">Male</mat-option>
+      <mat-option value="Female">Female</mat-option>
+      <mat-option value="Other">Other</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+        <div class="detail-box">
+
+  <label>State</label>
+
+  <span *ngIf="!isEditing">
+    {{user.state}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.state">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Andhra Pradesh">Andhra Pradesh</mat-option>
+      <mat-option value="Arunachal Pradesh">Arunachal Pradesh</mat-option>
+      <mat-option value="Assam">Assam</mat-option>
+      <mat-option value="Bihar">Bihar</mat-option>
+      <mat-option value="Chhattisgarh">Chhattisgarh</mat-option>
+      <mat-option value="Goa">Goa</mat-option>
+      <mat-option value="Gujarat">Gujarat</mat-option>
+      <mat-option value="Haryana">Haryana</mat-option>
+      <mat-option value="Himachal Pradesh">Himachal Pradesh</mat-option>
+      <mat-option value="Jharkhand">Jharkhand</mat-option>
+      <mat-option value="Karnataka">Karnataka</mat-option>
+      <mat-option value="Kerala">Kerala</mat-option>
+      <mat-option value="Madhya Pradesh">Madhya Pradesh</mat-option>
+      <mat-option value="Maharashtra">Maharashtra</mat-option>
+      <mat-option value="Manipur">Manipur</mat-option>
+      <mat-option value="Meghalaya">Meghalaya</mat-option>
+      <mat-option value="Mizoram">Mizoram</mat-option>
+      <mat-option value="Nagaland">Nagaland</mat-option>
+      <mat-option value="Odisha">Odisha</mat-option>
+      <mat-option value="Punjab">Punjab</mat-option>
+      <mat-option value="Rajasthan">Rajasthan</mat-option>
+      <mat-option value="Sikkim">Sikkim</mat-option>
+      <mat-option value="Tamil Nadu">Tamil Nadu</mat-option>
+      <mat-option value="Telangana">Telangana</mat-option>
+      <mat-option value="Tripura">Tripura</mat-option>
+      <mat-option value="Uttar Pradesh">Uttar Pradesh</mat-option>
+      <mat-option value="Uttarakhand">Uttarakhand</mat-option>
+      <mat-option value="West Bengal">West Bengal</mat-option>
+      <mat-option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</mat-option>
+      <mat-option value="Chandigarh">Chandigarh</mat-option>
+      <mat-option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</mat-option>
+      <mat-option value="Delhi">Delhi</mat-option>
+      <mat-option value="Jammu and Kashmir">Jammu and Kashmir</mat-option>
+      <mat-option value="Ladakh">Ladakh</mat-option>
+      <mat-option value="Lakshadweep">Lakshadweep</mat-option>
+      <mat-option value="Puducherry">Puducherry</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>District</label>
+
+  <span *ngIf="!isEditing">
+    {{user.district}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <input
+      matInput
+      [(ngModel)]="user.district">
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Occupation</label>
+
+  <span *ngIf="!isEditing">
+    {{user.occupation || 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.occupation">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Student">Student</mat-option>
+      <mat-option value="Farmer">Farmer</mat-option>
+      <mat-option value="Salaried">Salaried</mat-option>
+      <mat-option value="Self-employed">Self-employed</mat-option>
+      <mat-option value="Daily Wage Labourer">Daily Wage Labourer</mat-option>
+      <mat-option value="Homemaker">Homemaker</mat-option>
+      <mat-option value="Retired / Pensioner">Retired / Pensioner</mat-option>
+      <mat-option value="Unemployed">Unemployed</mat-option>
+      <mat-option value="Other">Other</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Education</label>
+
+  <span *ngIf="!isEditing">
+    {{user.education || 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.education">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="Below 10th">Below 10th</mat-option>
+      <mat-option value="10th Pass">10th Pass</mat-option>
+      <mat-option value="12th Pass">12th Pass</mat-option>
+      <mat-option value="Undergraduate">Undergraduate</mat-option>
+      <mat-option value="Graduate">Graduate</mat-option>
+      <mat-option value="Postgraduate">Postgraduate</mat-option>
+      <mat-option value="Doctorate">Doctorate</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Annual Income (₹)</label>
+
+  <span *ngIf="!isEditing">
+    {{user.income !== null && user.income !== '' ? ('₹' + user.income) : 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <input
+      matInput
+      type="number"
+      [(ngModel)]="user.income">
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Social Category</label>
+
+  <span *ngIf="!isEditing">
+    {{user.socialCategory || 'Not set'}}
+  </span>
+
+  <mat-form-field
+    appearance="outline"
+    class="full-width"
+    *ngIf="isEditing">
+
+    <mat-select [(ngModel)]="user.socialCategory">
+      <mat-option value="">Not set</mat-option>
+      <mat-option value="General">General</mat-option>
+      <mat-option value="OBC">OBC</mat-option>
+      <mat-option value="SC">SC</mat-option>
+      <mat-option value="ST">ST</mat-option>
+      <mat-option value="EWS">EWS</mat-option>
+      <mat-option value="Minority">Minority</mat-option>
+    </mat-select>
+
+  </mat-form-field>
+
+</div>
+
+        <div class="detail-box">
+
+  <label>Disability Status</label>
+
+  <span *ngIf="!isEditing">
+    {{user.disabilityStatus ? 'Yes' : 'No'}}
+  </span>
+
+  <mat-checkbox
+    *ngIf="isEditing"
+    [(ngModel)]="user.disabilityStatus">
+    I have a disability
+  </mat-checkbox>
+
+</div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+  <!-- ================= APPLICATION STATISTICS ================= -->
+
+<mat-card class="stats-card">
+
+  <div class="card-title">
+
+    <mat-icon>
+
+      analytics
+
+    </mat-icon>
+
+    <h2>
+
+      Application Statistics
+
+    </h2>
+
+  </div>
+
+  <div class="stats-grid">
+
+    <div class="stat-box blue">
+
+      <mat-icon>
+
+        description
+
+      </mat-icon>
+
+      <h3>
+
+        12
+
+      </h3>
+
+      <span>
+
+        Applications
+
+      </span>
+
+    </div>
+
+    <div class="stat-box green">
+
+      <mat-icon>
+
+        check_circle
+
+      </mat-icon>
+
+      <h3>
+
+        8
+
+      </h3>
+
+      <span>
+
+        Approved
+
+      </span>
+
+    </div>
+
+    <div class="stat-box orange">
+
+      <mat-icon>
+
+        pending_actions
+
+      </mat-icon>
+
+      <h3>
+
+        3
+
+      </h3>
+
+      <span>
+
+        Pending
+
+      </span>
+
+    </div>
+
+    <div class="stat-box purple">
+
+      <mat-icon>
+
+        bookmark
+
+      </mat-icon>
+
+      <h3>
+
+        15
+
+      </h3>
+
+      <span>
+
+        Saved Schemes
+
+      </span>
+
+    </div>
+
+  </div>
+
+</mat-card>
+
+<!-- ================= ACCOUNT SETTINGS ================= -->
+
+<mat-card class="settings-card">
+
+  <div class="card-title">
+
+    <mat-icon>
+
+      settings
+
+    </mat-icon>
+
+    <h2>
+
+      Account Settings
+
+    </h2>
+
+  </div>
+
+  <div class="settings-list">
+
+    <button
+      mat-stroked-button
+      class="setting-btn">
+
+      <mat-icon>
+
+        lock
+
+      </mat-icon>
+
+      Change Password
+
+    </button>
+
+    <button
+      mat-stroked-button
+      class="setting-btn">
+
+      <mat-icon>
+
+        notifications
+
+      </mat-icon>
+
+      Notification Preferences
+
+    </button>
+
+    <button
+      mat-stroked-button
+      class="setting-btn">
+
+      <mat-icon>
+
+        download
+
+      </mat-icon>
+
+      Download Profile
+
+    </button>
+
+    <button
+      mat-raised-button
+      color="warn"
+      class="logout-profile-btn"
+      (click)="logout()">
+
+      <mat-icon>
+
+        logout
+
+      </mat-icon>
+
+      Logout
+
+    </button>
+
+  </div>
+
+</mat-card>
+
+</div>

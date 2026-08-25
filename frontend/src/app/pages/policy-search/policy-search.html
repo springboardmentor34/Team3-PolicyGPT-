@@ -1,0 +1,581 @@
+<div class="policy-search-page">
+
+  <!-- ================= CONTENT ================= -->
+
+  <div class="page-content">
+
+    <div class="page-title">
+
+      <h1>{{ searchMode === 'policies' ? 'Policy Search' : 'Scheme Search' }}</h1>
+
+      <p>
+
+        Browse and filter government policies and public schemes across ministries,
+        categories and states.
+
+      </p>
+
+      <div class="mode-toggle">
+        <button
+          mat-stroked-button
+          [color]="searchMode === 'policies' ? 'primary' : ''"
+          (click)="toggleSearchMode('policies')">
+          <mat-icon>description</mat-icon>
+          Policies
+        </button>
+        <button
+          mat-stroked-button
+          [color]="searchMode === 'schemes' ? 'primary' : ''"
+          (click)="toggleSearchMode('schemes')">
+          <mat-icon>card_giftcard</mat-icon>
+          Schemes
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ================= SEARCH CARD ================= -->
+
+    <mat-card class="search-card">
+
+      <div class="search-row">
+
+        <mat-form-field
+          appearance="outline"
+          class="search-box">
+
+          <mat-icon matPrefix>
+
+            search
+
+          </mat-icon>
+
+          <input
+            matInput
+            [(ngModel)]="search"
+            (keyup)="applyFilters()"
+            placeholder="Search by policy name, ministry, scheme or keyword...">
+
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="search-btn"
+          (click)="searchPolicies()">
+
+          <mat-icon>
+
+            search
+
+          </mat-icon>
+
+          Search
+
+        </button>
+
+      </div>
+
+      <!-- ================= ACTIVE FILTERS ================= -->
+
+      <div class="active-filters">
+
+        <span>Active Filters :</span>
+        <div
+          class="chip"
+          *ngIf="categoryEducation">
+
+          Education
+
+          <mat-icon
+            (click)="categoryEducation=false;applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+  
+
+        <div
+          class="chip"
+          *ngIf="stateFilter">
+
+          {{ stateFilter }}
+
+          <mat-icon
+            (click)="stateFilter='';applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <div
+          class="chip"
+          *ngIf="availabilityFilter">
+
+          {{ availabilityFilter }}
+
+          <mat-icon
+            (click)="availabilityFilter='';applyFilters()">
+
+            close
+
+          </mat-icon>
+
+        </div>
+
+        <a
+          class="clear-link"
+          (click)="clearAllFilters()">
+
+          Clear All
+
+        </a>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= MAIN LAYOUT ================= -->
+
+    <div class="main-layout">
+
+      <!-- ================= FILTER CARD ================= -->
+
+      <mat-card class="filter-card">
+
+        <h3>CATEGORY</h3>
+
+        <ng-container *ngIf="searchMode === 'policies'">
+          <mat-checkbox
+            [(ngModel)]="categoryEducation"
+            (change)="applyFilters()">
+            Education
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryHealth"
+            (change)="applyFilters()">
+            Healthcare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryAgriculture"
+            (change)="applyFilters()">
+            Agriculture
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryEmployment"
+            (change)="applyFilters()">
+            Employment
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryHousing"
+            (change)="applyFilters()">
+            Housing
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryFinance"
+            (change)="applyFilters()">
+            Finance
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryWomenChildWelfare"
+            (change)="applyFilters()">
+            Women & Child Welfare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryEnvironment"
+            (change)="applyFilters()">
+            Environment
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryDigitalGovernance"
+            (change)="applyFilters()">
+            Digital Governance
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="categoryInfrastructure"
+            (change)="applyFilters()">
+            Infrastructure
+          </mat-checkbox>
+        </ng-container>
+
+        <ng-container *ngIf="searchMode === 'schemes'">
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryScholarships"
+            (change)="applyFilters()">
+            Scholarships
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryFarmerWelfare"
+            (change)="applyFilters()">
+            Farmer Welfare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryHealthcare"
+            (change)="applyFilters()">
+            Healthcare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryHousing"
+            (change)="applyFilters()">
+            Housing
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryBusinessSupport"
+            (change)="applyFilters()">
+            Business Support
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryWomenEmpowerment"
+            (change)="applyFilters()">
+            Women Empowerment
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategorySeniorCitizen"
+            (change)="applyFilters()">
+            Senior Citizen Welfare
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryStudentSchemes"
+            (change)="applyFilters()">
+            Student Schemes
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategoryEmploymentPrograms"
+            (change)="applyFilters()">
+            Employment Programs
+          </mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="schemeCategorySocialSecurity"
+            (change)="applyFilters()">
+            Social Security
+          </mat-checkbox>
+        </ng-container>
+
+        <hr>
+
+        <!-- ================= STATE ================= -->
+
+        <h3>STATE</h3>
+
+        <mat-form-field appearance="outline" class="state-field">
+          <mat-label>Filter by state</mat-label>
+          <input
+            matInput
+            [(ngModel)]="stateFilter"
+            (ngModelChange)="applyFilters()"
+            placeholder="e.g. Tamil Nadu, Karnataka, All India">
+        </mat-form-field>
+
+        <hr>
+
+        <!-- ================= MINISTRY ================= -->
+
+        <ng-container *ngIf="searchMode === 'policies'">
+          <h3>MINISTRY</h3>
+
+          <mat-form-field appearance="outline" class="state-field">
+            <mat-label>Filter by ministry</mat-label>
+            <input
+              matInput
+              [(ngModel)]="ministryFilter"
+              (ngModelChange)="applyFilters()"
+              placeholder="e.g. Ministry of Health">
+          </mat-form-field>
+
+          <hr>
+        </ng-container>
+
+        <!-- ================= DEPARTMENT ================= -->
+
+        <h3>DEPARTMENT</h3>
+
+        <mat-form-field appearance="outline" class="state-field">
+          <mat-label>Filter by department</mat-label>
+          <input
+            matInput
+            [(ngModel)]="departmentFilter"
+            (ngModelChange)="applyFilters()"
+            placeholder="e.g. Department of School Education">
+        </mat-form-field>
+
+        <hr>
+<!-- ================= PUBLICATION DATE ================= -->
+
+<h3>PUBLICATION DATE</h3>
+
+<mat-form-field appearance="outline" class="date-field">
+
+  <input
+    matInput
+    [matDatepicker]="picker"
+    [(ngModel)]="selectedPublicationDate"
+    (dateChange)="onPublicationDateChange($event.value)"
+    placeholder="Select date">
+
+  <mat-datepicker-toggle
+    matIconSuffix
+    [for]="picker">
+  </mat-datepicker-toggle>
+
+  <mat-datepicker #picker></mat-datepicker>
+
+</mat-form-field>
+  
+        <hr>
+      
+        <!-- ================= STATUS ================= -->
+
+        <h3>STATUS</h3>
+
+        <mat-checkbox
+  [(ngModel)]="activeOnly"
+  (change)="searchByStatus('Active')">
+
+  Active
+
+</mat-checkbox>
+
+        <hr>
+
+        <!-- ================= AVAILABILITY ================= -->
+
+        <h3>AVAILABILITY</h3>
+
+        <mat-form-field appearance="outline" class="state-field">
+          <mat-label>Filter by availability</mat-label>
+          <mat-select [(ngModel)]="availabilityFilter" (selectionChange)="applyFilters()">
+            <mat-option value="">All</mat-option>
+            <mat-option value="Upcoming">Upcoming</mat-option>
+            <mat-option value="Open">Open</mat-option>
+            <mat-option value="Closed">Closed</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          mat-stroked-button
+          class="reset-btn"
+          (click)="resetFilters()">
+
+          Reset Filters
+
+        </button>
+
+      </mat-card>
+
+      <!-- ================= RESULTS SECTION ================= -->
+
+      <div class="results-section">
+                <!-- ================= RESULTS HEADER ================= -->
+
+        <div class="results-header">
+
+          <h3>
+
+            {{filteredSchemes.length}} Results Found
+
+          </h3>
+
+          <mat-form-field
+            appearance="outline"
+            class="sort-box">
+
+            <mat-select
+              [(ngModel)]="selectedSort"
+              (selectionChange)="sortSchemes()">
+
+              <mat-option value="Most Relevant">
+
+                Most Relevant
+
+              </mat-option>
+
+              <mat-option value="Newest">
+
+                Newest
+
+              </mat-option>
+
+              <mat-option value="Deadline">
+
+                Deadline
+
+              </mat-option>
+
+            </mat-select>
+
+          </mat-form-field>
+
+        </div>
+
+        <!-- ================= SCHEME CARDS ================= -->
+
+        <mat-card
+          class="scheme-card"
+          *ngFor="let scheme of displayedSchemes">
+
+          <div class="card-top">
+
+            <div class="left-top">
+
+              <div class="scheme-icon">
+
+                <mat-icon>
+
+                  {{scheme.icon}}
+
+                </mat-icon>
+
+              </div>
+
+              <span class="category-tag">
+
+                {{scheme.category}}
+
+              </span>
+
+            </div>
+
+            <div
+              class="status-badge"
+              [ngClass]="scheme.statusColor">
+
+              {{scheme.status}}
+
+            </div>
+
+          </div>
+
+          <h2>
+
+            {{scheme.title}}
+
+          </h2>
+
+          <p class="description">
+
+            {{scheme.description}}
+
+          </p>
+
+          <div class="card-footer">
+
+            <div class="info">
+
+              <mat-icon>
+
+                calendar_today
+
+              </mat-icon>
+
+              <span>
+
+                {{scheme.deadline}}
+
+              </span>
+
+            </div>
+
+            <div class="info">
+
+              <mat-icon>
+
+                account_balance
+
+              </mat-icon>
+
+              <span>
+
+                {{scheme.ministry}}
+
+              </span>
+
+            </div>
+
+            <div class="info">
+
+              <mat-icon>
+
+                location_on
+
+              </mat-icon>
+
+              <span>
+
+                {{scheme.state}}
+
+              </span>
+
+            </div>
+
+            <a
+              class="view-btn"
+              [routerLink]="[searchMode === 'policies' ? '/policy-details' : '/scheme-details', scheme.id]">
+
+              View Details →
+
+            </a>
+
+          </div>
+
+        </mat-card>
+
+        <!-- ================= END OF SCHEME LIST ================= -->
+                 <!-- ================= PAGINATION ================= -->
+
+        <div class="pagination">
+
+          <!-- Previous -->
+
+          <button
+            mat-icon-button
+            (click)="previousPage()"
+            [disabled]="currentPage===1">
+
+            <mat-icon>
+
+              chevron_left
+
+            </mat-icon>
+
+          </button>
+
+          <!-- Page Numbers -->
+
+          <button
+            *ngFor="let page of pageNumbers"
+            mat-raised-button
+            [color]="currentPage===page ? 'primary' : ''"
+            (click)="goToPage(page)">
+
+            {{page}}
+
+          </button>
+
+          <!-- Next -->
+
+          <button
+            mat-icon-button
+            (click)="nextPage()"
+            [disabled]="currentPage===pageNumbers.length">
+
+            <mat-icon>
+
+              chevron_right
+
+            </mat-icon>
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

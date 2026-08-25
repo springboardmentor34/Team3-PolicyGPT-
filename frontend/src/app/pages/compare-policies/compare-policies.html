@@ -1,0 +1,398 @@
+<div class="compare-page">
+
+  <!-- ================= NAVBAR ================= -->
+
+  <!-- <header class="top-navbar no-print">
+
+    Logo
+
+    <div class="logo-section">
+
+      <div class="logo-box">
+
+        <mat-icon>shield</mat-icon>
+
+      </div>
+
+      <div class="logo-text">
+
+        <h2>PolicyGPT</h2>
+
+        <span>GOVT. SCHEME INTELLIGENCE</span>
+
+      </div>
+
+    </div>
+
+    Search
+
+    <div class="search-section">
+
+      <mat-form-field appearance="outline" class="nav-search">
+
+        <mat-icon matPrefix>search</mat-icon>
+
+        <input
+          matInput
+          [(ngModel)]="search"
+          placeholder="Search government schemes..."
+          (keyup)="searchPolicy()">
+
+      </mat-form-field>
+
+    </div>
+
+    <!-- Right -->
+
+    <!-- <div class="nav-right">
+
+      <div class="profile">
+
+        <div class="avatar">
+
+          {{userName.charAt(0)}}
+
+        </div>
+
+        <div class="profile-info">
+
+          <h4>{{userName}}</h4>
+
+          <span>Verified Citizen</span>
+
+        </div>
+
+      </div>
+
+      <button
+        mat-raised-button
+        class="logout-btn" (click)="logout()">
+
+        Logout
+
+      </button>
+
+    </div> -->
+
+  <!-- </header> -->
+
+  <!-- ================= PAGE ================= -->
+
+  <div class="page-content">
+
+    <!-- Header -->
+
+    <div class="page-header">
+
+      <div>
+
+        <h1>
+
+          {{ compareMode === 'policy' ? 'Compare Government Policies' : 'Compare Government Schemes' }}
+
+        </h1>
+
+        <p>
+
+          Compare eligibility, benefits, documents, application process and deadlines.
+
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- ================= COMPARE MODE TOGGLE ================= -->
+
+    <div class="mode-toggle">
+
+      <button
+        mat-stroked-button
+        [color]="compareMode === 'policy' ? 'primary' : ''"
+        [class.active]="compareMode === 'policy'"
+        (click)="switchMode('policy')">
+        <mat-icon>description</mat-icon>
+        Compare Policies
+      </button>
+
+      <button
+        mat-stroked-button
+        [color]="compareMode === 'scheme' ? 'primary' : ''"
+        [class.active]="compareMode === 'scheme'"
+        (click)="switchMode('scheme')">
+        <mat-icon>card_giftcard</mat-icon>
+        Compare Schemes
+      </button>
+
+    </div>
+
+    <!-- ================= SELECT POLICIES ================= -->
+
+    <!-- ================= SELECT POLICIES (2-4 items) ================= -->
+
+    <mat-card class="compare-card no-print">
+
+      <div class="compare-row multi">
+
+        <div
+          class="compare-slot"
+          *ngFor="let name of selectedNames; let i = index; trackBy: trackByIndex">
+
+          <mat-form-field appearance="outline" class="policy-select">
+
+            <mat-label>
+              {{ compareMode === 'policy' ? 'Policy' : 'Scheme' }} {{ i + 1 }}
+            </mat-label>
+
+            <mat-select
+              [ngModel]="selectedNames[i]"
+              (ngModelChange)="selectedNames[i] = $event; onSelectionChange()">
+
+              <mat-option
+                *ngFor="let policy of policies"
+                [value]="policy.name">
+
+                {{ policy.name }}
+
+              </mat-option>
+
+            </mat-select>
+
+          </mat-form-field>
+
+          <button
+            mat-icon-button
+            color="warn"
+            class="remove-slot-btn"
+            *ngIf="canRemove"
+            (click)="removeSlot(i)"
+            aria-label="Remove this item">
+
+            <mat-icon>close</mat-icon>
+
+          </button>
+
+        </div>
+
+        <!-- Add another item (up to 4) -->
+
+        <button
+          mat-stroked-button
+          color="primary"
+          class="add-slot-btn"
+          *ngIf="canAddMore"
+          (click)="addSlot()">
+
+          <mat-icon>add</mat-icon>
+          Add {{ compareMode === 'policy' ? 'Policy' : 'Scheme' }}
+
+        </button>
+
+        <!-- Swap (only meaningful with exactly 2 selected) -->
+
+        <button
+          mat-icon-button
+          color="primary"
+          *ngIf="selectedNames.length === 2"
+          (click)="swapPolicies()"
+          aria-label="Swap order">
+
+          <mat-icon>swap_horiz</mat-icon>
+
+        </button>
+
+        <!-- Reset -->
+
+        <button
+          mat-stroked-button
+          color="warn"
+          class="reset-btn"
+          (click)="resetComparison()">
+
+          Reset
+
+        </button>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= COMPARISON TABLE ================= -->
+
+    <mat-card class="comparison-card" *ngIf="comparedItems.length >= 2">
+
+      <div class="comparison-header">
+
+        <div>
+
+          <h2>Side-by-Side Comparison</h2>
+
+          <p>Compare important details of {{ comparedItems.length }} {{ compareMode === 'policy' ? 'policies' : 'schemes' }}.</p>
+
+        </div>
+
+        <div class="export-actions no-print">
+
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="exportCsv()">
+
+            <mat-icon>download</mat-icon>
+            Download CSV
+
+          </button>
+
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="printComparison()">
+
+            <mat-icon>picture_as_pdf</mat-icon>
+            Save as PDF
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="comparison-table">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Feature</th>
+
+              <th *ngFor="let item of comparedItems">{{ item.name }}</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td><strong>Category</strong></td>
+              <td *ngFor="let item of comparedItems">{{ item.category || 'Not specified' }}</td>
+            </tr>
+
+            <tr *ngIf="compareMode === 'policy'">
+              <td><strong>Ministry</strong></td>
+              <td *ngFor="let item of comparedItems">{{ item.ministry || 'Not applicable' }}</td>
+            </tr>
+
+            <tr>
+              <td><strong>Department</strong></td>
+              <td
+                *ngFor="let item of comparedItems"
+                [class.diff]="!allSame('department')">
+                {{ item.department || 'Not specified' }}
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Government Level</strong></td>
+              <td *ngFor="let item of comparedItems">{{ item.government_level || 'Not specified' }}</td>
+            </tr>
+
+            <tr>
+              <td><strong>State</strong></td>
+              <td *ngFor="let item of comparedItems">{{ item.state || 'All States' }}</td>
+            </tr>
+
+            <tr>
+              <td><strong>Last Date</strong></td>
+              <td *ngFor="let item of comparedItems">{{ item.deadline }}</td>
+            </tr>
+
+            <tr>
+              <td><strong>Status</strong></td>
+              <td *ngFor="let item of comparedItems">
+                <span class="status active">{{ item.status }}</span>
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= COMPARE BENEFITS ================= -->
+
+    <mat-card class="feature-block" *ngIf="comparedItems.length >= 2">
+
+      <h2>Benefits</h2>
+
+      <div class="feature-grid" [style.grid-template-columns]="'repeat(' + comparedItems.length + ', 1fr)'">
+
+        <div class="feature-panel" *ngFor="let item of comparedItems">
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.benefit || 'Not specified' }}</p>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= COMPARE ELIGIBILITY ================= -->
+
+    <mat-card class="feature-block" *ngIf="comparedItems.length >= 2 && compareMode === 'scheme'">
+
+      <h2>Eligibility</h2>
+
+      <div class="feature-grid" [style.grid-template-columns]="'repeat(' + comparedItems.length + ', 1fr)'">
+
+        <div class="feature-panel" *ngFor="let item of comparedItems">
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.eligibility || 'Not specified' }}</p>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= COMPARE APPLICATION PROCESS ================= -->
+
+    <mat-card class="feature-block" *ngIf="comparedItems.length >= 2 && compareMode === 'scheme'">
+
+      <h2>Application Process</h2>
+
+      <div class="feature-grid" [style.grid-template-columns]="'repeat(' + comparedItems.length + ', 1fr)'">
+
+        <div class="feature-panel" *ngFor="let item of comparedItems">
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.apply || 'Not specified' }}</p>
+          <span class="feature-sub" *ngIf="item.processing">Processing time: {{ item.processing }}</span>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- ================= REQUIRED DOCUMENTS ================= -->
+
+    <mat-card class="feature-block" *ngIf="comparedItems.length >= 2">
+
+      <h2>Required Documents</h2>
+
+      <div class="feature-grid" [style.grid-template-columns]="'repeat(' + comparedItems.length + ', 1fr)'">
+
+        <div class="feature-panel" *ngFor="let item of comparedItems">
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.documents || 'Not specified' }}</p>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+</div>

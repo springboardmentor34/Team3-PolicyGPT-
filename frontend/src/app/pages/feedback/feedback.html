@@ -1,0 +1,69 @@
+<div class="feedback-container">
+
+  <div class="feedback-card">
+
+    <h2>Feedback</h2>
+
+    <p class="subtitle">
+      How would you rate your experience with PolicyGPT?
+    </p>
+
+    <!-- Rating -->
+    <div class="rating-section">
+
+      <p>Rate your experience</p>
+
+      <div class="stars">
+        <button
+          type="button"
+          *ngFor="let star of [1, 2, 3, 4, 5]"
+          class="star"
+          [class.selected]="star <= rating"
+          (click)="setRating(star)">
+          ★
+        </button>
+      </div>
+
+      <span *ngIf="rating > 0" class="rating-text">
+        {{ rating }} / 5
+      </span>
+
+    </div>
+
+    <!-- Comments -->
+    <div class="comment-section">
+
+      <label for="comments">Comments</label>
+
+      <textarea
+        id="comments"
+        [(ngModel)]="comments"
+        rows="5"
+        placeholder="Tell us about your experience...">
+      </textarea>
+
+    </div>
+
+    <!-- Messages -->
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Submit -->
+    <button
+      type="button"
+      class="submit-button"
+      [disabled]="submitting"
+      (click)="submitFeedback()">
+
+      {{ submitting ? 'Submitting...' : 'Submit Feedback' }}
+
+    </button>
+
+  </div>
+
+</div>
