@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 from collections import OrderedDict
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, case
 from app.utils.database import get_db
 from app.auth.dependencies import require_roles
 from app.models.user import User
@@ -197,3 +197,41 @@ def get_content_usage(
     if not mine_only:
         response["most_searched_terms"] = most_searched_terms(db, limit=10)
     return response
+
+
+@router.get("/department")
+def get_department_analytics(
+    db: Session = Depends(get_db),
+):
+    """
+    Milestone 3 - Department Analytics. Groups every scheme (system-wide,
+    not scoped to one official) by department and reports how many are
+    Active vs everything else (Draft/Pending/Archived/null status), so
+    each row's active_schemes + inactive_schemes always sums to
+    total_schemes.
+    """
+    rows = (
+        db.query(
+            Scheme.department,
+            func.count(Scheme.scheme_id).label("total_schemes"),
+            func.sum(case((Scheme.status == "Active", 1), else_=0)).label("active_schemes"),
+        )
+        .group_by(Scheme.department)
+        .all()
+    )
+
+    data = []
+    for department, total_schemes, active_schemes in rows:
+        active = int(active_schemes or 0)
+        data.append({
+            "department": department or "Unspecified",
+            "total_schemes": total_schemes,
+            "active_schemes": active,
+            "inactive_schemes": total_schemes - active,
+        })
+
+    return {
+        "message": "Scheme counts grouped by department",
+        "count": len(data),
+        "data": data,
+    }
