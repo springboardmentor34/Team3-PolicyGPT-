@@ -10,6 +10,46 @@ font-family:'Inter',sans-serif;
 
 }
 
+/* ================= LOADING / ERROR / EMPTY (real-data states) ================= */
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 0;
+  color: #6B7280;
+  font-size: 15px;
+
+  .spin {
+    animation: pg-spin 1s linear infinite;
+  }
+}
+
+@keyframes pg-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.error-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  background: #FDECEA;
+  color: #B91C1C;
+  border-radius: 12px;
+  margin-bottom: 24px;
+
+  span { flex: 1; }
+}
+
+.empty-row {
+  text-align: center;
+  color: #9CA3AF;
+  padding: 24px 0 !important;
+}
+
 /* ================= NAVBAR ================= */
 
 .top-navbar{
