@@ -130,6 +130,39 @@
           </p>
         </mat-card>
       </div>
+      <div class="department-analytics">
+        <h2>Department Analytics</h2>
+        <p class="analytics-hint">Scheme counts by department, split into active vs. inactive.</p>
+        <p *ngIf="loadingDepartmentAnalytics" class="analytics-loading-note">Loading department analytics...</p>
+        <p *ngIf="departmentAnalyticsError" class="error-state">{{ departmentAnalyticsError }}</p>
+        <table
+          class="department-table"
+          *ngIf="!loadingDepartmentAnalytics && !departmentAnalyticsError && departmentAnalytics.length > 0"
+        >
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Total Schemes</th>
+              <th>Active</th>
+              <th>Inactive</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of departmentAnalytics">
+              <td>{{ row.department }}</td>
+              <td>{{ row.total_schemes }}</td>
+              <td class="active-cell">{{ row.active_schemes }}</td>
+              <td class="inactive-cell">{{ row.inactive_schemes }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p
+          *ngIf="!loadingDepartmentAnalytics && !departmentAnalyticsError && departmentAnalytics.length === 0"
+          class="chart-empty"
+        >
+          No department data yet.
+        </p>
+      </div>
     </div>
     <!-- ================= USAGE STATISTICS (Milestone 3, Task 6) ================= -->
     <div class="usage-section" *ngIf="usageStats">

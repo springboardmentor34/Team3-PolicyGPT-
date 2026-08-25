@@ -25,4 +25,12 @@ export class AnalyticsService {
   getContentUsage(): Observable<any> {
     return this.http.get<any>(`${this.api}/content-usage`);
   }
+  // Department Analytics (Milestone 3) — scheme counts per department,
+  // split into active vs inactive. Unlike getOverview()/getContentUsage(),
+  // this is always system-wide (the backend doesn't scope it to the
+  // caller), so it's rendered on the Admin Dashboard's platform-wide
+  // analytics section, not the Official-scoped Government Dashboard.
+  getDepartmentAnalytics(): Observable<any> {
+    return this.http.get<any>(`${this.api}/department`);
+  }
 }

@@ -59,6 +59,20 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   schemesUncategorizedCount = 0;
   policyApprovalTrend: { month: string; total: number; approved: number; pending: number; rejected: number }[] = [];
 
+  // Department Analytics (Milestone 3) — per-department scheme counts
+  // split into active vs inactive, from GET /analytics/department.
+  // Loaded via its OWN subscription (loadDepartmentAnalytics below),
+  // deliberately NOT folded into the forkJoin that loads admin stats +
+  // overview + usage stats: that forkJoin fails as a whole if any one
+  // member fails, which was silently leaving this table empty (staying
+  // at its initial []) whenever /admin/stats or /admin/usage-stats
+  // hiccuped — even though /analytics/department itself was working
+  // fine on its own. Keeping it independent means a problem with the
+  // admin-only endpoints can no longer blank out this table.
+  departmentAnalytics: { department: string; total_schemes: number; active_schemes: number; inactive_schemes: number }[] = [];
+  loadingDepartmentAnalytics = true;
+  departmentAnalyticsError = '';
+
   // ================= USAGE STATISTICS (Milestone 3, Task 6) =================
   usageStats: {
     total_users: number;
@@ -141,6 +155,27 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         this.loading = false;
         this.loadingAnalytics = false;
         this.analyticsError = 'Unable to load analytics breakdown.';
+      }
+    });
+
+    this.loadDepartmentAnalytics();
+  }
+
+  // Independent of loadDashboard()'s forkJoin above on purpose — see the
+  // comment on departmentAnalytics for why.
+  loadDepartmentAnalytics(): void {
+    this.loadingDepartmentAnalytics = true;
+    this.departmentAnalyticsError = '';
+
+    this.analyticsService.getDepartmentAnalytics().subscribe({
+      next: (res: any) => {
+        this.departmentAnalytics = res?.data ?? [];
+        this.loadingDepartmentAnalytics = false;
+      },
+      error: (err) => {
+        console.error('Failed to load department analytics:', err);
+        this.loadingDepartmentAnalytics = false;
+        this.departmentAnalyticsError = 'Unable to load department analytics.';
       }
     });
   }
