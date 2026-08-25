@@ -1,307 +1,144 @@
 <div class="reports-page">
 
-  <!-- ================= PAGE ================= -->
-
   <div class="page-content">
 
     <!-- Header -->
-
     <div class="page-header">
-
       <div>
-
-        <h1>
-
-          Reports Dashboard
-
-        </h1>
-
+        <h1>Reports Dashboard</h1>
         <p>
-
-          Platform-wide performance across schemes,
-          applications and citizen engagement.
-
+          {{ scope === 'all'
+            ? 'Platform-wide performance across policies, schemes and applications.'
+            : 'Performance across the policies and schemes you\'ve submitted.' }}
         </p>
-
       </div>
 
       <div class="header-actions">
-
         <mat-form-field appearance="outline" class="period-select">
+          <mat-icon matPrefix>calendar_month</mat-icon>
+          <mat-select [(value)]="selectedPeriod">
+            <mat-option value="Last 6 Months">Last 6 Months</mat-option>
+            <mat-option value="Last Year">Last Year</mat-option>
+            <mat-option value="This Year">This Year</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-  <mat-icon matPrefix>calendar_month</mat-icon>
-
-  <mat-select [(value)]="selectedPeriod">
-
-    <mat-option value="Last 6 Months">
-      Last 6 Months
-    </mat-option>
-
-    <mat-option value="Last Year">
-      Last Year
-    </mat-option>
-
-    <mat-option value="This Year">
-      This Year
-    </mat-option>
-
-  </mat-select>
-
-</mat-form-field>
-
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="exportReport()">
-
-          <mat-icon>
-
-            download
-
-          </mat-icon>
-
+        <button mat-raised-button color="primary" [matMenuTriggerFor]="exportMenu" [disabled]="loading">
+          <mat-icon>download</mat-icon>
           Export Report
-
         </button>
+        <mat-menu #exportMenu="matMenu">
+          <button mat-menu-item (click)="exportPdf()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            <span>Export as PDF</span>
+          </button>
+          <button mat-menu-item (click)="exportExcel()">
+            <mat-icon>grid_on</mat-icon>
+            <span>Export as Excel</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-state" *ngIf="loading">
+      <mat-icon class="spin">autorenew</mat-icon>
+      <span>Loading report data...</span>
+    </div>
+
+    <!-- Error state -->
+    <mat-card class="error-card" *ngIf="!loading && errorMessage">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+      <button mat-button color="primary" (click)="loadReportData()">Retry</button>
+    </mat-card>
+
+    <ng-container *ngIf="!loading && !errorMessage">
+
+      <!-- ================= KPI CARDS ================= -->
+      <div class="stats-grid">
+        <mat-card class="stat-card" *ngFor="let item of statistics">
+          <div class="card-top">
+            <div class="icon-circle" [ngClass]="item.color">
+              <mat-icon>{{ item.icon }}</mat-icon>
+            </div>
+            <span class="growth">{{ item.subtitle }}</span>
+          </div>
+          <h2>{{ item.value }}</h2>
+          <p>{{ item.title }}</p>
+        </mat-card>
+      </div>
+
+      <!-- ================= CHARTS ================= -->
+      <div class="charts-grid">
+
+        <mat-card class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Policy Submissions Over Time</h3>
+              <span>Submitted vs Approved, monthly</span>
+            </div>
+            <div class="chart-total">
+              <h2>{{ chartTotalThisPeriod }}</h2>
+              <p>Total this period</p>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas #applicationChart></canvas>
+          </div>
+        </mat-card>
+
+        <mat-card class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Policies by Category</h3>
+              <span>Share of total policies</span>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas #categoryChart></canvas>
+          </div>
+        </mat-card>
 
       </div>
 
-    </div>
-
-    <!-- ================= KPI CARDS ================= -->
-
-    <div class="stats-grid">
-
-      <mat-card
-        class="stat-card"
-        *ngFor="let item of statistics">
-
-        <div class="card-top">
-
-          <div
-            class="icon-circle"
-            [ngClass]="item.color">
-
-            <mat-icon>
-
-              {{item.icon}}
-
-            </mat-icon>
-
-          </div>
-
-          <span class="growth">
-
-            {{item.subtitle}}
-
-          </span>
-
-        </div>
-
-        <h2>
-
-          {{item.value}}
-
-        </h2>
-
-        <p>
-
-          {{item.title}}
-
-        </p>
-
-      </mat-card>
-
-    </div>
-
-    <!-- Charts Section Starts Here -->
-         <!-- ================= CHARTS ================= -->
-
-    <div class="charts-grid">
-
-      <!-- Line Chart -->
-
-      <mat-card class="chart-card">
-
-        <div class="chart-header">
-
+      <!-- ================= TABLE ================= -->
+      <div class="table-section">
+        <div class="table-header">
           <div>
-
-            <h3>
-
-              Application Over Time
-
-            </h3>
-
-            <span>
-
-              Submitted vs Approved, monthly
-
-            </span>
-
+            <h2>Scheme-wise Report</h2>
+            <p>Application volume and approval rate per scheme</p>
           </div>
-
-          <div class="chart-total">
-
-            <h2>
-
-              18.4K
-
-            </h2>
-
-            <p>
-
-              Total this period
-
-            </p>
-
-          </div>
-
         </div>
 
-        <div class="chart-container">
-    <canvas #applicationChart></canvas>
-</div>
-
-      </mat-card>
-
-      <!-- Doughnut Chart -->
-
-      <mat-card class="chart-card">
-
-        <div class="chart-header">
-
-          <div>
-
-            <h3>
-
-              Applications by Category
-
-            </h3>
-
-            <span>
-
-              Share of total applications
-
-            </span>
-
-          </div>
-
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Scheme</th>
+                <th>Category</th>
+                <th>Applications</th>
+                <th>Approved</th>
+                <th>Approval Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let report of schemeReports">
+                <td>{{ report.scheme }}</td>
+                <td><span class="category-pill">{{ report.category }}</span></td>
+                <td>{{ report.applications }}</td>
+                <td>{{ report.approved }}</td>
+                <td><span class="approval-pill">{{ report.approvalRate }}</span></td>
+              </tr>
+              <tr *ngIf="schemeReports.length === 0">
+                <td colspan="5" class="empty-row">No applications recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <div class="chart-container">
-    <canvas #categoryChart></canvas>
-</div>
-
-      </mat-card>
-
-    </div>
-
-    <!-- ================= TABLE ================= -->
-
-    <div class="table-section">
-
-      <div class="table-header">
-
-        <div>
-
-          <h2>
-
-            Scheme-wise Report
-
-          </h2>
-
-          <p>
-
-            Application volume and approval rate per scheme
-
-          </p>
-
-        </div>
-
       </div>
 
-      <div class="table-responsive">
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>Scheme</th>
-
-              <th>Category</th>
-
-              <th>Applications</th>
-
-              <th>Approval</th>
-
-              <th>Avg Processing Time</th>
-
-              <th>Trend</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            <tr *ngFor="let report of schemeReports">
-
-              <td>
-
-                {{report.scheme}}
-
-              </td>
-
-              <td>
-
-                <span class="category-pill">
-
-                  {{report.category}}
-
-                </span>
-
-              </td>
-
-              <td>
-
-                {{report.applications}}
-
-              </td>
-
-              <td>
-
-                <span class="approval-pill">
-
-                  {{report.approval}}
-
-                </span>
-
-              </td>
-
-              <td>
-
-                {{report.processing}}
-
-              </td>
-
-              <td class="trend">
-
-                {{report.trend}}
-
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
+    </ng-container>
 
   </div>
 
