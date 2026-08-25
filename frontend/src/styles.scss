@@ -117,22 +117,39 @@ a:hover { color: var(--pg-accent); text-decoration: underline; }
 
 /* ================= TOAST NOTIFICATIONS (ToastService) ================= */
 /* Replaces plain browser alert() popups app-wide with small, non-blocking
-   snackbar toasts. */
+   snackbar toasts.
 
-.toast-success {
-  --mdc-snackbar-container-color: #16A34A;
-  --mdc-snackbar-supporting-text-color: #ffffff;
-  --mat-mdc-snack-bar-button-color: #ffffff;
-}
+   NOTE: Angular Material 20's MDC-based snackbar sets its own background
+   via the --mdc-snackbar-container-color variable internally, but that
+   variable didn't reliably cascade down to the actual visible surface
+   in testing (showed up transparent instead of colored). Targeting the
+   real rendered elements directly with !important is more reliable
+   than depending on Material's internal variable indirection. */
 
-.toast-error {
-  --mdc-snackbar-container-color: #DC2626;
-  --mdc-snackbar-supporting-text-color: #ffffff;
-  --mat-mdc-snack-bar-button-color: #ffffff;
-}
-
+.toast-success,
+.toast-error,
 .toast-info {
-  --mdc-snackbar-container-color: #0F4C97;
-  --mdc-snackbar-supporting-text-color: #ffffff;
-  --mat-mdc-snack-bar-button-color: #ffffff;
+  .mdc-snackbar__surface {
+    color: #ffffff !important;
+  }
+
+  .mdc-snackbar__label {
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-snack-bar-action {
+    color: #ffffff !important;
+  }
+}
+
+.toast-success .mdc-snackbar__surface {
+  background-color: #16A34A !important;
+}
+
+.toast-error .mdc-snackbar__surface {
+  background-color: #DC2626 !important;
+}
+
+.toast-info .mdc-snackbar__surface {
+  background-color: #0F4C97 !important;
 }
