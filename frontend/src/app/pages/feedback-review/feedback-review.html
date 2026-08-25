@@ -1,0 +1,37 @@
+<div class="feedback-review-page">
+
+  <div class="page-header">
+    <h1>Citizen Feedback</h1>
+    <span class="feedback-count" *ngIf="!loading">{{ feedbackList.length }} total &middot; avg {{ averageRating }}/5</span>
+  </div>
+
+  <div class="loading" *ngIf="loading">Loading feedback...</div>
+
+  <mat-card class="error-card" *ngIf="!loading && errorMessage">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+    <button mat-button color="primary" (click)="loadFeedback()">Retry</button>
+  </mat-card>
+
+  <p class="empty-state" *ngIf="!loading && !errorMessage && feedbackList.length === 0">
+    No feedback submitted yet.
+  </p>
+
+  <div class="item-grid" *ngIf="!loading && feedbackList.length > 0">
+    <mat-card class="item-card" *ngFor="let f of feedbackList">
+      <div class="item-header">
+        <h3>{{ f.submitted_by_name || 'Unknown' }}</h3>
+        <span class="rating-stars" *ngIf="f.rating">
+          <mat-icon *ngFor="let s of starsFor(f.rating)">star</mat-icon>
+        </span>
+      </div>
+      <p class="item-meta" *ngIf="f.policy_id">Regarding Policy #{{ f.policy_id }}</p>
+      <p class="item-meta" *ngIf="f.scheme_id">Regarding Scheme #{{ f.scheme_id }}</p>
+      <p class="item-meta" *ngIf="!f.policy_id && !f.scheme_id">General feedback</p>
+      <p class="item-desc" *ngIf="f.comments">{{ f.comments }}</p>
+      <p class="item-desc empty" *ngIf="!f.comments">No comments left.</p>
+      <p class="feedback-date" *ngIf="f.created_at">{{ f.created_at | date:'dd MMM yyyy, h:mm a' }}</p>
+    </mat-card>
+  </div>
+
+</div>
