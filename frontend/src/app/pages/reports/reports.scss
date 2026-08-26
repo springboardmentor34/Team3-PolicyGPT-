@@ -50,6 +50,28 @@ font-family:'Inter',sans-serif;
   padding: 24px 0 !important;
 }
 
+.chart-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #94a3b8;
+  font-size: 13px;
+  margin: 0;
+}
+
+.stat-card.skeleton {
+  height: 140px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+  background-size: 400% 100%;
+  animation: pg-skeleton 1.4s ease infinite;
+}
+
+@keyframes pg-skeleton {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
 /* ================= NAVBAR ================= */
 
 .top-navbar{

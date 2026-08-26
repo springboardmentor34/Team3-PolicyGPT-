@@ -1,7 +1,8 @@
-import { Component, AfterViewInit, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Chart } from 'chart.js/auto';
+import { Chart, ChartItem } from 'chart.js/auto';
+import { forkJoin } from 'rxjs';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,28 +19,21 @@ import { ApplicationService } from '../../services/application.service';
 /**
  * Reports page (Milestone 3, Task 3 — Generate Reports)
  * ----------------------------------------------------------------------
- * Previously every number on this page (KPIs, both charts, the
- * scheme-wise table) was hardcoded mock data, and "Export Report" just
- * showed a toast without producing a file.
- *
- * This rewires the page to real backend data, reusing endpoints that
- * already exist rather than adding new ones:
- *   - AnalyticsService.getOverview()   -> /analytics/overview
- *       (auto-scoped server-side: an Official sees only their own
- *       policies/schemes; Admin sees the system-wide picture)
+ * Wired to real backend data, reusing endpoints that already exist:
+ *   - AnalyticsService.getOverview()          -> /analytics/overview
  *   - ApplicationService.getAllApplications() -> /applications/all
- *       (same auto-scoping, by scheme ownership)
+ * Both auto-scope server-side (Official sees only their own
+ * policies/schemes; Admin sees the system-wide picture).
  *
- * Two KPIs from the original mock had no honest backing anywhere in the
- * schema and were dropped rather than faked:
- *   - "Registered Citizens" (admin-only data an Official can't see, and
- *     not really a "report" metric for an Official's own submissions)
- *   - Per-scheme "Avg Processing Time" / "Trend" (no review-duration or
- *     historical-snapshot tracking exists anywhere in the DB)
- * They're replaced with KPIs and table columns that are fully derivable
- * from real rows: Total Policies, Total Schemes, Pending Approvals (ties
- * into the Policy Approval Workflow), Approved Policies, and a
- * scheme-wise table of real application counts + approval rate.
+ * Chart rendering follows the exact pattern already proven in
+ * admin-dashboard.ts: the <canvas> elements are NEVER behind *ngIf (see
+ * reports.html — only the KPI cards/table are), so every @ViewChild
+ * below is guaranteed populated by the time ngOnInit's data call
+ * resolves, via forkJoin, in a single deterministic render pass. An
+ * earlier version gated the canvases behind *ngIf and used a
+ * setTimeout() to work around the resulting timing race — that's what
+ * caused the charts to render blank; this version removes the race
+ * entirely instead of guessing at a delay.
  * ----------------------------------------------------------------------
  */
 @Component({
@@ -59,7 +53,7 @@ import { ApplicationService } from '../../services/application.service';
   templateUrl: './reports.html',
   styleUrls: ['./reports.scss'],
 })
-export class ReportsComponent implements AfterViewInit {
+export class ReportsComponent implements OnInit, AfterViewInit {
   private toast = inject(ToastService);
   private analyticsService = inject(AnalyticsService);
   private applicationService = inject(ApplicationService);
@@ -67,8 +61,7 @@ export class ReportsComponent implements AfterViewInit {
   @ViewChild('applicationChart') applicationChart!: ElementRef<HTMLCanvasElement>;
   @ViewChild('categoryChart') categoryChart!: ElementRef<HTMLCanvasElement>;
 
-  private lineChartInstance?: Chart;
-  private pieChartInstance?: Chart;
+  private charts: Chart[] = [];
 
   loading = true;
   errorMessage = '';
@@ -76,9 +69,9 @@ export class ReportsComponent implements AfterViewInit {
   /** 'mine' for an Official (their own submissions only) or 'all' for Admin — set from the backend response, never assumed client-side. */
   scope: 'mine' | 'all' = 'mine';
 
-  // ================= FILTER (display-only; backend doesn't support a
-  // date-range filter on /analytics/overview yet, so this doesn't
-  // re-query — kept so the UI isn't torn out, no functional claim made) =================
+  // Display-only; /analytics/overview doesn't support a date-range filter
+  // yet, so this doesn't re-query — kept so the control isn't torn out,
+  // but it makes no functional claim it doesn't back up.
   selectedPeriod = 'Last 6 Months';
 
   // ================= KPI CARDS =================
@@ -104,41 +97,33 @@ export class ReportsComponent implements AfterViewInit {
 
   private readonly palette = ['#2563EB', '#16A34A', '#F59E0B', '#7C3AED', '#DB2777', '#0EA5E9', '#EA580C'];
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
+    // Canvases are always present in the DOM (see reports.html — no
+    // *ngIf gates them), so by the time this resolves, both @ViewChild
+    // refs above are guaranteed populated. Matches the pattern in
+    // admin-dashboard.ts's ngOnInit/loadDashboard.
     this.loadReportData();
   }
+
+  ngAfterViewInit(): void {}
 
   loadReportData(): void {
     this.loading = true;
     this.errorMessage = '';
 
-    // Both calls are independent (different endpoints, different
-    // failure modes worth telling apart), so they're kept as two
-    // subscriptions rather than combined into one forkJoin — a citizen
-    // hitting a stray "You do not have permission" only reads as clearly
-    // wrong if it names which part failed.
-    this.analyticsService.getOverview().subscribe({
-      next: (overview) => {
+    forkJoin({
+      overview: this.analyticsService.getOverview(),
+      applications: this.applicationService.getAllApplications(),
+    }).subscribe({
+      next: ({ overview, applications }) => {
         this.applyOverview(overview);
+        this.applySchemeReport(applications?.data || []);
         this.loading = false;
-        // Charts need a rendered <canvas>, which only exists once
-        // *ngIf="!loading" has resolved — deferred one tick so the DOM
-        // is actually there before Chart.js reads it.
-        setTimeout(() => this.renderCharts(), 0);
+        this.renderCharts();
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = this.describeError(err, 'load report analytics');
-      },
-    });
-
-    this.applicationService.getAllApplications().subscribe({
-      next: (res) => this.applySchemeReport(res?.data || []),
-      error: () => {
-        // Non-fatal: KPIs/charts from /analytics/overview above still
-        // render even if this second call fails, so the whole page
-        // doesn't go blank over one table.
-        this.schemeReports = [];
+        this.errorMessage = this.describeError(err);
       },
     });
   }
@@ -209,32 +194,39 @@ export class ReportsComponent implements AfterViewInit {
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   }
 
-  private describeError(err: any, action: string): string {
+  private describeError(err: any): string {
     if (err.status === 403) return 'You do not have permission to view reports.';
     if (err.status === 401) return 'Your session has expired. Please log in again.';
     if (err.status === 0) return 'Network error — please check your connection and try again.';
-    return `Could not ${action}. Please try again.`;
+    return 'Could not load report data. Please try again.';
   }
 
-  // ================= CHARTS =================
+  // ================= CHART RENDERING =================
+  // Called exactly once, from inside the forkJoin success callback above
+  // — by that point the API calls have genuinely completed and (since
+  // canvases are never behind *ngIf) both @ViewChild refs are guaranteed
+  // already populated.
 
   private renderCharts(): void {
-    this.loadLineChart();
-    this.loadPieChart();
+    this.charts.forEach((chart) => chart.destroy());
+    this.charts = [];
+
+    this.renderLineChart();
+    this.renderDoughnutChart();
   }
 
-  private loadLineChart(): void {
+  private renderLineChart(): void {
     if (!this.applicationChart) return;
-    this.lineChartInstance?.destroy();
 
-    this.lineChartInstance = new Chart(this.applicationChart.nativeElement, {
+    const hasData = this.trendMonths.length > 0;
+    const chart = new Chart(this.applicationChart.nativeElement as ChartItem, {
       type: 'line',
       data: {
-        labels: this.trendMonths.length ? this.trendMonths : ['No data yet'],
+        labels: hasData ? this.trendMonths : ['No data yet'],
         datasets: [
           {
             label: 'Submitted',
-            data: this.trendSubmitted.length ? this.trendSubmitted : [0],
+            data: hasData ? this.trendSubmitted : [0],
             borderColor: '#2563EB',
             backgroundColor: 'rgba(37,99,235,0.2)',
             fill: true,
@@ -242,7 +234,7 @@ export class ReportsComponent implements AfterViewInit {
           },
           {
             label: 'Approved',
-            data: this.trendApproved.length ? this.trendApproved : [0],
+            data: hasData ? this.trendApproved : [0],
             borderColor: '#16A34A',
             backgroundColor: 'rgba(22,163,74,0.2)',
             fill: true,
@@ -250,23 +242,31 @@ export class ReportsComponent implements AfterViewInit {
           },
         ],
       },
-      options: { responsive: true, maintainAspectRatio: false },
+      options: { responsive: false, maintainAspectRatio: false },
     });
+
+    this.charts.push(chart);
   }
 
-  private loadPieChart(): void {
+  private renderDoughnutChart(): void {
     if (!this.categoryChart) return;
-    this.pieChartInstance?.destroy();
 
-    const labels = this.categoryReport.length ? this.categoryReport.map((c) => c.category) : ['No data yet'];
-    const data = this.categoryReport.length ? this.categoryReport.map((c) => c.percentage) : [1];
-    const colors = this.categoryReport.length ? this.categoryReport.map((c) => c.color) : ['#E5E7EB'];
+    const hasData = this.categoryReport.length > 0;
+    const labels = hasData ? this.categoryReport.map((c) => c.category) : ['No data yet'];
+    const data = hasData ? this.categoryReport.map((c) => c.percentage) : [1];
+    const colors = hasData ? this.categoryReport.map((c) => c.color) : ['#E5E7EB'];
 
-    this.pieChartInstance = new Chart(this.categoryChart.nativeElement, {
+    const chart = new Chart(this.categoryChart.nativeElement as ChartItem, {
       type: 'doughnut',
       data: { labels, datasets: [{ data, backgroundColor: colors }] },
-      options: { responsive: true, maintainAspectRatio: false },
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 }, padding: 8 } } },
+      },
     });
+
+    this.charts.push(chart);
   }
 
   // ================= EXPORT (real files, not a toast-only stub) =================
