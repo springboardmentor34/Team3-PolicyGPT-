@@ -202,6 +202,7 @@ def get_content_usage(
 @router.get("/department")
 def get_department_analytics(
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("admin", "administrator")),
 ):
     """
     Milestone 3 - Department Analytics. Groups every scheme (system-wide,
@@ -209,6 +210,14 @@ def get_department_analytics(
     Active vs everything else (Draft/Pending/Archived/null status), so
     each row's active_schemes + inactive_schemes always sums to
     total_schemes.
+
+    Admin-only, unlike /overview and /content-usage above — this data is
+    cross-official by nature (comparing every department against every
+    other), so it can't be scoped down to "my own data" the way those
+    two can. That makes it exactly the kind of system-wide information
+    that should stay behind Admin, not the broader Official+Admin
+    _ANALYTICS_ROLES group. Previously this endpoint had NO auth check
+    at all — anyone, logged in or not, could call it directly.
     """
     rows = (
         db.query(
