@@ -73,6 +73,13 @@ export const routes: Routes = [
     canActivate: [authGuard, adminGuard],
   },
   {
+    path: 'feedback-review',
+    loadComponent: () =>
+      import('./pages/feedback-review/feedback-review').then((m) => m.FeedbackReviewComponent),
+    title: 'PolicyGPT | Citizen Feedback',
+    canActivate: [authGuard, adminGuard],
+  },
+  {
     path: 'policy-search',
     loadComponent: () => import('./pages/policy-search/policy-search').then((m) => m.PolicySearchComponent),
     title: 'PolicyGPT | Search Policies',
