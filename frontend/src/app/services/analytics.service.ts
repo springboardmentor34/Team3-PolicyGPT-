@@ -33,4 +33,10 @@ export class AnalyticsService {
   getDepartmentAnalytics(): Observable<any> {
     return this.http.get<any>(`${this.api}/department`);
   }
+  // Policies Department Analytics (Milestone 3 extension) — same shape
+  // as getDepartmentAnalytics() above, but over policies: department,
+  // total_policies, active_policies, inactive_policies.
+  getPolicyDepartmentAnalytics(): Observable<any> {
+    return this.http.get<any>(`${this.api}/department/policies`);
+  }
 }

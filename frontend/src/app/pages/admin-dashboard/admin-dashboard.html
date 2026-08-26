@@ -163,6 +163,39 @@
           No department data yet.
         </p>
       </div>
+      <div class="department-analytics">
+        <h2>Policies Department Analytics</h2>
+        <p class="analytics-hint">Policy counts by department, split into active vs. inactive.</p>
+        <p *ngIf="loadingPolicyDepartmentAnalytics" class="analytics-loading-note">Loading policy department analytics...</p>
+        <p *ngIf="policyDepartmentAnalyticsError" class="error-state">{{ policyDepartmentAnalyticsError }}</p>
+        <table
+          class="department-table"
+          *ngIf="!loadingPolicyDepartmentAnalytics && !policyDepartmentAnalyticsError && policyDepartmentAnalytics.length > 0"
+        >
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Total Policies</th>
+              <th>Active</th>
+              <th>Inactive</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of policyDepartmentAnalytics">
+              <td>{{ row.department }}</td>
+              <td>{{ row.total_policies }}</td>
+              <td class="active-cell">{{ row.active_policies }}</td>
+              <td class="inactive-cell">{{ row.inactive_policies }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p
+          *ngIf="!loadingPolicyDepartmentAnalytics && !policyDepartmentAnalyticsError && policyDepartmentAnalytics.length === 0"
+          class="chart-empty"
+        >
+          No department data yet.
+        </p>
+      </div>
     </div>
     <!-- ================= USAGE STATISTICS (Milestone 3, Task 6) ================= -->
     <div class="usage-section" *ngIf="usageStats">
