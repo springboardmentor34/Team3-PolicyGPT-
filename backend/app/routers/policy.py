@@ -18,6 +18,8 @@ from app.auth.dependencies import require_roles, get_current_user_optional
 from app.models.search_history import SearchHistory
 from app.utils.activity_log import log_activity
 
+from app.services.notification_service import notify_users_by_role
+
 router = APIRouter(
     prefix="/policies",
     tags=["Policy Management"]
@@ -349,6 +351,13 @@ def approve_policy(
     policy.approved_by = current_user.user_id
     policy.approved_at = datetime.now(timezone.utc)
     policy.status = _status_for_approval("Approved")
+    notify_users_by_role(
+    db=db,
+    role="citizen",
+    title="New Policy Alert",
+    message=f"A new policy has been approved: {policy.policy_name}",
+    notification_type="new_policy",
+    )
     # Clear any prior rejection so the record doesn't show stale reasons
     # if a previously-rejected policy is resubmitted and later approved.
     policy.rejection_reason = None

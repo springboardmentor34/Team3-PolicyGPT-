@@ -12,6 +12,7 @@ from app.models.eligibility_rule import EligibilityRule
 from app.auth.dependencies import get_current_user, require_roles
 from app.schemas.application_schema import ApplicationCreate, ApplicationStatusUpdate
 from app.routers.eligibility_check import EligibilityCheckRequest, _check_rule
+from app.services.notification_service import create_in_app_notification
 
 router = APIRouter(
     prefix="/applications",
@@ -235,6 +236,39 @@ def update_application_status(
             )
 
     application.status = payload.status.value
+
+    # Notify the citizen about the application status change
+    status_messages = {
+    "Under Review": (
+        "Application Under Review",
+        "Your application for this scheme is now under review."
+    ),
+    "Approved": (
+        "Application Approved",
+        "Your application for this scheme has been approved."
+    ),
+    "Rejected": (
+        "Application Rejected",
+        "Your application for this scheme has been rejected."
+    ),
+    }
+
+    title, message = status_messages.get(
+        application.status,
+        (
+            "Application Status Updated",
+            "Your application status has been updated."
+        )
+    )
+
+    create_in_app_notification(
+        db=db,
+        user_id=application.user_id,
+        title=title,
+        message=message,
+        notification_type="application",
+    )
+
     db.commit()
     db.refresh(application)
 

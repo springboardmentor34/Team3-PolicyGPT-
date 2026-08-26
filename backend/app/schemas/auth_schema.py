@@ -31,7 +31,7 @@ class TokenResponse(BaseModel):
 
 
 class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
+    email: str
 
 
 class ResetPasswordRequest(BaseModel):

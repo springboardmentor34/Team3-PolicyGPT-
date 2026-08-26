@@ -1,18 +1,23 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { RouterModule } from "@angular/router";
 
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from "@angular/material/card";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+import { MatChipsModule } from "@angular/material/chips";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
+
+import {
+  NotificationService,
+  BackendNotification,
+} from "../../services/notification.service";
 
 @Component({
-  selector: 'app-notifications',
+  selector: "app-notifications",
   standalone: true,
   imports: [
     CommonModule,
@@ -24,191 +29,185 @@ import { MatSelectModule } from '@angular/material/select';
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
   ],
-  templateUrl: './notifications.html',
-  styleUrls: ['./notifications.scss']
+  templateUrl: "./notifications.html",
+  styleUrls: ["./notifications.scss"],
 })
-export class NotificationsComponent {
+export class NotificationsComponent implements OnInit {
+  private notificationService = inject(NotificationService);
 
-  selectedFilter = 'All';
+  selectedFilter = "All";
+  selectedPeriod = "Last 30 days";
 
-filteredNotifications:any[] = [];
-  selectedPeriod = 'Last 30 days';
+  filteredNotifications: any[] = [];
+  notifications: any[] = [];
 
-  // ================= FILTERS =================
+  filters = ["All", "Unread", "Applications", "System"];
 
-  filters = [
-    'All',
-    'Unread',
-    'Applications',
-    'System'
-  ];
+  periods = ["Today", "Last 7 Days", "Last 30 Days", "All"];
 
-  periods = [
-    'Today',
-    'Last 7 Days',
-    'Last 30 Days',
-    'All'
-  ];
-
-  // ================= NOTIFICATIONS =================
-notifications = [
-
-  {
-    id:1,
-    type:'Applications',
-    isRead:false,
-    icon:'check_circle',
-    color:'green',
-    title:'Your PM Kisan application was approved',
-    message:'Your application for PM Kisan Samman Nidhi has been approved. The first installment of ₹2,000 will be credited within 5 working days.',
-    action:'View Application',
-    time:'2 hours ago'
-  },
-
-  {
-    id:2,
-    type:'System',
-    isRead:false,
-    icon:'verified',
-    color:'blue',
-    title:'New Scheme Matched',
-    message:'Based on your profile you are eligible for Skill India Digital.',
-    action:'View Scheme',
-    time:'Yesterday'
-  },
-
-  {
-    id:3,
-    type:'Applications',
-    isRead:true,
-    icon:'warning',
-    color:'orange',
-    title:'Document Verification Pending',
-    message:'Please upload your updated Income Certificate to continue verification.',
-    action:'Upload Document',
-    time:'2 days ago'
-  },
-
-  {
-    id:4,
-    type:'Applications',
-    isRead:false,
-    icon:'calendar_month',
-    color:'purple',
-    title:'Application Deadline Reminder',
-    message:'National Scholarship Portal applications close on 15 October 2026.',
-    action:'Continue Application',
-    time:'3 days ago'
-  },
-
-  {
-    id:5,
-    type:'Applications',
-    isRead:true,
-    icon:'task_alt',
-    color:'green',
-    title:'PM Awas Yojana Application Submitted',
-    message:'We have received your application. You will be notified once the verification process is completed.',
-    action:'Track Status',
-    time:'5 days ago'
-  },
-
-  {
-    id:6,
-    type:'System',
-    isRead:false,
-    icon:'lock',
-    color:'yellow',
-    title:'Password Changed Successfully',
-    message:'Your account password has been updated successfully.',
-    action:'Security Settings',
-    time:'1 week ago'
+  ngOnInit(): void {
+    this.loadNotifications();
   }
 
-];
+  // ================= LOAD FROM BACKEND =================
 
-  // ================= METHODS =================
+  loadNotifications(): void {
+    this.notificationService.getNotifications().subscribe({
+      next: (data: BackendNotification[]) => {
+        this.notifications = data.map((notification) =>
+          this.mapNotification(notification)
+        );
 
-  // ================= INITIALIZE =================
+        this.filterNotifications();
+      },
 
-constructor(){
-
-  this.filteredNotifications = [...this.notifications];
-
-}
-
-// ================= FILTER =================
-
-setFilter(filter:string):void{
-
-  this.selectedFilter = filter;
-
-  this.filterNotifications();
-
-}
-
-filterNotifications():void{
-
-  if(this.selectedFilter === 'All'){
-
-    this.filteredNotifications = [...this.notifications];
-
+      error: (error) => {
+        console.error("Failed to load notifications:", error);
+      },
+    });
   }
 
-  else if(this.selectedFilter === 'Unread'){
+  // ================= MAP BACKEND → UI =================
 
-    this.filteredNotifications = this.notifications.filter(
+  private mapNotification(notification: BackendNotification): any {
+    let type = "System";
+    let icon = "notifications";
+    let color = "blue";
 
-      item => !item.isRead
+    if (notification.notification_type === "application") {
+      type = "Applications";
+      icon = "task_alt";
+      color = "green";
+    } else if (notification.notification_type === "deadline_reminder") {
+      type = "Applications";
+      icon = "calendar_month";
+      color = "purple";
+    } else if (notification.notification_type === "scheme_update") {
+      type = "System";
+      icon = "volunteer_activism";
+      color = "blue";
+    } else if (notification.notification_type === "new_policy") {
+      type = "System";
+      icon = "policy";
+      color = "blue";
+    }
 
-    );
-
+    return {
+      id: notification.notification_id,
+      type: type,
+      isRead: notification.is_read,
+      icon: icon,
+      color: color,
+      title: notification.title,
+      message: notification.message,
+      action: "",
+      time: this.formatTime(notification.created_at),
+    };
   }
 
-  else if(this.selectedFilter === 'Applications'){
+  // ================= TIME =================
 
-    this.filteredNotifications = this.notifications.filter(
+  private formatTime(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
 
-      item => item.type === 'Applications'
+    const diffMs = now.getTime() - date.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
-    );
+    if (diffMinutes < 1) {
+      return "Just now";
+    }
 
+    if (diffMinutes < 60) {
+      return `${diffMinutes} minutes ago`;
+    }
+
+    const diffHours = Math.floor(diffMinutes / 60);
+
+    if (diffHours < 24) {
+      return `${diffHours} hours ago`;
+    }
+
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffDays === 1) {
+      return "Yesterday";
+    }
+
+    return `${diffDays} days ago`;
   }
 
-  else if(this.selectedFilter === 'System'){
+  // ================= FILTER =================
 
-    this.filteredNotifications = this.notifications.filter(
+  setFilter(filter: string): void {
+    this.selectedFilter = filter;
 
-      item => item.type === 'System'
-
-    );
-
+    this.filterNotifications();
   }
 
-}
+  filterNotifications(): void {
+    if (this.selectedFilter === "All") {
+      this.filteredNotifications = [...this.notifications];
+    } else if (this.selectedFilter === "Unread") {
+      this.filteredNotifications = this.notifications.filter(
+        (item) => !item.isRead
+      );
+    } else if (this.selectedFilter === "Applications") {
+      this.filteredNotifications = this.notifications.filter(
+        (item) => item.type === "Applications"
+      );
+    } else if (this.selectedFilter === "System") {
+      this.filteredNotifications = this.notifications.filter(
+        (item) => item.type === "System"
+      );
+    }
+  }
 
-// ================= MARK ALL READ =================
+  // ================= MARK ONE AS READ =================
 
-markAllRead():void{
+  markAsRead(item: any): void {
+    if (item.isRead) {
+      return;
+    }
 
-  this.notifications.forEach(item=>{
+    this.notificationService.markAsRead(item.id).subscribe({
+      next: () => {
+        item.isRead = true;
 
-    item.isRead = true;
+        this.filterNotifications();
+      },
 
-  });
+      error: (error) => {
+        console.error("Failed to mark notification as read:", error);
+      },
+    });
+  }
 
-  this.filterNotifications();
+  // ================= MARK ALL READ =================
 
-}
+  markAllRead(): void {
+    const unread = this.notifications.filter((item) => !item.isRead);
 
-// ================= UNREAD COUNT =================
+    unread.forEach((item) => {
+      this.notificationService.markAsRead(item.id).subscribe({
+        next: () => {
+          item.isRead = true;
 
-getUnreadCount():number{
+          this.filterNotifications();
+        },
 
-  return this.notifications.filter(item=>!item.isRead).length;
+        error: (error) => {
+          console.error("Failed to mark notification as read:", error);
+        },
+      });
+    });
+  }
 
-}
+  // ================= UNREAD COUNT =================
 
+  getUnreadCount(): number {
+    return this.notifications.filter((item) => !item.isRead).length;
+  }
 }

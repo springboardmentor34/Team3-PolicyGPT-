@@ -10,6 +10,7 @@ from app.models.scheme import Scheme
 from app.models.user import User
 from app.schemas.scheme_schema import SchemeCreate, SchemeUpdate, SchemeOut
 from app.auth.dependencies import require_roles, get_current_user_optional
+from app.services.notification_service import notify_users_by_role
 from app.models.search_history import SearchHistory
 from app.utils.activity_log import log_activity
 
@@ -203,8 +204,19 @@ def update_scheme(
     for field, value in update_data.items():
         setattr(scheme, field, value)
 
-    db.commit()
+        db.commit()
     db.refresh(scheme)
+
+    # Notify citizens when a scheme is updated
+    notify_users_by_role(
+        db=db,
+        role="citizen",
+        title="Scheme Update",
+        message=f"A scheme has been updated: {scheme.scheme_name}",
+        notification_type="scheme_update",
+    )
+
+    db.commit()
     return scheme
 
 
