@@ -244,3 +244,41 @@ def get_department_analytics(
         "count": len(data),
         "data": data,
     }
+
+
+@router.get("/department/policies")
+def get_policy_department_analytics(
+    db: Session = Depends(get_db),
+):
+    """
+    Policies Department Analytics (Milestone 3 extension) — mirrors
+    get_department_analytics above but over the policies table/Policy
+    model instead of schemes. Same shape and same Active-vs-everything-
+    else (Draft/Pending/Archived/null) rule, so active_policies +
+    inactive_policies always sums to total_policies.
+    """
+    rows = (
+        db.query(
+            Policy.department,
+            func.count(Policy.policy_id).label("total_policies"),
+            func.sum(case((Policy.status == "Active", 1), else_=0)).label("active_policies"),
+        )
+        .group_by(Policy.department)
+        .all()
+    )
+
+    data = []
+    for department, total_policies, active_policies in rows:
+        active = int(active_policies or 0)
+        data.append({
+            "department": department or "Unspecified",
+            "total_policies": total_policies,
+            "active_policies": active,
+            "inactive_policies": total_policies - active,
+        })
+
+    return {
+        "message": "Policy counts grouped by department",
+        "count": len(data),
+        "data": data,
+    }

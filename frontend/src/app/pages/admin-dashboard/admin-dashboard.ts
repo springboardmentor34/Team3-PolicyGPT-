@@ -73,6 +73,13 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   loadingDepartmentAnalytics = true;
   departmentAnalyticsError = '';
 
+  // Policies Department Analytics (Milestone 3 extension) — same
+  // independent-loading pattern as departmentAnalytics above (schemes),
+  // over GET /analytics/department/policies instead.
+  policyDepartmentAnalytics: { department: string; total_policies: number; active_policies: number; inactive_policies: number }[] = [];
+  loadingPolicyDepartmentAnalytics = true;
+  policyDepartmentAnalyticsError = '';
+
   // ================= USAGE STATISTICS (Milestone 3, Task 6) =================
   usageStats: {
     total_users: number;
@@ -159,6 +166,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     });
 
     this.loadDepartmentAnalytics();
+    this.loadPolicyDepartmentAnalytics();
   }
 
   // Independent of loadDashboard()'s forkJoin above on purpose — see the
@@ -176,6 +184,25 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         console.error('Failed to load department analytics:', err);
         this.loadingDepartmentAnalytics = false;
         this.departmentAnalyticsError = 'Unable to load department analytics.';
+      }
+    });
+  }
+
+  // Policies counterpart of loadDepartmentAnalytics() above — same
+  // independent-subscription pattern, its own loading/error state.
+  loadPolicyDepartmentAnalytics(): void {
+    this.loadingPolicyDepartmentAnalytics = true;
+    this.policyDepartmentAnalyticsError = '';
+
+    this.analyticsService.getPolicyDepartmentAnalytics().subscribe({
+      next: (res: any) => {
+        this.policyDepartmentAnalytics = res?.data ?? [];
+        this.loadingPolicyDepartmentAnalytics = false;
+      },
+      error: (err) => {
+        console.error('Failed to load policy department analytics:', err);
+        this.loadingPolicyDepartmentAnalytics = false;
+        this.policyDepartmentAnalyticsError = 'Unable to load policy department analytics.';
       }
     });
   }
