@@ -9,6 +9,7 @@ import { forkJoin } from 'rxjs';
 import { AdminService } from '../../services/admin.service';
 import { AnalyticsService } from '../../services/analytics.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -27,6 +28,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   private adminService = inject(AdminService);
   private analyticsService = inject(AnalyticsService);
   private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
   loading = true;
@@ -115,9 +117,52 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     // removes the entire class of "canvas doesn't exist yet" timing
     // bugs a setTimeout-based approach was fragile against.
     this.loadDashboard();
+    this.loadNotifications();
   }
 
   ngAfterViewInit(): void {}
+
+  // ================= NOTIFICATIONS =================
+  // Admin Dashboard previously had no notification UI at all — no bell
+  // icon, no badge, nothing. Same real backend/pattern as Government
+  // Dashboard's fix.
+  notifications: { id: number; icon: string; title: string; message: string; color: string; isRead: boolean }[] = [];
+  unreadNotificationCount = 0;
+
+  private static readonly NOTIFICATION_STYLE: Record<string, { icon: string; color: string }> = {
+    'Policy Submitted': { icon: 'pending_actions', color: 'orange' },
+    'Policy Approved': { icon: 'check_circle', color: 'green' },
+    'Policy Rejected': { icon: 'cancel', color: 'red' },
+    'New Policy': { icon: 'campaign', color: 'blue' },
+    'New Scheme': { icon: 'campaign', color: 'blue' },
+    'Scheme Updated': { icon: 'update', color: 'orange' },
+    'Application Status': { icon: 'assignment_turned_in', color: 'orange' },
+  };
+
+  loadNotifications(): void {
+    this.notificationService.getMyNotifications().subscribe({
+      next: (response: any) => {
+        this.unreadNotificationCount = response.unread_count || 0;
+        this.notifications = (response.data || []).slice(0, 5).map((n: any) => {
+          const style = AdminDashboardComponent.NOTIFICATION_STYLE[n.notification_type]
+            || { icon: 'notifications', color: 'blue' };
+          return {
+            id: n.notification_id,
+            icon: style.icon,
+            title: n.title,
+            message: n.message,
+            color: style.color,
+            isRead: n.is_read
+          };
+        });
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  goToNotifications(): void {
+    this.router.navigate(['/notifications']);
+  }
 
   // ================= LOAD + RENDER (single deterministic pass) =================
   // forkJoin waits for BOTH /admin/stats and /analytics/overview to

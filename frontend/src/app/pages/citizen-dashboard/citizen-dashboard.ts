@@ -17,6 +17,7 @@ import { EligibilityResultService } from '../../services/eligibility-result.serv
 import { SearchHistoryService } from '../../services/search-history.service';
 import { SavedPolicyService } from '../../services/saved-policy.service';
 import { ApplicationService } from '../../services/application.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-citizen-dashboard',
@@ -42,6 +43,7 @@ export class CitizenDashboardComponent implements OnInit {
   private searchHistoryService = inject(SearchHistoryService);
   private savedPolicyService = inject(SavedPolicyService);
   private applicationService = inject(ApplicationService);
+  private notificationService = inject(NotificationService);
 
   userName = '';
 
@@ -65,6 +67,7 @@ export class CitizenDashboardComponent implements OnInit {
     this.loadSearchHistory();
     this.loadSavedPoliciesCount();
     this.loadApplicationsCount();
+    this.loadNotifications();
   }
 
   // Real "Saved Policies" count — was previously a hardcoded 7 that
@@ -97,6 +100,43 @@ export class CitizenDashboardComponent implements OnInit {
           applicationsCard.value = apps.length;
           applicationsCard.badge = pendingCount > 0 ? `${pendingCount} pending` : 'up to date';
         }
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // Real "Notifications" card + preview list — was previously a
+  // hardcoded value of 5 with a hardcoded "3 news" badge and 3 fixed
+  // rows shown to every citizen regardless of who was logged in.
+  private timeAgo(iso: string): string {
+    const then = new Date(iso).getTime();
+    const seconds = Math.max(0, Math.floor((Date.now() - then) / 1000));
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+    const days = Math.floor(hours / 24);
+    if (days === 1) return 'Yesterday';
+    return `${days} days ago`;
+  }
+
+  loadNotifications(): void {
+    this.notificationService.getMyNotifications().subscribe({
+      next: (response: any) => {
+        const notificationsCard = this.stats.find(s => s.title === 'Notifications');
+        if (notificationsCard) {
+          notificationsCard.value = response.count || 0;
+          notificationsCard.badge = response.unread_count > 0 ? `${response.unread_count} new` : 'all read';
+        }
+        // Only the 3 most recent, for the dashboard preview list —
+        // the full list with filters/mark-as-read lives on /notifications.
+        this.notifications = (response.data || []).slice(0, 3).map((n: any) => ({
+          id: n.notification_id,
+          title: n.title,
+          time: this.timeAgo(n.created_at),
+          isRead: n.is_read
+        }));
       },
       error: (err) => console.error(err)
     });
@@ -216,20 +256,10 @@ export class CitizenDashboardComponent implements OnInit {
     deadline: string;
   }[] = [];
 
-  notifications = [
-    {
-      title: 'Your PM Kisan application was approved.',
-      time: '2 hours ago'
-    },
-    {
-      title: 'New scheme matched: Skill India Digital.',
-      time: 'Yesterday'
-    },
-    {
-      title: 'Document verification pending.',
-      time: '2 days ago'
-    }
-  ];
+  // Populated by loadNotifications() below with the citizen's own real,
+  // per-user notifications — was previously a hardcoded 3-row array
+  // shown identically to every citizen regardless of who was logged in.
+  notifications: { id: number; title: string; time: string; isRead: boolean }[] = [];
 
   history: string[] = [];
   loadingHistory = true;

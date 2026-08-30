@@ -9,6 +9,10 @@
       </div>
     </div>
     <div class="nav-right">
+      <button mat-icon-button class="icon-btn" (click)="goToNotifications()">
+        <mat-icon>notifications</mat-icon>
+        <span class="badge" *ngIf="unreadNotificationCount > 0">{{ unreadNotificationCount }}</span>
+      </button>
       <button mat-raised-button class="logout-btn" (click)="logout()">
         Logout
       </button>
@@ -244,6 +248,28 @@
         </div>
       </div>
     </div>
+    <!-- ================= LATEST NOTIFICATIONS ================= -->
+    <div class="notifications-section no-print">
+      <div class="card-header">
+        <h2>Latest Notifications</h2>
+        <button mat-button color="primary" (click)="goToNotifications()">View All</button>
+      </div>
+      <div
+        class="notification-item"
+        *ngFor="let n of notifications"
+        [class.unread]="!n.isRead">
+        <mat-icon [class]="n.color">
+          {{ n.icon }}
+        </mat-icon>
+        <div>
+          <h4>{{ n.title }}</h4>
+          <p>{{ n.message }}</p>
+        </div>
+      </div>
+      <p class="chart-empty-inline" *ngIf="notifications.length === 0">
+        No notifications yet.
+      </p>
+    </div>
     <div class="quick-actions no-print">
       <h2>Quick Actions</h2>
       <div class="action-buttons">
@@ -262,6 +288,14 @@
         <button mat-raised-button color="primary" routerLink="/reports">
           <mat-icon>analytics</mat-icon>
           Reports
+        </button>
+        <button mat-raised-button color="primary" routerLink="/feedback-review">
+          <mat-icon>reviews</mat-icon>
+          Citizen Feedback
+        </button>
+        <button mat-raised-button color="primary" routerLink="/audit-logs">
+          <mat-icon>history</mat-icon>
+          Audit Logs
         </button>
       </div>
     </div>

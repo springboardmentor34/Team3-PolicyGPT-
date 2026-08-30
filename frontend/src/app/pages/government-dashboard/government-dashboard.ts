@@ -16,6 +16,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Chart, ChartItem } from 'chart.js/auto';
 import { ApplicationService } from '../../services/application.service';
 import { SchemeService } from '../../services/scheme.service';
+import { NotificationService } from '../../services/notification.service';
 @Component({
   selector: 'app-government-dashboard',
   standalone: true,
@@ -40,6 +41,7 @@ export class GovernmentDashboardComponent implements OnInit {
   private analyticsService = inject(AnalyticsService);
   private applicationService = inject(ApplicationService);
   private schemeService = inject(SchemeService);
+  private notificationService = inject(NotificationService);
   private snackBar = inject(MatSnackBar);
   logout(): void {
     this.authService.logout();
@@ -53,6 +55,7 @@ export class GovernmentDashboardComponent implements OnInit {
     this.loadContentUsage();
     this.loadApplications();
     this.loadDeadlines();
+    this.loadNotifications();
   }
   loadCurrentUser(): void {
     this.authService.getMe().subscribe({
@@ -369,26 +372,47 @@ export class GovernmentDashboardComponent implements OnInit {
       default: return 'pending';
     }
   }
-  notifications = [
-    {
-      icon: 'check_circle',
-      title: 'PM Kisan applications approved',
-      message: '125 applications approved today.',
-      color: 'green'
-    },
-    {
-      icon: 'warning',
-      title: 'Pending document verification',
-      message: '63 applications require verification.',
-      color: 'orange'
-    },
-    {
-      icon: 'campaign',
-      title: 'New scheme published',
-      message: 'Skill India Digital is now available.',
-      color: 'blue'
-    }
-  ];
+  // Real per-user notifications — previously 3 hardcoded rows shown
+  // identically to every official regardless of who was logged in, plus
+  // a top-nav bell badge that was always "5" with no click handler at
+  // all (Officials had no way to reach /notifications from here).
+  notifications: { id: number; icon: string; title: string; message: string; color: string; isRead: boolean }[] = [];
+  unreadNotificationCount = 0;
+
+  private static readonly NOTIFICATION_STYLE: Record<string, { icon: string; color: string }> = {
+    'Policy Submitted': { icon: 'pending_actions', color: 'orange' },
+    'Policy Approved': { icon: 'check_circle', color: 'green' },
+    'Policy Rejected': { icon: 'cancel', color: 'red' },
+    'New Policy': { icon: 'campaign', color: 'blue' },
+    'New Scheme': { icon: 'campaign', color: 'blue' },
+    'Scheme Updated': { icon: 'update', color: 'orange' },
+    'Application Status': { icon: 'assignment_turned_in', color: 'orange' },
+  };
+
+  loadNotifications(): void {
+    this.notificationService.getMyNotifications().subscribe({
+      next: (response: any) => {
+        this.unreadNotificationCount = response.unread_count || 0;
+        this.notifications = (response.data || []).slice(0, 5).map((n: any) => {
+          const style = GovernmentDashboardComponent.NOTIFICATION_STYLE[n.notification_type]
+            || { icon: 'notifications', color: 'blue' };
+          return {
+            id: n.notification_id,
+            icon: style.icon,
+            title: n.title,
+            message: n.message,
+            color: style.color,
+            isRead: n.is_read
+          };
+        });
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  goToNotifications(): void {
+    this.router.navigate(['/notifications']);
+  }
   deadlines: { scheme_id: number; scheme_name: string; end_date: string; category: string }[] = [];
   loadingDeadlines = true;
   deadlinesError = '';

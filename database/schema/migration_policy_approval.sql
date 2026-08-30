@@ -55,3 +55,102 @@ BEGIN
 END $$;
 
 COMMIT;
+
+
+-- ============================================================================
+-- Migration: Real Notification System (Module 7)
+-- ----------------------------------------------------------------------------
+-- The original backend had a `notifications` router that was just an
+-- in-memory Python list — no database table backed it at all, even though
+-- earlier schema drafts for this project mentioned a `notifications` table
+-- as a Milestone 1 deliverable. Because we can't be certain whether YOUR
+-- database already has a `notifications` table (and if so, with which
+-- columns), this migration is written defensively:
+--   - CREATE TABLE IF NOT EXISTS, so it's a no-op if the table is already
+--     exactly this shape.
+--   - Each column is added individually with IF NOT EXISTS, so if an older
+--     `notifications` table already exists with a different/partial set of
+--     columns, this just adds whatever's missing rather than failing or
+--     dropping existing data.
+--
+-- Run this once against your database before using the new Notification
+-- endpoints (GET/PATCH/DELETE /notifications/*).
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS notifications (
+    notification_id BIGSERIAL PRIMARY KEY
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'user_id'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN user_id BIGINT;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'title'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN title VARCHAR(255);
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'message'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN message TEXT;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'notification_type'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN notification_type VARCHAR(50) DEFAULT 'General';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'related_table'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN related_table VARCHAR(50);
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'related_id'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN related_id BIGINT;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'is_read'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN is_read BOOLEAN NOT NULL DEFAULT FALSE;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'notifications' AND column_name = 'created_at'
+    ) THEN
+        ALTER TABLE notifications ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    END IF;
+
+    -- Foreign key to users, added only if both the column and the
+    -- constraint don't already exist.
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_name = 'fk_notification_user'
+    ) THEN
+        ALTER TABLE notifications
+            ADD CONSTRAINT fk_notification_user
+            FOREIGN KEY (user_id) REFERENCES users(user_id);
+    END IF;
+END $$;
+
+COMMIT;

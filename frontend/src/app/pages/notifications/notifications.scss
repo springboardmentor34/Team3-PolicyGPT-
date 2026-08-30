@@ -451,3 +451,13 @@ padding:20px;
   margin-top:25px;
 
 }
+.loading, .error-state, .empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #6B7280;
+  font-size: 15px;
+}
+
+.error-state {
+  color: #DC2626;
+}

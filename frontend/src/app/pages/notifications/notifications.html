@@ -74,10 +74,19 @@ Mark all as read
 <!-- ================= NOTIFICATION LIST ================= -->
 <!-- ================= NOTIFICATION LIST ================= -->
 
+<div class="loading" *ngIf="loading">Loading notifications...</div>
+
+<p class="error-state" *ngIf="!loading && errorMessage">{{ errorMessage }}</p>
+
+<p class="empty-state" *ngIf="!loading && !errorMessage && filteredNotifications.length === 0">
+No notifications here yet.
+</p>
+
 <mat-card
 class="notification-card"
 *ngFor="let item of filteredNotifications"
-[class.unread]="!item.isRead">
+[class.unread]="!item.isRead"
+(click)="markOneRead(item)">
   <div class="notification-left">
 
     <div class="notification-icon" [ngClass]="item.color">
@@ -92,7 +101,7 @@ class="notification-card"
 
       <p>{{item.message}}</p>
 
-      <a href="javascript:void(0)">
+      <a href="javascript:void(0)" *ngIf="item.action" (click)="onAction(item)">
         {{item.action}}
       </a>
 

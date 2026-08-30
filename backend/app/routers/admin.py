@@ -1,10 +1,8 @@
 from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-
 from app.utils.database import get_db
 from app.auth.dependencies import require_roles
 from app.models.user import User
@@ -12,12 +10,11 @@ from app.models.policy import Policy
 from app.models.scheme import Scheme
 from app.models.audit_log import AuditLog
 from app.models.search_history import SearchHistory
-
+from app.utils.activity_log import log_activity
 router = APIRouter(
     prefix="/admin",
     tags=["Admin Dashboard"]
 )
-
 # Roles an admin is allowed to assign to another user. Matches the
 # self-registration enum (citizen/official/researcher/organization) plus
 # the elevated roles that can't be picked at registration (admin/
@@ -27,12 +24,8 @@ ASSIGNABLE_ROLES = {
     "citizen", "official", "researcher", "organization",
     "admin", "administrator", "government official",
 }
-
-
 class UpdateUserRoleRequest(BaseModel):
     role: str
-
-
 @router.get("/stats")
 def get_admin_stats(
     db: Session = Depends(get_db),
@@ -45,7 +38,6 @@ def get_admin_stats(
     total_users = db.query(User).count()
     total_policies = db.query(Policy).count()
     total_schemes = db.query(Scheme).count()
-
     pending_policies = (
         db.query(Policy).filter(Policy.approval_status == "Pending").count()
     )
@@ -55,10 +47,8 @@ def get_admin_stats(
     rejected_policies = (
         db.query(Policy).filter(Policy.approval_status == "Rejected").count()
     )
-
     role_counts = db.query(User.role, func.count(User.user_id)).group_by(User.role).all()
     users_by_role = {role or "unknown": count for role, count in role_counts}
-
     return {
         "total_users": total_users,
         "total_policies": total_policies,
@@ -68,8 +58,6 @@ def get_admin_stats(
         "rejected_policies": rejected_policies,
         "users_by_role": users_by_role,
     }
-
-
 @router.get("/users")
 def list_users(
     role: Optional[str] = None,
@@ -84,18 +72,14 @@ def list_users(
     — the dashboard only ever showed an aggregate role count.
     """
     query = db.query(User)
-
     if role:
         query = query.filter(func.lower(User.role) == role.strip().lower())
-
     if q:
         like = f"%{q.strip()}%"
         query = query.filter(
             (User.full_name.ilike(like)) | (User.email.ilike(like))
         )
-
     users = query.order_by(User.user_id).all()
-
     return {
         "data": [
             {
@@ -111,8 +95,6 @@ def list_users(
             for u in users
         ]
     }
-
-
 @router.patch("/users/{user_id}/role")
 def update_user_role(
     user_id: int,
@@ -126,22 +108,27 @@ def update_user_role(
             status_code=400,
             detail=f"'{new_role}' is not a recognized role.",
         )
-
     target = db.query(User).filter(User.user_id == user_id).first()
     if not target:
         raise HTTPException(status_code=404, detail="User not found")
-
+    old_role = target.role
     target.role = new_role
     db.commit()
     db.refresh(target)
-
+    # Real audit trail entry, not just usage tracking — old->new role is
+    # encoded directly into the action string since audit_logs has no
+    # free-text detail column, and adding one is a bigger schema change
+    # than this needs for a single readable line.
+    log_activity(
+        db, current_user.user_id,
+        action=f"update_user_role: {old_role} -> {new_role}",
+        table_name="users", record_id=target.user_id,
+    )
     return {
         "message": "Role updated successfully",
         "user_id": target.user_id,
         "role": target.role,
     }
-
-
 @router.patch("/users/{user_id}/deactivate")
 def deactivate_user(
     user_id: int,
@@ -155,17 +142,16 @@ def deactivate_user(
             status_code=400,
             detail="You cannot deactivate your own account.",
         )
-
     target = db.query(User).filter(User.user_id == user_id).first()
     if not target:
         raise HTTPException(status_code=404, detail="User not found")
-
     target.is_active = False
     db.commit()
-
+    log_activity(
+        db, current_user.user_id,
+        action="deactivate_user", table_name="users", record_id=target.user_id,
+    )
     return {"message": "User deactivated", "user_id": target.user_id, "is_active": False}
-
-
 @router.patch("/users/{user_id}/activate")
 def activate_user(
     user_id: int,
@@ -175,12 +161,13 @@ def activate_user(
     target = db.query(User).filter(User.user_id == user_id).first()
     if not target:
         raise HTTPException(status_code=404, detail="User not found")
-
     target.is_active = True
     db.commit()
-
+    log_activity(
+        db, current_user.user_id,
+        action="activate_user", table_name="users", record_id=target.user_id,
+    )
     return {"message": "User activated", "user_id": target.user_id, "is_active": True}
-
 @router.get("/usage-stats")
 def get_usage_stats(
     db: Session = Depends(get_db),
@@ -188,35 +175,28 @@ def get_usage_stats(
 ):
     """
     Milestone 3, Task 6: Usage Statistics Dashboard.
-
     Genuinely different from /admin/stats and /analytics/overview —
     those describe what's IN the platform (how many policies exist, by
     category, etc). This describes how people are actually USING the
     platform: who's active, what they're searching for, what they're
     viewing, and how many eligibility checks are being run.
-
     Honest limitation: activity is only recorded for logged-in users
     (audit_logs.user_id is NOT NULL by design), so anonymous browsing
     isn't reflected here. That's a real, known gap, not an oversight.
     """
     from datetime import datetime, timedelta, timezone
-
     seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
-
     total_users = db.query(User).count()
-
     active_users_7d = (
         db.query(func.count(func.distinct(AuditLog.user_id)))
         .filter(AuditLog.created_at >= seven_days_ago)
         .scalar()
     ) or 0
-
     total_eligibility_checks = (
         db.query(AuditLog)
         .filter(AuditLog.action == "eligibility_check")
         .count()
     )
-
     most_viewed_policies_raw = (
         db.query(AuditLog.record_id, func.count(AuditLog.log_id).label("views"))
         .filter(AuditLog.action == "view_policy")
@@ -233,7 +213,6 @@ def get_usage_stats(
             "name": policy.policy_name if policy else "Unknown Policy",
             "views": views,
         })
-
     most_viewed_schemes_raw = (
         db.query(AuditLog.record_id, func.count(AuditLog.log_id).label("views"))
         .filter(AuditLog.action == "view_scheme")
@@ -250,7 +229,6 @@ def get_usage_stats(
             "name": scheme.scheme_name if scheme else "Unknown Scheme",
             "views": views,
         })
-
     most_searched_terms_raw = (
         db.query(SearchHistory.search_keyword, func.count(SearchHistory.search_id).label("count"))
         .group_by(SearchHistory.search_keyword)
@@ -261,7 +239,6 @@ def get_usage_stats(
     most_searched_terms = [
         {"term": term, "count": count} for term, count in most_searched_terms_raw
     ]
-
     return {
         "total_users": total_users,
         "active_users_7d": active_users_7d,
@@ -269,4 +246,57 @@ def get_usage_stats(
         "most_viewed_policies": most_viewed_policies,
         "most_viewed_schemes": most_viewed_schemes,
         "most_searched_terms": most_searched_terms,
+    }
+# Usage-tracking entries that power /admin/usage-stats above — these are
+# routine browsing activity, not administrative actions, so the audit
+# trail below excludes them by default (see get_audit_logs' `action`
+# param to opt into seeing them anyway).
+_USAGE_TRACKING_ACTIONS = {"view_policy", "view_scheme", "eligibility_check"}
+@router.get("/audit-logs")
+def get_audit_logs(
+    limit: int = 100,
+    action: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles("admin", "administrator")),
+):
+    """
+    Real administrative-action audit trail — distinct from
+    /admin/usage-stats above, which uses this SAME audit_logs table but
+    only for citizen/official browsing activity (view_policy,
+    view_scheme, eligibility_check). This endpoint surfaces the other
+    category: actions with real consequences — role changes, account
+    activation/deactivation, policy approve/reject, and admin-performed
+    archive/unarchive of another official's content (see log_activity()
+    call sites in this file, policy.py, and scheme.py).
+    Defaults to excluding usage-tracking entries so the list reads as an
+    actual accountability log, not a page-view feed; pass ?action=view_policy
+    (etc.) explicitly to see those instead.
+    """
+    query = db.query(AuditLog).order_by(AuditLog.created_at.desc())
+    if action:
+        query = query.filter(AuditLog.action.ilike(f"%{action.strip()}%"))
+    else:
+        query = query.filter(~AuditLog.action.in_(_USAGE_TRACKING_ACTIONS))
+    logs = query.limit(limit).all()
+    actor_ids = {log.user_id for log in logs if log.user_id}
+    actors = {}
+    if actor_ids:
+        actors = {
+            u.user_id: u.full_name
+            for u in db.query(User).filter(User.user_id.in_(actor_ids)).all()
+        }
+    return {
+        "message": "Administrative action audit trail",
+        "count": len(logs),
+        "data": [
+            {
+                "log_id": log.log_id,
+                "actor_name": actors.get(log.user_id, "Unknown"),
+                "action": log.action,
+                "table_name": log.table_name,
+                "record_id": log.record_id,
+                "created_at": log.created_at,
+            }
+            for log in logs
+        ]
     }

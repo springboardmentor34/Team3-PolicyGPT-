@@ -12,6 +12,7 @@ from app.models.eligibility_rule import EligibilityRule
 from app.auth.dependencies import get_current_user, require_roles
 from app.schemas.application_schema import ApplicationCreate, ApplicationStatusUpdate
 from app.routers.eligibility_check import EligibilityCheckRequest, _check_rule
+from app.utils.notify import create_notification
 
 router = APIRouter(
     prefix="/applications",
@@ -237,6 +238,19 @@ def update_application_status(
     application.status = payload.status.value
     db.commit()
     db.refresh(application)
+
+    # Notification Module (Task 7): "Application Notifications" — the
+    # applicant is told the moment their status actually changes, rather
+    # than having to keep checking /applications themselves.
+    scheme_for_notice = db.query(Scheme).filter(Scheme.scheme_id == application.scheme_id).first()
+    scheme_name = scheme_for_notice.scheme_name if scheme_for_notice else "a scheme"
+    create_notification(
+        db, user_id=application.user_id,
+        title="Application Status Updated",
+        message=f"Your application to \"{scheme_name}\" is now {application.status}.",
+        notification_type="Application Status",
+        related_table="applications", related_id=application.application_id,
+    )
 
     return {
         "message": "Application status updated",

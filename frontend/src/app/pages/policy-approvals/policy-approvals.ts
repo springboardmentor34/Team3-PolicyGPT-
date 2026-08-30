@@ -126,7 +126,20 @@ export class PolicyApprovalsComponent implements OnInit {
    * list. Relies on uploaded_by_name/email now included in the
    * /policies/pending response (see policy.py).
    */
-  get groupedBySubmitter(): { name: string; email: string | null; policies: any[] }[] {
+  // Was a `get groupedBySubmitter()` getter — Angular calls that on
+  // EVERY change-detection cycle, and it built a brand-new array of
+  // brand-new objects each time. Combined with *ngFor having no
+  // trackBy, Angular saw every object as "new" on every check and
+  // destroyed+recreated the whole card list constantly. Mounting a new
+  // Material form-field (the reject textarea) triggers its own change
+  // detection, which called this getter again, which looked "new"
+  // again — a runaway loop that froze the tab the instant Reject was
+  // clicked (Approve never mounts a new component, so it never
+  // triggered this). Now a plain cached field, recomputed only when
+  // pendingPolicies actually changes.
+  groupedBySubmitter: { name: string; email: string | null; policies: any[] }[] = [];
+
+  private recomputeGroupedBySubmitter(): void {
     const groups = new Map<string, { name: string; email: string | null; policies: any[] }>();
 
     for (const policy of this.pendingPolicies) {
@@ -137,7 +150,15 @@ export class PolicyApprovalsComponent implements OnInit {
       groups.get(key)!.policies.push(policy);
     }
 
-    return Array.from(groups.values()).sort((a, b) => a.name.localeCompare(b.name));
+    this.groupedBySubmitter = Array.from(groups.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  trackByGroupName(_index: number, group: { name: string }): string {
+    return group.name;
+  }
+
+  trackByPolicyId(_index: number, policy: any): number {
+    return policy.policy_id;
   }
 
   loadPendingPolicies(): void {
@@ -146,6 +167,7 @@ export class PolicyApprovalsComponent implements OnInit {
     this.policyService.getPendingPolicies().subscribe({
       next: (res) => {
         this.pendingPolicies = res?.data || [];
+        this.recomputeGroupedBySubmitter();
         this.loading = false;
       },
       error: (err) => {
@@ -223,6 +245,7 @@ export class PolicyApprovalsComponent implements OnInit {
 
   private removeFromPendingList(policyId: number): void {
     this.pendingPolicies = this.pendingPolicies.filter((p) => p.policy_id !== policyId);
+    this.recomputeGroupedBySubmitter();
     if (this.expandedPolicyId === policyId) this.expandedPolicyId = null;
   }
 

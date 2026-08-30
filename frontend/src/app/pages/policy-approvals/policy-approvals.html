@@ -32,7 +32,7 @@
     </p>
 
     <div class="item-grid" *ngIf="!loadingApproved && approvedByMe.length > 0">
-      <mat-card class="item-card" *ngFor="let policy of approvedByMe">
+      <mat-card class="item-card" *ngFor="let policy of approvedByMe; trackBy: trackByPolicyId">
         <div class="item-header">
           <h3>{{ policy.policy_name }}</h3>
           <span class="status-badge active">Approved</span>
@@ -69,7 +69,7 @@
     </p>
 
     <div class="submitter-groups" *ngIf="pendingPolicies.length > 0">
-      <div class="submitter-group" *ngFor="let group of groupedBySubmitter">
+      <div class="submitter-group" *ngFor="let group of groupedBySubmitter; trackBy: trackByGroupName">
 
         <h2 class="submitter-heading">
           <mat-icon>person</mat-icon>
@@ -79,7 +79,7 @@
         </h2>
 
         <div class="item-grid">
-          <mat-card class="item-card" *ngFor="let policy of group.policies">
+          <mat-card class="item-card" *ngFor="let policy of group.policies; trackBy: trackByPolicyId">
 
         <div class="item-header">
           <h3>{{ policy.policy_name }}</h3>

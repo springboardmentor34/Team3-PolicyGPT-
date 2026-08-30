@@ -30,4 +30,12 @@ export class AdminService {
   getUsageStats(): Observable<any> {
     return this.http.get<any>(`${this.api}/usage-stats`);
   }
+  // ================= AUDIT LOGS (administrative-action trail — see
+  // admin.py get_audit_logs for what this excludes by default) =================
+  getAuditLogs(filters?: { limit?: number; action?: string }): Observable<any> {
+    let params = new HttpParams();
+    if (filters?.limit) params = params.set('limit', filters.limit);
+    if (filters?.action) params = params.set('action', filters.action);
+    return this.http.get<any>(`${this.api}/audit-logs`, { params });
+  }
 }

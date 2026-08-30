@@ -19,9 +19,9 @@
       </mat-form-field>
     </div>
     <div class="nav-right">
-      <button mat-icon-button class="icon-btn">
+            <button mat-icon-button class="icon-btn" (click)="goToNotifications()">
         <mat-icon>notifications</mat-icon>
-        <span class="badge">5</span>
+        <span class="badge" *ngIf="unreadNotificationCount > 0">{{ unreadNotificationCount }}</span>
       </button>
       <div class="profile">
         <div class="avatar">
@@ -264,50 +264,27 @@
       </button>
     </div>
   </mat-card>
-  <!-- ================= LATEST NOTIFICATIONS ================= -->
+ <!-- ================= LATEST NOTIFICATIONS ================= -->
 <mat-card class="dashboard-card">
-  <h2>
-    Latest Notifications
-  </h2>
-  <div class="notification-item">
-    <mat-icon class="green">
-      check_circle
+  <div class="card-header">
+    <h2>Latest Notifications</h2>
+    <button mat-button color="primary" (click)="goToNotifications()">View All</button>
+  </div>
+  <div
+    class="notification-item"
+    *ngFor="let n of notifications"
+    [class.unread]="!n.isRead">
+    <mat-icon [class]="n.color">
+      {{ n.icon }}
     </mat-icon>
     <div>
-      <h4>
-        PM Kisan applications approved
-      </h4>
-      <p>
-        125 applications approved today.
-      </p>
+      <h4>{{ n.title }}</h4>
+      <p>{{ n.message }}</p>
     </div>
   </div>
-  <div class="notification-item">
-    <mat-icon class="orange">
-      warning
-    </mat-icon>
-    <div>
-      <h4>
-        Pending document verification
-      </h4>
-      <p>
-        63 applications require document verification.
-      </p>
-    </div>
-  </div>
-  <div class="notification-item">
-    <mat-icon class="blue">
-      campaign
-    </mat-icon>
-    <div>
-      <h4>
-        New scheme published
-      </h4>
-      <p>
-        Skill India Digital scheme is now live.
-      </p>
-    </div>
-  </div>
+  <p class="chart-empty-inline" *ngIf="notifications.length === 0">
+    No notifications yet.
+  </p>
 </mat-card>
 <!-- ================= UPCOMING DEADLINES ================= -->
 <mat-card class="dashboard-card">

@@ -1,0 +1,64 @@
+<div class="audit-logs-page">
+  <header class="top-navbar">
+    <div class="logo-section">
+      <div class="logo-box"><mat-icon>shield</mat-icon></div>
+      <div class="logo-text">
+        <h2>PolicyGPT</h2>
+        <span>ADMIN CONTROL PANEL</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button mat-stroked-button routerLink="/admin-dashboard">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Dashboard
+      </button>
+      <button mat-raised-button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </header>
+  <div class="page-content">
+    <h1>Audit Logs</h1>
+    <p class="subtitle">Who did what, and when — role changes, account activation, policy decisions, and admin moderation actions.</p>
+    <div class="filters-bar">
+      <mat-form-field appearance="outline" class="action-filter-field">
+        <mat-label>Filter by action</mat-label>
+        <mat-select [(ngModel)]="actionFilter" (selectionChange)="onFilterChange()">
+          <mat-option *ngFor="let f of actionFilters" [value]="f.value">{{ f.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div *ngIf="loading" class="loading-state">Loading audit trail...</div>
+    <div *ngIf="error" class="error-state">{{ error }}</div>
+    <table *ngIf="!loading && !error" class="logs-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Performed By</th>
+          <th>Affected Record</th>
+          <th>When</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logs">
+          <td>
+            <div class="action-cell">
+              <mat-icon>{{ actionIcon(log.action) }}</mat-icon>
+              <div>
+                <span class="action-label">{{ actionLabel(log.action) }}</span>
+                <span class="action-detail" *ngIf="actionDetail(log.action)">{{ actionDetail(log.action) }}</span>
+              </div>
+            </div>
+          </td>
+          <td>{{ log.actor_name }}</td>
+          <td>
+            <span class="record-badge">{{ log.table_name }}</span>
+            <span class="record-id" *ngIf="log.record_id">#{{ log.record_id }}</span>
+          </td>
+          <td>{{ log.created_at | date: 'medium' }}</td>
+        </tr>
+        <tr *ngIf="logs.length === 0">
+          <td colspan="4" class="empty-row">No administrative actions match this filter yet.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

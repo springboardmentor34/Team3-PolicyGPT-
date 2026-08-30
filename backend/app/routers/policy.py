@@ -17,6 +17,7 @@ from app.schemas.policy_schema import (
 from app.auth.dependencies import require_roles, get_current_user_optional
 from app.models.search_history import SearchHistory
 from app.utils.activity_log import log_activity
+from app.utils.notify import create_notification, broadcast_to_citizens, broadcast_to_admins
 
 router = APIRouter(
     prefix="/policies",
@@ -294,6 +295,27 @@ def update_policy(
 
     db.commit()
     db.refresh(policy)
+
+    # Notification Module (Task 7): a modified policy re-enters the
+    # review queue exactly like a fresh submission does, so Admins need
+    # the same heads-up here as create_policy's — otherwise an edited
+    # policy could sit invisibly in Pending with nobody told it's there.
+    if changed:
+        create_notification(
+            db, user_id=policy.uploaded_by_user_id,
+            title="Policy Sent Back for Review",
+            message=f"Your changes to \"{policy.policy_name}\" have been saved and sent back for admin review.",
+            notification_type="Policy Submitted",
+            related_table="policies", related_id=policy.policy_id,
+        )
+        broadcast_to_admins(
+            db,
+            title="Policy Updated — Needs Re-Review",
+            message=f"\"{policy.policy_name}\" was modified by {current_user.full_name} and is awaiting your review again.",
+            notification_type="Policy Submitted",
+            related_table="policies", related_id=policy.policy_id,
+        )
+
     return policy
 
 
@@ -312,6 +334,17 @@ def archive_policy(
     policy.status = "Archived"
     db.commit()
     db.refresh(policy)
+
+    # Only logged when an Admin archives someone else's policy — an
+    # official archiving their own is routine self-service, not an
+    # administrative action worth an audit trail entry.
+    if (current_user.role or "").strip().lower() in ("admin", "administrator") \
+            and policy.uploaded_by_user_id != current_user.user_id:
+        log_activity(
+            db, current_user.user_id,
+            action="admin_archive_policy", table_name="policies", record_id=policy.policy_id,
+        )
+
     return policy
 
 
@@ -330,6 +363,14 @@ def unarchive_policy(
     policy.status = _status_for_approval(policy.approval_status)
     db.commit()
     db.refresh(policy)
+
+    if (current_user.role or "").strip().lower() in ("admin", "administrator") \
+            and policy.uploaded_by_user_id != current_user.user_id:
+        log_activity(
+            db, current_user.user_id,
+            action="admin_unarchive_policy", table_name="policies", record_id=policy.policy_id,
+        )
+
     return policy
 
 
@@ -357,6 +398,31 @@ def approve_policy(
 
     db.commit()
     db.refresh(policy)
+
+    log_activity(
+        db, current_user.user_id,
+        action="approve_policy", table_name="policies", record_id=policy.policy_id,
+    )
+
+    # Notification Module (Task 7): tell the submitting official their
+    # policy was approved, AND broadcast a "New Policy Alert" to every
+    # citizen — this policy just became publicly visible for the first
+    # time, which is exactly what that feature describes.
+    create_notification(
+        db, user_id=policy.uploaded_by_user_id,
+        title="Policy Approved",
+        message=f"Your policy \"{policy.policy_name}\" has been approved and is now live.",
+        notification_type="Policy Approved",
+        related_table="policies", related_id=policy.policy_id,
+    )
+    broadcast_to_citizens(
+        db,
+        title="New Policy Alert",
+        message=f"A new policy is now available: \"{policy.policy_name}\".",
+        notification_type="New Policy",
+        related_table="policies", related_id=policy.policy_id,
+    )
+
     return policy
 
 
@@ -399,6 +465,12 @@ def unapprove_policy(
 
     db.commit()
     db.refresh(policy)
+
+    log_activity(
+        db, current_user.user_id,
+        action="unapprove_policy", table_name="policies", record_id=policy.policy_id,
+    )
+
     return policy
 
 
@@ -426,6 +498,26 @@ def reject_policy(
 
     db.commit()
     db.refresh(policy)
+
+    # Reason itself lives on the policy row (rejection_reason) — the
+    # audit trail entry just marks that a reject happened, when, by whom.
+    log_activity(
+        db, current_user.user_id,
+        action="reject_policy", table_name="policies", record_id=policy.policy_id,
+    )
+
+    # Notification Module (Task 7): tell the submitting official why
+    # their policy was rejected, including the reason so they can fix
+    # and resubmit — no citizen-facing broadcast here since a rejected
+    # policy never became publicly visible.
+    create_notification(
+        db, user_id=policy.uploaded_by_user_id,
+        title="Policy Rejected",
+        message=f"Your policy \"{policy.policy_name}\" was rejected. Reason: {payload.reason}",
+        notification_type="Policy Rejected",
+        related_table="policies", related_id=policy.policy_id,
+    )
+
     return policy
 
 
@@ -448,4 +540,17 @@ def create_policy(
     db.add(new_policy)
     db.commit()
     db.refresh(new_policy)
+
+    # Notification Module (Task 7): tell every Admin a new policy needs
+    # review — previously an Admin only found out by remembering to check
+    # Policy Approvals themselves; there was no push in the other
+    # direction at all.
+    broadcast_to_admins(
+        db,
+        title="New Policy Pending Approval",
+        message=f"\"{new_policy.policy_name}\" was submitted by {current_user.full_name} and is awaiting your review.",
+        notification_type="Policy Submitted",
+        related_table="policies", related_id=new_policy.policy_id,
+    )
+
     return new_policy

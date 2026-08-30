@@ -59,6 +59,13 @@ export const routes: Routes = [
     canActivate: [authGuard, adminGuard],
   },
   {
+    path: 'audit-logs',
+    loadComponent: () =>
+      import('./pages/audit-logs/audit-logs').then((m) => m.AuditLogsComponent),
+    title: 'PolicyGPT | Audit Logs',
+    canActivate: [authGuard, adminGuard],
+  },
+  {
     path: 'manage-policies-schemes',
     loadComponent: () =>
       import('./pages/manage-policies-schemes/manage-policies-schemes').then((m) => m.ManagePoliciesSchemesComponent),

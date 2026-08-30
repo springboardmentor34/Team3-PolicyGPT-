@@ -322,6 +322,15 @@ color:#EA580C;
 .notification-item .blue{
 color:#2563EB;
 }
+.notification-item .red{
+color:#DC2626;
+}
+.notification-item.unread{
+background:#EFF6FF;
+border-radius:8px;
+padding-left:10px;
+padding-right:10px;
+}
 /* ================= DEADLINES ================= */
 .deadline-item{
 display:flex;
