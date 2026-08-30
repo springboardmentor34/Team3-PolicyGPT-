@@ -16,7 +16,6 @@ router = APIRouter(
     tags=["Notification Management"]
 )
 
-notifications = []
 
 @router.get("/me")
 def get_my_notifications(
@@ -38,8 +37,6 @@ def get_my_notifications(
         .count()
     )
 
-@router.get("/")
-def get_notifications():
     return {
         "message": "Your notifications",
         "count": len(rows),
