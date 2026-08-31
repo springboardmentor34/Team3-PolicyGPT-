@@ -111,6 +111,8 @@ CREATE TABLE notifications (
     title VARCHAR(200) NOT NULL,
     message TEXT NOT NULL,
     notification_type VARCHAR(30),
+    related_table VARCHAR(50),
+    related_id BIGINT,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
