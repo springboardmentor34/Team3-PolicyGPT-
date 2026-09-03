@@ -152,6 +152,7 @@ export class PolicySearchComponent implements OnInit {
     // (routerLink="/policy-search" queryParams="{ category: '...', type: '...' }").
     const categoryFromUrl = this.route.snapshot.queryParamMap.get('category');
     const typeFromUrl = this.route.snapshot.queryParamMap.get('type');
+    const keywordFromUrl = this.route.snapshot.queryParamMap.get('q');
 
     if (categoryFromUrl) {
       // Deliberately NOT passed as a backend `keyword` — the backend's
@@ -170,6 +171,14 @@ export class PolicySearchComponent implements OnInit {
       // e.g. from the Citizen Dashboard's "Search Schemes" quick action
       // (routerLink="/policy-search" queryParams="{ type: 'scheme' }").
       this.toggleSearchMode('schemes');
+    } else if (keywordFromUrl) {
+      // Plain keyword search, e.g. from the homepage's hero search bar
+      // (routerLink="/policy-search" queryParams="{ q: '...' }"). Unlike
+      // category, a free-text keyword genuinely IS meant for the
+      // backend's name/description search, so it's safe to pass through
+      // as-is here.
+      this.search = keywordFromUrl;
+      this.loadPolicies(keywordFromUrl);
     } else {
       this.loadPolicies();
     }

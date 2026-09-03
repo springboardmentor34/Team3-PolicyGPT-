@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -68,13 +69,9 @@ export class PolicyService {
 
   // Temporary until backend endpoint is created
   getPopularCategories(): Observable<any[]> {
-    return of([
-      { name: 'Agriculture', icon: 'agriculture', count: 1 },
-      { name: 'Health', icon: 'health_and_safety', count: 0 },
-      { name: 'Education', icon: 'school', count: 0 },
-      { name: 'Housing', icon: 'home', count: 0 },
-      { name: 'Employment', icon: 'work', count: 0 }
-    ]);
+    return this.http.get<any>(`${this.api}/categories/summary`).pipe(
+      map(response => response.data || [])
+    );
   }
 
 }

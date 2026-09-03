@@ -1,9 +1,6 @@
 <mat-card class="pg-card pg-policy-card" [routerLink]="['/policy-details', policy.id]">
   <div class="pg-policy-card__header">
     <span class="pg-status" [ngClass]="'pg-status--' + policy.status">{{ policy.status }}</span>
-    <button mat-icon-button (click)="onSave($event)" aria-label="Save policy">
-      <mat-icon>{{ policy.isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-    </button>
   </div>
 
   <mat-card-content>

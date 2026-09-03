@@ -1,0 +1,13 @@
+# Never copy your local node_modules into the build context — we run
+# a fresh "npm ci" inside the container instead. Copying this would be
+# enormous (often 500MB+) and pointless, since it gets reinstalled
+# anyway. It can also cause real bugs: some npm packages compile
+# native code specific to your OS (Windows), which won't work inside
+# the Linux-based container.
+node_modules/
+dist/
+.angular/
+
+.git/
+.gitignore
+README.md

@@ -16,6 +16,12 @@
   width: 100%;
 }
 
+.pg-navbar__brand-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .pg-brand {
   display: flex;
   align-items: center;

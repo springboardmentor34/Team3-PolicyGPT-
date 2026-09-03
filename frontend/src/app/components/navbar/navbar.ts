@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { BackButtonComponent } from '../back-button/back-button';
 
 @Component({
   selector: 'app-navbar',
@@ -26,6 +27,7 @@ import { AuthService } from '../../services/auth.service';
     MatSidenavModule,
     MatTooltipModule,
     MatSnackBarModule,
+    BackButtonComponent,
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',

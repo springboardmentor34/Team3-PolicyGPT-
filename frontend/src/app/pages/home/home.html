@@ -31,13 +31,13 @@
 <section class="pg-stats">
   <div class="pg-container pg-stats__grid">
     @for (stat of stats; track stat.label) {
-      <div class="pg-stats__item">
+      <!-- <div class="pg-stats__item">
         <mat-icon>{{ stat.icon }}</mat-icon>
         <div>
           <h3>{{ stat.value }}</h3>
           <span>{{ stat.label }}</span>
         </div>
-      </div>
+      </div> -->
     }
   </div>
 </section>
@@ -104,17 +104,6 @@
           }
         </div>
       }
-    </section>
-
-    <!-- ===================== CTA BANNER ===================== -->
-    <section class="pg-cta">
-      <div class="pg-cta__text">
-        <h2>Not sure which schemes you're eligible for?</h2>
-        <p>Answer a few quick questions and instantly see which government schemes apply to you.</p>
-      </div>
-      <button mat-raised-button class="pg-btn-primary" routerLink="/eligibility-checker">
-        Check My Eligibility <mat-icon iconPositionEnd>arrow_forward</mat-icon>
-      </button>
     </section>
 
   </div>

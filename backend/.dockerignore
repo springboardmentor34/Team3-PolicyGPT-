@@ -1,0 +1,16 @@
+# Never copy your local virtual environment into the image — we
+# install fresh dependencies from requirements.txt instead. Including
+# this would massively bloat the image and can even break things if
+# your venv has Windows-specific compiled packages that don't work
+# inside Linux-based containers.
+venv/
+__pycache__/
+*.pyc
+
+# Don't leak local secrets/config into the image.
+.env
+
+# Not needed inside the container.
+.git/
+.gitignore
+README.md

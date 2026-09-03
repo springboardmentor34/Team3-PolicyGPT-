@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 from app.utils.database import get_db
 from app.models.policy import Policy
@@ -230,6 +230,56 @@ def get_policies_approved_by_me(
         "message": "Policies you have approved",
         "count": len(policies),
         "data": data,
+    }
+
+
+@router.get("/categories/summary")
+def get_category_summary(db: Session = Depends(get_db)):
+    """
+    Public, no-auth-required category counts for the homepage's
+    "Popular Categories" tiles — deliberately separate from
+    /analytics/overview, which requires an Admin/Official token and
+    isn't reachable by a citizen who hasn't even logged in yet, let
+    alone a guest just browsing the homepage.
+
+    Only counts Approved, public-facing policies — a citizen shouldn't
+    see a category look "popular" because of policies still sitting in
+    an internal approval queue.
+
+    Registered before GET /{policy_id} for the same routing-order reason
+    documented on /approved-by-me above.
+    """
+    FIXED_CATEGORIES = [
+        ("Education", "school"),
+        ("Healthcare", "health_and_safety"),
+        ("Agriculture", "agriculture"),
+        ("Employment", "work"),
+        ("Housing", "home"),
+        ("Finance", "account_balance"),
+        ("Women & Child Welfare", "diversity_3"),
+        ("Environment", "eco"),
+        ("Digital Governance", "computer"),
+        ("Infrastructure", "construction"),
+    ]
+
+    rows = (
+        db.query(Policy.category, func.count(Policy.policy_id))
+        .filter(Policy.approval_status == "Approved")
+        .group_by(Policy.category)
+        .all()
+    )
+    counts_by_category = {category: count for category, count in rows}
+
+    return {
+        "message": "Category summary",
+        "data": [
+            {
+                "name": name,
+                "icon": icon,
+                "count": counts_by_category.get(name, 0),
+            }
+            for name, icon in FIXED_CATEGORIES
+        ],
     }
 
 

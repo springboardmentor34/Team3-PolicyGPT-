@@ -1,9 +1,6 @@
 <mat-card class="pg-card pg-scheme-card" [routerLink]="['/scheme-details', scheme.id]">
   <div class="pg-scheme-card__header">
     <span class="pg-status pg-status--active">Available</span>
-    <button mat-icon-button (click)="onSave($event)" aria-label="Save scheme">
-      <mat-icon>{{ scheme.isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-    </button>
   </div>
 
   <mat-card-content>

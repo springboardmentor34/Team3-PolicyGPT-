@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -15,11 +15,4 @@ import { Scheme } from '../../models/scheme.model';
 })
 export class SchemeCardComponent {
   @Input({ required: true }) scheme!: Scheme;
-  @Output() save = new EventEmitter<Scheme>();
-
-  onSave(event: Event): void {
-    event.stopPropagation();
-    event.preventDefault();
-    this.save.emit(this.scheme);
-  }
 }

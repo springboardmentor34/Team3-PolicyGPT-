@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -16,11 +16,4 @@ import { Policy } from '../../models/policy.model';
 })
 export class PolicyCardComponent {
   @Input({ required: true }) policy!: Policy;
-  @Output() save = new EventEmitter<Policy>();
-
-  onSave(event: Event): void {
-    event.stopPropagation();
-    event.preventDefault();
-    this.save.emit(this.policy);
-  }
 }

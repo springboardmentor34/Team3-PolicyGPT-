@@ -1,11 +1,15 @@
 <mat-toolbar class="pg-navbar">
   <div class="pg-navbar__inner pg-container">
-    <a routerLink="/home" class="pg-brand" (click)="closeMobileMenu()">
+    <div class="pg-navbar__brand-group">
+      <app-back-button></app-back-button>
+
+      <a routerLink="/home" class="pg-brand" (click)="closeMobileMenu()">
       <mat-icon class="pg-brand__icon">account_balance</mat-icon>
       <span class="pg-brand__text">
         Policy<span class="pg-brand__accent">GPT</span>
       </span>
     </a>
+    </div>
 
     <nav class="pg-nav-links">
       @for (link of navLinks; track link.path) {

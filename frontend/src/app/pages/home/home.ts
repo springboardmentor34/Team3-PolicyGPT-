@@ -93,13 +93,17 @@ export class HomeComponent implements OnInit {
 
 });
 
-    // this.policyService.getPopularCategories().subscribe((categories) => {
-    //   this.categories = categories;
-    //   this.loadingCategories = false;
-    // });
-
-    this.categories = [];
-    this.loadingCategories = false;
+    this.policyService.getPopularCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.loadingCategories = false;
+      },
+      error: (err) => {
+        console.error('Failed to load popular categories:', err);
+        this.categories = [];
+        this.loadingCategories = false;
+      }
+    });
   }
 
   onHeroSearch(query: string): void {

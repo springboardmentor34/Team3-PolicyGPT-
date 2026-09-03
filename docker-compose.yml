@@ -1,0 +1,126 @@
+# This file lives at the PROJECT ROOT (Team3-PolicyGPT-/docker-compose.yml)
+# — NOT inside backend/ or frontend/ — since its whole job is to
+# orchestrate multiple services that live in different folders.
+#
+# Run everything with: docker-compose up
+# Run just one service: docker-compose up db
+
+services:
+
+  # ================= DATABASE =================
+  db:
+    # Using the OFFICIAL Postgres image directly — no custom Dockerfile
+    # needed here, since we're not adding any custom code, just
+    # configuration. "16" pins a specific major version so a future
+    # Postgres release can't silently change behavior on you.
+    image: postgres:16
+
+    # These three become the actual database credentials AND database
+    # name the moment this container first starts. They must match
+    # what's in your DATABASE_URL: postgresql://postgres:1234@db:5432/policygpt
+    #   user=postgres, password=1234, dbname=policygpt
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: policygpt
+
+    # LEFT SIDE = a path on your real Windows machine (relative to this
+    # file). RIGHT SIDE = the path INSIDE the container. Postgres's
+    # official image automatically executes every .sql file it finds
+    # in /docker-entrypoint-initdb.d/, in alphabetical order — but only
+    # the FIRST time it starts on an empty data volume. That's how your
+    # schema gets created automatically instead of you running it by hand.
+    #
+    # ":ro" = read-only. The container should never be able to modify
+    # your actual schema.sql file on disk, only read it once at startup.
+    volumes:
+      - ./database/schema/schema.sql:/docker-entrypoint-initdb.d/1_schema.sql:ro
+      - ./database/sample_data/sample_data.sql:/docker-entrypoint-initdb.d/2_sample_data.sql:ro
+      # This is the actual persistent volume — where Postgres's real
+      # data files live. Named "pgdata" below, declared at the bottom
+      # of this file. This is what survives `docker-compose down`
+      # (removing containers) even though the container itself is gone.
+      - pgdata:/var/lib/postgresql/data
+
+    # Publishes port 5432 out to your Windows machine too — not
+    # strictly required for the backend to reach it (that happens over
+    # the internal Docker network via the service name "db"), but
+    # lets YOU connect with a local tool like pgAdmin or DBeaver at
+    # localhost:5432 to inspect the data directly while developing.
+    ports:
+      - "5432:5432"
+
+    # Lets `docker-compose up` report whether Postgres is actually
+    # ready to accept connections yet, not just "the container started".
+    # We'll use this in a moment once the backend service depends on it.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ================= BACKEND =================
+  backend:
+    # "build" (not "image") — this one needs YOUR custom Dockerfile,
+    # not an official pre-made image. "context: ./backend" tells
+    # Docker "run that Dockerfile using the backend/ folder as the
+    # starting point" — this is what COPY requirements.txt and
+    # COPY app/ inside that Dockerfile are relative to.
+    build:
+      context: ./backend
+
+    # THIS is the payoff from the database.py change we made earlier.
+    # DATABASE_URL is now an environment variable your code reads —
+    # here we override it to point at "db" (the service name above),
+    # not "localhost". Docker Compose automatically creates an internal
+    # network where every service can reach every other service by
+    # its name, exactly like a hostname.
+    environment:
+      DATABASE_URL: postgresql://postgres:1234@db:5432/policygpt
+
+    # Publishes container port 8000 to host port 8000. This is what
+    # makes every hardcoded "http://127.0.0.1:8000/..." in your Angular
+    # services actually work — your BROWSER (not this container) is
+    # what makes those calls, and it reaches this published port
+    # directly on your own machine.
+    ports:
+      - "8000:8000"
+
+    # "condition: service_healthy" — don't just start the backend the
+    # instant the db CONTAINER exists; wait until Postgres has actually
+    # passed its healthcheck (pg_isready, defined above) and is truly
+    # ready to accept connections. Without this, the backend could try
+    # to connect within the first second or two, before Postgres has
+    # finished starting up, and crash on its very first request.
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ================= FRONTEND =================
+  frontend:
+    build:
+      context: ./frontend
+
+    # Container port 80 (where nginx serves the app, set in the
+    # frontend Dockerfile) is mapped to host port 4200 — matching what
+    # your backend's CORS config already expects
+    # (http://localhost:4200), and what you're used to typing in your
+    # browser from local development.
+    ports:
+      - "4200:80"
+
+    # A softer dependency than the backend's — the frontend container
+    # itself doesn't actually need the backend running (nginx just
+    # serves static files regardless), this only affects the ORDER
+    # `docker-compose up` starts things in, so the backend is likely
+    # ready by the time you actually open the browser and it starts
+    # making API calls.
+    depends_on:
+      - backend
+
+# Declares "pgdata" as a real named volume Docker manages for you —
+# this is what the "pgdata:/var/lib/postgresql/data" line above refers
+# to. Docker creates and stores this on your machine automatically; you
+# don't need to create this folder yourself.
+volumes:
+  pgdata:
