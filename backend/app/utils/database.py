@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 # back to the exact same localhost connection this always used.
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:1234@localhost:5432/policygpt"
+    "postgresql://postgres:#Priya.15@localhost:5432/schemews_db"
 )
 
 engine = create_engine(DATABASE_URL)

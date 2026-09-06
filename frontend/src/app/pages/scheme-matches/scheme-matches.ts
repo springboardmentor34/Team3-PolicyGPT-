@@ -37,8 +37,6 @@ export class SchemeMatchesComponent implements OnInit {
 
   totalMatches = 0;
 
-  search = '';
-
   schemes: any[] = [];
 
   // (ii) User Profile Analysis

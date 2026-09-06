@@ -299,17 +299,44 @@
 
           I agree to the
 
-          <a href="javascript:void(0)">
+          <a href="javascript:void(0)" (click)="toggleTerms()">
             Terms of Use
           </a>
 
           and
 
-          <a href="javascript:void(0)">
+          <a href="javascript:void(0)" (click)="togglePrivacy()">
             Privacy Policy
           </a>
 
         </mat-checkbox>
+
+        <div class="terms-content" *ngIf="showTerms">
+          <h4>Terms of Use</h4>
+          <p>
+            By creating an account, you agree to use PolicyGPT only to search for,
+            check eligibility for, and apply to government policies and public
+            welfare schemes for yourself or someone you're authorized to represent.
+          </p>
+          <p>
+            The eligibility results and scheme information shown are for guidance
+            only — final eligibility and approval are always decided by the
+            respective government department. Providing false information in your
+            profile may affect the accuracy of your matches.
+          </p>
+        </div>
+
+        <div class="terms-content" *ngIf="showPrivacy">
+          <h4>Privacy Policy</h4>
+          <p>
+            We collect the profile details you provide (such as state, income, and
+            occupation) solely to match you with schemes you may be eligible for.
+          </p>
+          <p>
+            Your data is not sold or shared with third parties. You can review or
+            update your information at any time from your Profile page.
+          </p>
+        </div>
 
       </div>
 

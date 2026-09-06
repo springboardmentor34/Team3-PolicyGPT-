@@ -167,6 +167,16 @@ background:linear-gradient(135deg,#7C3AED,#8B5CF6);
 .red{
 background:linear-gradient(135deg,#DC2626,#EF4444);
 }
+.teal{
+background:linear-gradient(135deg,#0D9488,#14B8A6);
+}
+.stat-card.clickable{
+cursor:pointer;
+transition:transform .15s ease;
+}
+.stat-card.clickable:hover{
+transform:translateY(-2px);
+}
 /* ================= GRID ================= */
 .dashboard-grid{
 display:grid;

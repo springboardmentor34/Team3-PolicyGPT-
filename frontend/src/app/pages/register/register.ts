@@ -51,6 +51,23 @@ export class RegisterComponent {
 
   agree = false;
 
+  // Terms of Use / Privacy Policy links previously did nothing
+  // (href="javascript:void(0)"), so clicking them showed no content at
+  // all. Toggling an inline panel is the minimal fix — no new route or
+  // dialog component needed for static legal text.
+  showTerms = false;
+  showPrivacy = false;
+
+  toggleTerms(): void {
+    this.showTerms = !this.showTerms;
+    if (this.showTerms) this.showPrivacy = false;
+  }
+
+  togglePrivacy(): void {
+    this.showPrivacy = !this.showPrivacy;
+    if (this.showPrivacy) this.showTerms = false;
+  }
+
   // Full list of Indian states and union territories — matches the
   // Eligibility Checker's state list exactly, so a citizen's selected
   // state during registration lines up with anything filtered/matched

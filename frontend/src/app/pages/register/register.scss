@@ -548,6 +548,31 @@ body{
     text-decoration:underline;
 }
 
+.terms-content{
+    margin-top:12px;
+    padding:14px 16px;
+    background:#F8FAFC;
+    border:1px solid #E2E8F0;
+    border-radius:10px;
+    font-size:13px;
+    line-height:1.5;
+    color:#475569;
+}
+
+.terms-content h4{
+    margin:0 0 8px;
+    font-size:14px;
+    color:#1E293B;
+}
+
+.terms-content p{
+    margin:0 0 8px;
+}
+
+.terms-content p:last-child{
+    margin-bottom:0;
+}
+
 /* =========================================================
    CREATE ACCOUNT BUTTON
 ========================================================= */

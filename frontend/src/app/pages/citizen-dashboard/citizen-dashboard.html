@@ -25,85 +25,11 @@
 
     <p>
 
-      You have 3 new scheme matches based on your profile updates.
-
-      <br>
-
-      Check your eligibility for the latest government policies
-
-      <br>
-
-      and public welfare schemes in under two minutes.
+      PolicyGPT helps you discover, understand, and apply for government
+      policies and public welfare schemes you're eligible for — all in
+      one place.
 
     </p>
-
-    <button
-      mat-raised-button
-      class="eligibility-btn">
-
-      <mat-icon>task_alt</mat-icon>
-
-      Check Eligibility
-
-    </button>
-
-  </div>
-
-  <!-- Right -->
-
-  <div class="banner-right">
-
-    <div class="citizen-card">
-
-      <div class="info-row">
-
-        <span class="label">
-
-          Citizen ID
-
-        </span>
-
-        <span class="value">
-
-          IN-7742-9931
-
-        </span>
-
-      </div>
-
-      <div class="info-row">
-
-        <span class="label">
-
-          State
-
-        </span>
-
-        <span class="value">
-
-          Tamil Nadu
-
-        </span>
-
-      </div>
-
-      <div class="info-row">
-
-        <span class="label">
-
-          Profile Status
-
-        </span>
-
-        <span class="verified">
-
-          ✔ Verified
-
-        </span>
-
-      </div>
-
-    </div>
 
   </div>
 
@@ -263,49 +189,6 @@
 
   <div class="right-column">
     <!-- =====================================================
-     NOTIFICATIONS
-====================================================== -->
-
-<mat-card class="side-card">
-
-  <div class="section-header">
-
-    <h3>Notifications</h3>
-
-    <div class="header-right">
-
-      
-
-      <button
-        mat-button
-        color="primary">
-
-        View All
-
-      </button>
-
-    </div>
-
-  </div>
-
-  <div
-    class="notification-item"
-    *ngFor="let notify of notifications">
-
-    <div class="notification-dot"></div>
-
-    <div class="notification-content">
-
-      <h4>{{notify.title}}</h4>
-
-      <span>{{notify.time}}</span>
-
-    </div>
-
-  </div>
-
-</mat-card>
-<!-- =====================================================
      SEARCH HISTORY
 ====================================================== -->
 
@@ -354,79 +237,6 @@
     No searches yet — try searching for a policy or scheme.
 
   </p>
-
-</mat-card>
-<!-- =====================================================
-     QUICK ACTIONS
-====================================================== -->
-
-<mat-card class="side-card">
-
-  <div class="section-header">
-
-    <h3>Quick Actions</h3>
-
-  </div>
-
-  <button
-    mat-stroked-button
-    class="quick-btn"
-    (click)="goToSearchSchemes()">
-
-    <mat-icon>
-
-      search
-
-    </mat-icon>
-
-    Search Schemes
-
-  </button>
-
-  <button
-    mat-stroked-button
-    class="quick-btn"
-    (click)="goToApplications()">
-
-    <mat-icon>
-
-      assignment
-
-    </mat-icon>
-
-    Track Applications
-
-  </button>
-
-  <button
-    mat-stroked-button
-    class="quick-btn"
-    (click)="goToSavedPolicies()">
-
-    <mat-icon>
-
-      bookmark
-
-    </mat-icon>
-
-    Saved Policies
-
-  </button>
-
-  <button
-    mat-stroked-button
-    class="quick-btn"
-    (click)="goToProfile()">
-
-    <mat-icon>
-
-      account_circle
-
-    </mat-icon>
-
-    Update Profile
-
-  </button>
 
 </mat-card>
 
