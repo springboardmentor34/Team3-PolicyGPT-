@@ -95,6 +95,11 @@ export class RegisterComponent {
       return;
     }
 
+    if (this.mobile && !/^\d{10}$/.test(this.mobile)) {
+      this.toast.error('Mobile number must be exactly 10 digits.');
+      return;
+    }
+
     const registerData = {
       full_name: this.fullName,
       email: this.email,

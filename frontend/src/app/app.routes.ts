@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
+import { officialGuard, officialOrAdminGuard } from './guards/official.guard';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
@@ -42,7 +43,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/government-dashboard/government-dashboard').then((m) => m.GovernmentDashboardComponent),
     title: 'PolicyGPT | Government Dashboard',
-    canActivate: [authGuard],
+    canActivate: [authGuard, officialGuard],
   },
   {
     path: 'admin-dashboard',
@@ -70,7 +71,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/manage-policies-schemes/manage-policies-schemes').then((m) => m.ManagePoliciesSchemesComponent),
     title: 'PolicyGPT | Manage Policies & Schemes',
-    canActivate: [authGuard],
+    canActivate: [authGuard, officialOrAdminGuard],
   },
   {
     path: 'policy-approvals',

@@ -1,7 +1,8 @@
+import re
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserRole(str, Enum):
@@ -18,6 +19,15 @@ class RegisterRequest(BaseModel):
     role: UserRole
     mobile: Optional[str] = None
     state: Optional[str] = None
+
+    @field_validator("mobile")
+    @classmethod
+    def validate_mobile(cls, value: Optional[str]) -> Optional[str]:
+        # Blank/omitted stays optional (unchanged) — only a NON-EMPTY value
+        # is required to be exactly 10 digits.
+        if value and not re.fullmatch(r"\d{10}", value):
+            raise ValueError("Mobile number must be exactly 10 digits.")
+        return value
 
 
 class LoginRequest(BaseModel):
