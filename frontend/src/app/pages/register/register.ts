@@ -90,6 +90,11 @@ export class RegisterComponent {
 
   createAccount() {
 
+    if (!this.agree) {
+      this.toast.error('Please agree to the Terms of Use and Privacy Policy to continue.');
+      return;
+    }
+
     const registerData = {
       full_name: this.fullName,
       email: this.email,

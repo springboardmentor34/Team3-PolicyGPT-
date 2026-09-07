@@ -189,6 +189,47 @@
 
   <div class="right-column">
     <!-- =====================================================
+     NOTIFICATIONS
+====================================================== -->
+
+<mat-card class="side-card">
+
+  <div class="section-header">
+
+    <h3>Notifications</h3>
+
+    <div class="header-right">
+
+      <button
+        mat-button
+        color="primary">
+
+        View All
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    class="notification-item"
+    *ngFor="let notify of notifications">
+
+    <div class="notification-dot"></div>
+
+    <div class="notification-content">
+
+      <h4>{{notify.title}}</h4>
+
+      <span>{{notify.time}}</span>
+
+    </div>
+
+  </div>
+
+</mat-card>
+<!-- =====================================================
      SEARCH HISTORY
 ====================================================== -->
 

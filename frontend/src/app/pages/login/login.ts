@@ -8,7 +8,6 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatCheckboxModule } from "@angular/material/checkbox";
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
@@ -23,8 +22,7 @@ import { ToastService } from '../../services/toast.service';
     MatButtonModule,
     MatCardModule,
     MatInputModule,
-    MatFormFieldModule,
-    MatCheckboxModule
+    MatFormFieldModule
   ],
   templateUrl: "./login.html",
   styleUrl: "./login.scss",
@@ -39,7 +37,6 @@ export class LoginComponent {
   email = "";
   password = "";
   hidePassword = true;
-  rememberMe = false;
 
   login() {
 
