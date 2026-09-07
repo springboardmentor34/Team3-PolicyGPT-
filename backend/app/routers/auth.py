@@ -17,6 +17,7 @@ from app.auth.security import (
     create_access_token,
     create_password_reset_token,
     decode_password_reset_token,
+    password_fingerprint,
 )
 from app.auth.dependencies import get_current_user
 logger = logging.getLogger("policygpt.auth")
@@ -125,7 +126,7 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
     else about this flow needs to change."""
     user = db.query(User).filter(User.email == payload.email).first()
     if user:
-        reset_token = create_password_reset_token(user.email)
+        reset_token = create_password_reset_token(user.email, user.password_hash)
         reset_link = f"http://localhost:4200/reset-password?token={reset_token}"
         logger.info("Password reset link for %s: %s", user.email, reset_link)
     return {
@@ -135,11 +136,18 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
 def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
     """Password Reset step 2. Validates the short-lived reset token and
     sets the new password."""
-    email = decode_password_reset_token(payload.token)
-    if email is None:
+    token_payload = decode_password_reset_token(payload.token)
+    if token_payload is None:
         raise HTTPException(status_code=400, detail="Invalid or expired reset link")
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.email == token_payload.get("sub")).first()
     if user is None:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link")
+    # Token is bound to the password_hash that existed when it was issued.
+    # Once a reset succeeds, password_hash changes, so this fingerprint no
+    # longer matches — making the same link fail if replayed. Same generic
+    # error message as every other failure case here, so a replayed link
+    # can't be distinguished from an actually-invalid one.
+    if token_payload.get("pwd_fp") != password_fingerprint(user.password_hash):
         raise HTTPException(status_code=400, detail="Invalid or expired reset link")
     if len(payload.new_password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters")

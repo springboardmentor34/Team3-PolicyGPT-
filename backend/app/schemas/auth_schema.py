@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserRole(str, Enum):
@@ -14,7 +14,7 @@ class UserRole(str, Enum):
 class RegisterRequest(BaseModel):
     full_name: str
     email: EmailStr
-    password: str
+    password: str = Field(min_length=8, description="Must be at least 8 characters long.")
     role: UserRole
     mobile: Optional[str] = None
     state: Optional[str] = None

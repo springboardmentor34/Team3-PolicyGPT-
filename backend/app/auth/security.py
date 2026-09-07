@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -62,19 +63,37 @@ def decode_access_token(token: str):
 RESET_TOKEN_EXPIRE_MINUTES = 15
 
 
-def create_password_reset_token(email: str) -> str:
+def password_fingerprint(password_hash: str) -> str:
+    """Irreversible fingerprint of a user's CURRENT password_hash, embedded
+    in the reset token so it's bound to "the password as it was when this
+    token was issued." password_hash changes the instant a reset succeeds,
+    so a replayed token's fingerprint stops matching on its second use —
+    making the token single-use without a denylist or DB column."""
+    return hashlib.sha256(password_hash.encode()).hexdigest()
+
+
+def create_password_reset_token(email: str, password_hash: str) -> str:
     expire = datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
-    to_encode = {"sub": email, "purpose": "password_reset", "exp": expire}
+    to_encode = {
+        "sub": email,
+        "purpose": "password_reset",
+        "pwd_fp": password_fingerprint(password_hash),
+        "exp": expire,
+    }
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_password_reset_token(token: str) -> str | None:
-    """Returns the email if the token is valid, unexpired, and actually a
-    password-reset token (not a normal login access token). Returns None
-    otherwise."""
+def decode_password_reset_token(token: str) -> dict | None:
+    """Returns the token's payload (with 'sub' and 'pwd_fp') if it's valid,
+    unexpired, and actually a password-reset token (not a normal login
+    access token). Returns None otherwise.
+    The caller MUST additionally compare payload['pwd_fp'] against
+    password_fingerprint(current_user.password_hash) before trusting
+    'sub' — that's what makes the token single-use (see reset_password()
+    in routers/auth.py)."""
     payload = decode_access_token(token)
     if payload is None:
         return None
     if payload.get("purpose") != "password_reset":
         return None
-    return payload.get("sub")
+    return payload
