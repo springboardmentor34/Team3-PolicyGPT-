@@ -143,6 +143,11 @@ export class ProfileComponent implements OnInit {
   }
 
   saveProfile() {
+    if (this.user.mobile && !/^\d{10}$/.test(this.user.mobile)) {
+      this.toast.error('Mobile number must be exactly 10 digits.');
+      return;
+    }
+
     this.saving = true;
 
     const payload = {
