@@ -1,7 +1,6 @@
 databases:
   - name: policygpt-db
     databaseName: policygpt
-    user: postgres
     plan: free
 
 services:
