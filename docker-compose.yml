@@ -47,8 +47,17 @@ services:
     # the internal Docker network via the service name "db"), but
     # lets YOU connect with a local tool like pgAdmin or DBeaver at
     # localhost:5432 to inspect the data directly while developing.
+    # Publishes to host port 5433, NOT 5432 — your machine already has a
+    # native Postgres service permanently occupying 5432 (confirmed via
+    # netstat: PID 7468, postgres.exe). Mapping to a different host port
+    # avoids that collision entirely. This ONLY affects tools running on
+    # your Windows host (like pgAdmin) connecting in from outside Docker —
+    # it has zero effect on how the backend container reaches this
+    # database, since that happens over the internal Docker network using
+    # the service name "db" and the CONTAINER's own port 5432, completely
+    # separate from whatever host port is mapped here.
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
     # Lets `docker-compose up` report whether Postgres is actually
     # ready to accept connections yet, not just "the container started".

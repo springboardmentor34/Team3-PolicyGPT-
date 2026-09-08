@@ -29,3 +29,4 @@ class ApplicationOut(BaseModel):
     scheme: SchemeOut
 
     model_config = ConfigDict(from_attributes=True)
+

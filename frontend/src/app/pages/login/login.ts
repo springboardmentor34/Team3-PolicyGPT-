@@ -8,6 +8,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
@@ -22,7 +23,8 @@ import { ToastService } from '../../services/toast.service';
     MatButtonModule,
     MatCardModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatCheckboxModule
   ],
   templateUrl: "./login.html",
   styleUrl: "./login.scss",
@@ -37,6 +39,7 @@ export class LoginComponent {
   email = "";
   password = "";
   hidePassword = true;
+  rememberMe = false;
 
   login() {
 
@@ -55,11 +58,17 @@ export class LoginComponent {
 
       this.toast.success('Login Successful');
 
-      const role = this.getRoleFromToken(response.access_token);
+      const role = (this.getRoleFromToken(response.access_token) || '').trim().toLowerCase();
 
-      if (role === 'official') {
+      // Case-insensitive, and matches every role variant your backend
+      // itself already recognizes as "official" (see analytics.py's
+      // _ANALYTICS_ROLES) — the previous exact-match check against
+      // lowercase 'official'/'admin' never matched real seeded values
+      // like 'Government Official' or 'Admin', so EVERY login (Official
+      // and Admin alike) silently fell through to Citizen Dashboard here.
+      if (['official', 'government official', 'government'].includes(role)) {
         this.router.navigate(['/government-dashboard']);
-      } else if (role === 'admin' || role === 'administrator') {
+      } else if (['admin', 'administrator'].includes(role)) {
         this.router.navigate(['/admin-dashboard']);
       } else {
         this.router.navigate(['/citizen-dashboard']);
