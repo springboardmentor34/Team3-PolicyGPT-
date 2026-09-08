@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 
 import { EligibilityResultService } from '../../services/eligibility-result.service';
 import { ToastService } from '../../services/toast.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-eligibility-checker',
@@ -189,7 +190,7 @@ export class EligibilityCheckerComponent {
     };
 
     this.http.post<any>(
-      'http://127.0.0.1:8000/eligibility/check',
+      `${environment.apiUrl}/eligibility/check`,
       request
     ).subscribe({
 

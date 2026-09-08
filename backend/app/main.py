@@ -13,22 +13,29 @@ from app.routers import application
 # root logger defaults to WARNING level with no handler attached.
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 
+from app.utils.database import init_db
+
 app = FastAPI(
     title="PolicyGPT API",
     description="Government Policy & Public Scheme Intelligence Platform",
     version="1.0.0"
 )
 
+@app.on_event("startup")
+def startup_event():
+    init_db()
+
 # CORS Configuration
 
 origins = [
     "http://localhost:4200",
-    "http://127.0.0.1:4200"
+    "http://127.0.0.1:4200",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,12 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
   private http = inject(HttpClient);
-  private api = 'http://127.0.0.1:8000/admin';
+  private get api() {
+    return `${environment.apiUrl}/admin`;
+  }
   getStats(): Observable<any> {
     return this.http.get<any>(`${this.api}/stats`);
   }

@@ -1,12 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AnalyticsService {
   private http = inject(HttpClient);
-  private api = 'http://127.0.0.1:8000/analytics';
+  private get api() {
+    return `${environment.apiUrl}/analytics`;
+  }
   // Shared by the Government Dashboard and the Admin Dashboard — live
   // Policy Statistics + Scheme Usage Analytics (Milestone 3, "Develop
   // Analytics Dashboard"). Requires an Official or Admin/Administrator

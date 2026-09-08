@@ -100,6 +100,11 @@ export class RegisterComponent {
       return;
     }
 
+    if (!this.password || this.password.length < 8) {
+      this.toast.error('Password must be at least 8 characters long.');
+      return;
+    }
+
     const registerData = {
       full_name: this.fullName,
       email: this.email,
@@ -125,7 +130,16 @@ export class RegisterComponent {
 
         console.error(error);
 
-        this.toast.error('Registration Failed');
+        let msg = 'Registration Failed';
+        if (error.error?.detail) {
+          if (Array.isArray(error.error.detail)) {
+            msg = error.error.detail.map((d: any) => d.msg).join(', ');
+          } else if (typeof error.error.detail === 'string') {
+            msg = error.error.detail;
+          }
+        }
+
+        this.toast.error(msg);
 
       }
 

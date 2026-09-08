@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,9 @@ export class Feedback {
 
   private http = inject(HttpClient);
 
-  private api = 'http://127.0.0.1:8000/feedback';
+  private get api() {
+    return `${environment.apiUrl}/feedback`;
+  }
 
   submitFeedback(data: any): Observable<any> {
     return this.http.post<any>(`${this.api}/`, data);

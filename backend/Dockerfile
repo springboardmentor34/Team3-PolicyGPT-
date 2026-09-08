@@ -53,4 +53,4 @@ EXPOSE 8000
 # from outside. No --reload here, unlike your local dev command:
 # --reload is a development convenience that watches for file changes,
 # which has no purpose in a built container image.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

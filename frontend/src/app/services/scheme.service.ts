@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Scheme } from '../models/scheme.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,9 @@ export class SchemeService {
 
   private http = inject(HttpClient);
 
-  private api = 'http://127.0.0.1:8000/schemes';
+  private get api() {
+    return `${environment.apiUrl}/schemes`;
+  }
 
   getAllSchemes(filters?: { category?: string; state?: string; department?: string; status?: string; keyword?: string; include_archived?: boolean; mine_only?: boolean }): Observable<any> {
     let params = new HttpParams();

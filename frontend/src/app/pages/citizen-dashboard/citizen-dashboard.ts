@@ -18,6 +18,7 @@ import { SearchHistoryService } from '../../services/search-history.service';
 import { SavedPolicyService } from '../../services/saved-policy.service';
 import { ApplicationService } from '../../services/application.service';
 import { NotificationService } from '../../services/notification.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-citizen-dashboard',
@@ -166,7 +167,7 @@ export class CitizenDashboardComponent implements OnInit {
   // Dashboard + Citizen Dashboard "Eligible Schemes").
   loadEligibleSchemesCount(): void {
     this.loadingEligibleCount = true;
-    this.http.get<any>('http://127.0.0.1:8000/eligibility/my-matches').subscribe({
+    this.http.get<any>(`${environment.apiUrl}/eligibility/my-matches`).subscribe({
       next: (response) => {
         const count = response?.eligible_count ?? 0;
         this.stats[0].value = count;
